@@ -1,0 +1,90 @@
+{
+  "_comment": "Fixture-scale gold eval set (12 items) grounded in tests/fixtures/sample_doc*.json, spanning every question type the plan requires: text, table, figure, multi-hop, and adversarial/unanswerable. expected_chunk_ids were verified by actually running src/chunk/chunker.py over the fixtures (not guessed) -- see the chunk_id listing this was built from. This set exists to prove the eval harness itself is correct end-to-end; scripts/generate_gold_set.py documents how to scale it to ~120-150 items once the real corpus is parsed via notebooks/01_docling_parse_corpus.ipynb.",
+
+  "items": [
+    {
+      "id": "q1-text-factual",
+      "question": "What is the first-line drug class for heart failure with reduced ejection fraction?",
+      "type": "text",
+      "is_answerable": true,
+      "expected_chunk_ids": ["fixture-doc-1__chunk-0"]
+    },
+    {
+      "id": "q2-table-lookup",
+      "question": "What is the target maintenance dose of metoprolol succinate?",
+      "type": "table",
+      "is_answerable": true,
+      "expected_chunk_ids": ["fixture-doc-1__chunk-1"]
+    },
+    {
+      "id": "q3-table-lookup",
+      "question": "What is the starting dose of carvedilol?",
+      "type": "table",
+      "is_answerable": true,
+      "expected_chunk_ids": ["fixture-doc-1__chunk-1"]
+    },
+    {
+      "id": "q4-figure-grounded",
+      "question": "What does the beta-blocker titration flowchart show should happen during dose increases?",
+      "type": "figure",
+      "is_answerable": true,
+      "expected_chunk_ids": ["fixture-doc-1__chunk-2"]
+    },
+    {
+      "id": "q5-text-factual",
+      "question": "What side effects should be monitored for during beta-blocker up-titration?",
+      "type": "text",
+      "is_answerable": true,
+      "expected_chunk_ids": ["fixture-doc-1__chunk-3"]
+    },
+    {
+      "id": "q6-table-lookup",
+      "question": "What is the loading dose of ticagrelor after a myocardial infarction?",
+      "type": "table",
+      "is_answerable": true,
+      "expected_chunk_ids": ["fixture-doc-2__chunk-1"]
+    },
+    {
+      "id": "q7-text-factual",
+      "question": "How long is dual antiplatelet therapy recommended after an acute myocardial infarction?",
+      "type": "text",
+      "is_answerable": true,
+      "expected_chunk_ids": ["fixture-doc-2__chunk-0"]
+    },
+    {
+      "id": "q8-text-factual",
+      "question": "When should bleeding risk be assessed for a patient on dual antiplatelet therapy?",
+      "type": "text",
+      "is_answerable": true,
+      "expected_chunk_ids": ["fixture-doc-2__chunk-2"]
+    },
+    {
+      "id": "q9-multihop",
+      "question": "For a patient started on both a beta-blocker and dual antiplatelet therapy after a myocardial infarction, what is the beta-blocker starting dose range and the P2Y12 inhibitor loading dose, using bisoprolol and clopidogrel as the agents?",
+      "type": "multihop",
+      "is_answerable": true,
+      "expected_chunk_ids": ["fixture-doc-1__chunk-1", "fixture-doc-2__chunk-1"]
+    },
+    {
+      "id": "q10-adversarial",
+      "question": "What is the recommended surgical technique for coronary artery bypass grafting?",
+      "type": "adversarial",
+      "is_answerable": false,
+      "expected_chunk_ids": []
+    },
+    {
+      "id": "q11-adversarial",
+      "question": "What is the pediatric dosing of ticagrelor for children under 12?",
+      "type": "adversarial",
+      "is_answerable": false,
+      "expected_chunk_ids": []
+    },
+    {
+      "id": "q12-adversarial",
+      "question": "What was the sample size of the clinical trial that established these beta-blocker dosing guidelines?",
+      "type": "adversarial",
+      "is_answerable": false,
+      "expected_chunk_ids": []
+    }
+  ]
+}

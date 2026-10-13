@@ -1,0 +1,52 @@
+{
+  "doc_id": "fixture-doc-2",
+  "title": "Fixture: Antiplatelet Therapy After Myocardial Infarction",
+  "source_type": "guideline",
+  "license": "test-fixture",
+  "resolved_url": "https://example.invalid/fixture-doc-2",
+  "elements": [
+    {
+      "element_id": "fixture-doc-2-heading-1",
+      "type": "section_header",
+      "page": 1,
+      "section": "Background",
+      "text": "Background"
+    },
+    {
+      "element_id": "fixture-doc-2-text-1",
+      "type": "text",
+      "page": 1,
+      "section": "Background",
+      "text": "Dual antiplatelet therapy (DAPT) combining aspirin with a P2Y12 inhibitor is recommended for 12 months following an acute myocardial infarction to reduce the risk of stent thrombosis."
+    },
+    {
+      "element_id": "fixture-doc-2-heading-2",
+      "type": "section_header",
+      "page": 2,
+      "section": "Agent Selection",
+      "text": "Agent Selection"
+    },
+    {
+      "element_id": "fixture-doc-2-table-1",
+      "type": "table",
+      "page": 2,
+      "section": "Agent Selection",
+      "caption": "Table 1. P2Y12 inhibitor options",
+      "markdown": "| Drug | Loading dose | Maintenance dose |\n| --- | --- | --- |\n| Clopidogrel | 600 mg | 75 mg once daily |\n| Ticagrelor | 180 mg | 90 mg twice daily |\n| Prasugrel | 60 mg | 10 mg once daily |"
+    },
+    {
+      "element_id": "fixture-doc-2-heading-3",
+      "type": "section_header",
+      "page": 3,
+      "section": "Bleeding Risk",
+      "text": "Bleeding Risk"
+    },
+    {
+      "element_id": "fixture-doc-2-text-2",
+      "type": "text",
+      "page": 3,
+      "section": "Bleeding Risk",
+      "text": "Patients on DAPT should be assessed for bleeding risk using a validated score before therapy is initiated, and again at each follow-up visit."
+    }
+  ]
+}
