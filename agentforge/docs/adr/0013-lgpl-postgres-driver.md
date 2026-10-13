@@ -53,3 +53,9 @@ is reviewed again.
 - One extra notice obligation at release time, already tracked for R1-50.
 - Organizations with blanket "no LGPL" policies would see psycopg in the SBOM. The asyncpg
   fallback is documented for that case.
+
+## Implementation note (R1-05, 2026-10-13)
+
+psycopg 3.3.6 (`psycopg[binary]`) is the single Postgres driver: async through SQLAlchemy for the
+API and worker, sync for migrations and schema checks (`agentforge.db.engine`). asyncpg is not
+installed.

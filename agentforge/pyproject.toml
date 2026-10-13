@@ -11,6 +11,7 @@ dev = [
     "import-linter>=2.15",
     "pytest",
     "ruff",
+    "testcontainers>=4.15.0",
 ]
 
 [tool.uv]
@@ -49,9 +50,15 @@ addopts = "-ra --strict-markers --strict-config"
 root_package = "agentforge"
 
 [[tool.importlinter.contracts]]
-name = "core is infrastructure: it never imports api or worker"
+name = "core is infrastructure: it never imports db, api, or worker"
 type = "forbidden"
 source_modules = ["agentforge.core"]
+forbidden_modules = ["agentforge.db", "agentforge.api", "agentforge.worker"]
+
+[[tool.importlinter.contracts]]
+name = "db is infrastructure: it never imports api or worker"
+type = "forbidden"
+source_modules = ["agentforge.db"]
 forbidden_modules = ["agentforge.api", "agentforge.worker"]
 
 [[tool.importlinter.contracts]]

@@ -14,11 +14,28 @@ def main(argv: Sequence[str] | None = None) -> int:
     commands.add_parser("worker", help="Run the background worker")
     health = commands.add_parser("healthcheck", help="Exit 0 if a local process is healthy")
     health.add_argument("target", choices=["api", "worker"])
+    migrate = commands.add_parser(
+        "migrate", help="Upgrade the database schema and seed defaults (runs as schema owner)"
+    )
+    migrate.add_argument("--revision", default="head", help="Target revision (default: head)")
     commands.add_parser("version", help="Print the version")
     args = parser.parse_args(argv)
 
     if args.command == "version":
         print(__version__)
+    elif args.command == "migrate":
+        from agentforge.core.logging import configure_logging, get_logger
+        from agentforge.core.settings import get_settings
+        from agentforge.db.migrate import seed_defaults, upgrade
+
+        settings = get_settings()
+        configure_logging(settings.log_level, settings.log_format)
+        if settings.migration_database_url is None:
+            print("AGENTFORGE_MIGRATION_DATABASE_URL is not set", file=sys.stderr)
+            return 2
+        upgrade(settings.migration_database_url, args.revision)
+        seed_defaults(settings.migration_database_url)
+        get_logger("agentforge.migrate").info("migrations_applied", revision=args.revision)
     elif args.command == "api":
         import uvicorn
 

@@ -4,7 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -27,6 +27,12 @@ class Settings(BaseSettings):
     worker_poll_seconds: float = Field(default=1.0, gt=0)
 
     ollama_base_url: str = "http://127.0.0.1:11434"
+
+    # Postgres URLs (postgresql://user:password@host:port/db). Secret: never logged.
+    # database_url uses the agentforge_app role (RLS applies); migration_database_url uses the
+    # schema owner and is only needed by `agentforge migrate`.
+    database_url: SecretStr | None = None
+    migration_database_url: SecretStr | None = None
 
 
 @lru_cache

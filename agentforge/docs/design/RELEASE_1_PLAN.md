@@ -19,6 +19,7 @@ All hours and weeks below are **Estimates** (±30%). Nothing here is Measured. M
 | R1-02 Dependency verification | ✅ Done | 2026-10-13 | License gate in `make check`; ADR-0013 (psycopg LGPL exception) accepted |
 | R1-04 Backend skeleton | ✅ Done | 2026-10-13 | Done before R1-03, which needs something to run |
 | R1-03 Compose stack | ✅ Done | 2026-10-13 | Postgres + API + worker healthy via `make up`; `make doctor`. **Deviations:** the `web` service joins in R1-08 (no web app yet); the optional Jaeger profile moves to the observability work in R2, since it needs an OTLP exporter. Linux-CI run of `make up` lands with R1-09 |
+| R1-05 Database foundation | ✅ Done | 2026-10-13 | Roles owner/app/engine; schemas `app` (forced RLS) and `engine`; `tenant_session`; schema lint; migration 0001; 10 integration tests on real Postgres (testcontainers). Driver: psycopg 3 (ADR-0013). Note: in the dev container the owner is a superuser, which bypasses RLS; production should use a non-superuser owner (deployment guide, R1-48) |
 
 ---
 

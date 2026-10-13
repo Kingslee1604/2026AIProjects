@@ -1,28 +1,38 @@
-# AgentForge local stack. Start with `make up` (creates .env with a random database password).
+# AgentForge local stack. Start with `make up` (creates .env with random database passwords).
 # Every published port is bound to 127.0.0.1 only (security baseline S1).
 # Ollama runs on the host by default; `--profile ollama` runs it in a container instead.
+#
+# Database roles (deploy/postgres/initdb/10-roles.sh, architecture §13.2):
+#   agentforge_owner  - runs migrations only (`migrate` service)
+#   agentforge_app    - used by api and worker; row level security applies to it
+#   agentforge_engine - reserved for the durable run engine (milestone M3)
 name: agentforge
 
-x-server: &server
-  image: agentforge-server:dev
-  build:
-    context: .
-    dockerfile: deploy/docker/server.Dockerfile
-  environment: &server-env
-    AGENTFORGE_ENV: development
-    AGENTFORGE_LOG_LEVEL: ${AGENTFORGE_LOG_LEVEL:-INFO}
-    AGENTFORGE_OLLAMA_BASE_URL: ${AGENTFORGE_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
-    AGENTFORGE_DATABASE_URL: postgresql://agentforge_owner:${POSTGRES_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
-  extra_hosts:
-    - "host.docker.internal:host-gateway"
-  depends_on:
-    postgres:
-      condition: service_healthy
+x-hardening: &hardening
   read_only: true
   tmpfs:
     - /tmp
   cap_drop: [ALL]
   security_opt: ["no-new-privileges:true"]
+
+x-server: &server
+  <<: *hardening
+  image: agentforge-server:dev
+  build:
+    context: .
+    dockerfile: deploy/docker/server.Dockerfile
+  environment:
+    AGENTFORGE_ENV: development
+    AGENTFORGE_LOG_LEVEL: ${AGENTFORGE_LOG_LEVEL:-INFO}
+    AGENTFORGE_OLLAMA_BASE_URL: ${AGENTFORGE_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+    AGENTFORGE_DATABASE_URL: postgresql://agentforge_app:${AGENTFORGE_APP_DB_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  depends_on:
+    postgres:
+      condition: service_healthy
+    migrate:
+      condition: service_completed_successfully
   restart: unless-stopped
 
 services:
@@ -32,16 +42,34 @@ services:
       POSTGRES_DB: agentforge
       POSTGRES_USER: agentforge_owner
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run "make up", which creates .env}
+      AGENTFORGE_APP_DB_PASSWORD: ${AGENTFORGE_APP_DB_PASSWORD:?run "make up", which creates .env}
+      AGENTFORGE_ENGINE_DB_PASSWORD: ${AGENTFORGE_ENGINE_DB_PASSWORD:?run "make up", which creates .env}
     ports:
       - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql
+      - ./deploy/postgres/initdb:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U agentforge_owner -d agentforge"]
+      # Checks the app role can log in, so it only passes after the init script has run.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U agentforge_app -d agentforge"]
       interval: 5s
       timeout: 3s
-      retries: 20
+      retries: 30
     restart: unless-stopped
+
+  migrate:
+    <<: *hardening
+    image: agentforge-server:dev
+    build:
+      context: .
+      dockerfile: deploy/docker/server.Dockerfile
+    command: ["migrate"]
+    environment:
+      AGENTFORGE_MIGRATION_DATABASE_URL: postgresql://agentforge_owner:${POSTGRES_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
 
   api:
     <<: *server
