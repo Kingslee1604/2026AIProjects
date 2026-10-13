@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# raw corpus is downloaded via scripts/download_corpus.py, not committed --
+# but the provenance manifest (resolved urls/license/sha256 per file) is small
+# and valuable, so it's kept
+data/raw/*
+!data/raw/manifest.json
+
+# local vector store / index artifacts
+data/qdrant_local/
+data/qdrant_eval_fixture/
+*.qdrant
+
+# eval run artifacts (baseline is committed, per-run reports are not)
+eval_sets/runs/
+
+.streamlit/
+*.log
+.DS_Store
+Thumbs.db

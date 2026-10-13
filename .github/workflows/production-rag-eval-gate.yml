@@ -1,0 +1,81 @@
+# Eval gate for production-rag/ (moved from production-rag/.github/ because GitHub Actions
+# only reads workflows at the repository root). Behavior is unchanged; paths are prefixed.
+name: production-rag eval gate
+
+on:
+  pull_request:
+    paths:
+      - "production-rag/src/retrieve/**"
+      - "production-rag/src/rerank/**"
+      - "production-rag/src/chunk/**"
+      - "production-rag/src/generate/**"
+      - "production-rag/src/eval/**"
+      - "production-rag/eval_sets/gold.json"
+      - ".github/workflows/production-rag-eval-gate.yml"
+  workflow_dispatch: {}
+
+defaults:
+  run:
+    working-directory: production-rag
+
+jobs:
+  unit-and-integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run test suite (chunker, retriever, reranker; Ollama-dependent
+          tests self-skip since no Ollama daemon is available in CI)
+        run: python -m pytest tests/ -v
+
+  retrieval-ablation-smoke:
+    runs-on: ubuntu-latest
+    needs: unit-and-integration-tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run retrieval ablation against the fixture corpus
+        run: python scripts/run_eval.py --mode retrieval --corpus fixture
+
+      - name: Upload retrieval ablation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: retrieval-ablation-report
+          path: production-rag/eval_sets/runs/retrieval_ablation_*.json
+
+  # Generation eval requires a local LLM (Ollama). It's gated on a
+  # self-hosted/manual runner rather than GitHub-hosted CI compute, since a
+  # 3B-class model + citation entailment checks are too slow for hosted
+  # runners across ~150 gold questions. See production-rag/README.md "CI eval gate".
+  generation-eval-full:
+    runs-on: [self-hosted, ollama]
+    if: github.event_name == 'workflow_dispatch'
+    needs: unit-and-integration-tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run full generation eval against the real corpus and compare to baseline
+        run: python scripts/run_eval.py --mode generation --corpus real
+
+      - name: Upload generation eval report
+        uses: actions/upload-artifact@v4
+        with:
+          name: generation-eval-report
+          path: production-rag/eval_sets/runs/generation_eval_*.json

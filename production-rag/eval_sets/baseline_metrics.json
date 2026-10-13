@@ -1,0 +1,108 @@
+{
+  "model": "qwen2.5:7b",
+  "rows": [
+    {
+      "id": "q1-text-factual",
+      "question": "What is the first-line drug class for heart failure with reduced ejection fraction?",
+      "status": "answered",
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "refused_correctly": true
+    },
+    {
+      "id": "q2-table-lookup",
+      "question": "What is the target maintenance dose of metoprolol succinate?",
+      "status": "citation_violation",
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "refused_correctly": false
+    },
+    {
+      "id": "q3-table-lookup",
+      "question": "What is the starting dose of carvedilol?",
+      "status": "answered",
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "refused_correctly": true
+    },
+    {
+      "id": "q4-figure-grounded",
+      "question": "What does the beta-blocker titration flowchart show should happen during dose increases?",
+      "status": "answered",
+      "citation_precision": 1.0,
+      "citation_recall": 0.0,
+      "refused_correctly": true
+    },
+    {
+      "id": "q5-text-factual",
+      "question": "What side effects should be monitored for during beta-blocker up-titration?",
+      "status": "answered",
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "refused_correctly": true
+    },
+    {
+      "id": "q6-table-lookup",
+      "question": "What is the loading dose of ticagrelor after a myocardial infarction?",
+      "status": "answered",
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "refused_correctly": true
+    },
+    {
+      "id": "q7-text-factual",
+      "question": "How long is dual antiplatelet therapy recommended after an acute myocardial infarction?",
+      "status": "answered",
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "refused_correctly": true
+    },
+    {
+      "id": "q8-text-factual",
+      "question": "When should bleeding risk be assessed for a patient on dual antiplatelet therapy?",
+      "status": "answered",
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "refused_correctly": true
+    },
+    {
+      "id": "q9-multihop",
+      "question": "For a patient started on both a beta-blocker and dual antiplatelet therapy after a myocardial infarction, what is the beta-blocker starting dose range and the P2Y12 inhibitor loading dose, using bisoprolol and clopidogrel as the agents?",
+      "status": "insufficient_evidence",
+      "citation_precision": null,
+      "citation_recall": 0.0,
+      "refused_correctly": false
+    },
+    {
+      "id": "q10-adversarial",
+      "question": "What is the recommended surgical technique for coronary artery bypass grafting?",
+      "status": "insufficient_evidence",
+      "citation_precision": null,
+      "citation_recall": null,
+      "refused_correctly": true
+    },
+    {
+      "id": "q11-adversarial",
+      "question": "What is the pediatric dosing of ticagrelor for children under 12?",
+      "status": "insufficient_evidence",
+      "citation_precision": null,
+      "citation_recall": null,
+      "refused_correctly": true
+    },
+    {
+      "id": "q12-adversarial",
+      "question": "What was the sample size of the clinical trial that established these beta-blocker dosing guidelines?",
+      "status": "insufficient_evidence",
+      "citation_precision": null,
+      "citation_recall": null,
+      "refused_correctly": true
+    }
+  ],
+  "aggregate": {
+    "n": 12,
+    "citation_precision": 0.875,
+    "citation_recall": 0.6666666666666666,
+    "refusal_accuracy": 0.8333333333333334,
+    "answer_relevance": null
+  }
+}
