@@ -14,6 +14,12 @@ node_modules/
 .next/
 .pnpm-store/
 
+# Downloaded datasets are never committed, in any project. Kept at the root (not only in each
+# project's .gitignore) so the rule survives switching to a branch that lacks the project.
+# Each project re-downloads its data with a script; small provenance manifests are kept.
+**/data/raw/*
+!**/data/raw/manifest.json
+
 # Environment and secrets
 .env
 .env.*
