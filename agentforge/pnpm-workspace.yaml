@@ -4,6 +4,38 @@ packages:
 # Supply-chain policy: only install versions published at least 14 days ago (minutes).
 minimumReleaseAge: 20160
 
+# Exceptions: security fixes may be adopted before they are 14 days old. Exact versions only,
+# each with its reason. Remove an entry once the version is older than the window.
+minimumReleaseAgeExclude:
+  # CVE-2026-94483 (HIGH, SSRF in image optimization), fixed in 16.3.8. Published 2026-09-30,
+  # adopted 2026-10-13 after review; found by the Trivy image scan. The release spans the
+  # next, @next/*, and eslint-config-next packages, all at exactly 16.3.8.
+  - next@16.3.8
+  - eslint-config-next@16.3.8
+  - "@next/env@16.3.8"
+  - "@next/eslint-plugin-next@16.3.8"
+  - "@next/swc-darwin-arm64@16.3.8"
+  - "@next/swc-darwin-x64@16.3.8"
+  - "@next/swc-linux-arm64-gnu@16.3.8"
+  - "@next/swc-linux-arm64-musl@16.3.8"
+  - "@next/swc-linux-x64-gnu@16.3.8"
+  - "@next/swc-linux-x64-musl@16.3.8"
+  - "@next/swc-win32-arm64-msvc@16.3.8"
+  - "@next/swc-win32-x64-msvc@16.3.8"
+  # GHSA-68fv-2mgg-jv7q (HIGH), fixed in 1.2.2, published 2026-09-30; found by OSV-Scanner.
+  - source-map-js@1.2.2
+
+# Optional dependencies we deliberately do not install.
+ignoredOptionalDependencies:
+  # Next.js image optimization (disabled in next.config.ts); its libvips binary is LGPL-3.0.
+  - sharp
+
+# Force patched versions of vulnerable transitive dependencies (found by OSV-Scanner).
+overrides:
+  lodash-es: ">=4.18.1" # GHSA-f23m-r3pf-42rh, GHSA-r5fr-rjxr-66jc (via mermaid, docs tooling)
+  katex: ">=0.18.2" # GHSA-238p-pmpm-9mq7 (via mermaid, docs tooling)
+  source-map-js: ">=1.2.2" # GHSA-68fv-2mgg-jv7q (via postcss)
+
 # Dependency install scripts are blocked unless listed here as true (pnpm default).
 allowBuilds:
   # eslint's resolver ships its native binary as a platform package; the script is a fallback.

@@ -9,6 +9,7 @@ next-env.d.ts
 *.tsbuildinfo
 test-results/
 playwright-report/
+build/
 
 # Generated from the backend's OpenAPI schema (make api-client)
 apps/web/src/lib/api/openapi.json

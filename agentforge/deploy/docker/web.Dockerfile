@@ -19,6 +19,11 @@ RUN pnpm --filter @agentforge/web build
 
 FROM node:24.21.0-trixie-slim@sha256:173f125896c3b47ddf056734c7ea789d04595a6a08769a8f78e0df642781fb66 AS runtime
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
+# The server needs only `node`. Removing npm and corepack drops their bundled dependencies
+# (and their CVEs) from the runtime image.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+      /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /opt/yarn-* \
+      /usr/local/bin/yarn /usr/local/bin/yarnpkg
 WORKDIR /app
 COPY --from=build --chown=node:node /src/apps/web/.next/standalone ./
 COPY --from=build --chown=node:node /src/apps/web/.next/static ./apps/web/.next/static

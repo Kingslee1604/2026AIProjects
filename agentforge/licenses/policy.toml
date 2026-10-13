@@ -15,6 +15,7 @@ spdx = [
   "BlueOak-1.0.0",
   "BSD-2-Clause",
   "BSD-3-Clause",
+  "CC-BY-4.0", # data files (e.g. caniuse-lite via Next.js); attribution listed in THIRD_PARTY_LICENSES
   "CC0-1.0",
   "ISC",
   "MIT",
@@ -32,8 +33,7 @@ spdx = [
 [dev_only]
 # Allowed only for development-only dependencies. Must never reach a shipped install.
 spdx = [
-  "CC-BY-4.0", # data files in tooling
-  "EPL-2.0",   # elkjs, pulled in by mermaid (docs diagram validation only)
+  "EPL-2.0", # elkjs, pulled in by mermaid (docs diagram validation only)
 ]
 
 # Per-package exceptions: when registry metadata is missing or wrong, or an ADR approves a

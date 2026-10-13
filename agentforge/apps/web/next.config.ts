@@ -20,6 +20,9 @@ const config: NextConfig = {
   outputFileTracingRoot: path.join(import.meta.dirname, "../.."),
   poweredByHeader: false,
   reactStrictMode: true,
+  // No server-side image optimization: AgentForge does not need it, it was the subject of
+  // CVE-2026-94483, and it would ship sharp's LGPL libvips binary (sharp is not installed).
+  images: { unoptimized: true },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${apiOrigin}/:path*` }];
   },

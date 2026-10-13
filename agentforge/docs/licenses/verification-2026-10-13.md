@@ -30,6 +30,16 @@ Release 1 task **R1-02**. Closes the `[VERIFY]` items in architecture §20.2 tha
 | F5 | MCP project is relicensing from MIT to Apache-2.0 (MCP Inspector LICENSE); the Python SDK is still MIT | Both permissive | ✅ No action |
 | F6 | `qdrant-client` 1.19 removed APIs (seen in production-rag) | Reminder that unpinned ranges break builds | ✅ Lockfiles + minimum-age policy already address this |
 
+### Update from CI setup (R1-09, 2026-10-13)
+
+| # | Finding | Action |
+|---|---|---|
+| F7 | The license gate listed only the pnpm workspace root, so the web app's packages were not checked | Fixed: `pnpm licenses list -r`. Coverage went from 203 to 666 packages (137 shipped) |
+| F8 | `sharp` (Next.js image optimization) bundles libvips under `LGPL-3.0-or-later` | Image optimization disabled (`images.unoptimized`), `sharp` excluded via `ignoredOptionalDependencies`. Also removes the CVE-2026-94483 code path |
+| F9 | `caniuse-lite` (browser-support data used by Next.js) is `CC-BY-4.0` and shipped | `CC-BY-4.0` moved to the general allowlist for data files; attribution goes in `THIRD_PARTY_LICENSES` |
+| F10 | Trivy: `next` 16.3.7 HIGH (CVE-2026-94483); npm's bundled deps in the Node base image HIGH | `next` 16.3.8 via a dated security exception to the 14-day rule; npm and corepack removed from the web runtime image |
+| F11 | OSV-Scanner: lodash-es, katex, source-map-js (fixable); braces (no fix released) | Overrides to patched versions; braces ignored until 2027-01-13 with a written reason (`osv-scanner.toml`) |
+
 ## Python packages
 
 Scope: **S** = shipped with AgentForge, **D** = development only. "Task" is the Release 1 task that

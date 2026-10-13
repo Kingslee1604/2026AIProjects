@@ -254,7 +254,8 @@ def collect_python() -> list[Package]:
 
 def collect_npm() -> list[Package]:
     def listing(prod: bool) -> dict[str, list[dict[str, object]]]:
-        args = ["pnpm", "licenses", "list", "--json"] + (["--prod"] if prod else [])
+        # -r: every workspace project (the web app), not only the workspace root.
+        args = ["pnpm", "licenses", "list", "--json", "-r"] + (["--prod"] if prod else [])
         output = _run(args).strip()
         return json.loads(output) if output else {}
 
