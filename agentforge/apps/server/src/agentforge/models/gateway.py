@@ -56,6 +56,10 @@ class ModelGateway:
         # MODEL_PROVIDER=fake routes every model reference to the fake provider.
         self._force_provider = force_provider
 
+    def provider(self, name: str) -> Provider | None:
+        """A configured provider by name (tests use it to script the fake provider)."""
+        return self._providers.get(name)
+
     def _resolve(self, ref: str) -> tuple[Provider, str, str]:
         parsed = ModelRef.parse(ref)
         provider_name = self._force_provider or parsed.provider

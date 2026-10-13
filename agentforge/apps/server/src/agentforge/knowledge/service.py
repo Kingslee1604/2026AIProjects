@@ -255,29 +255,29 @@ class KnowledgeService:
         try:
             await self._ingest(job)
         except ParseError as error:
-            await self._set_status(job.org_id, job.document_id, "failed", str(error))
+            await self._set_status(job.org_id, job.subject_id, "failed", str(error))
             await queue.finish(self._sessions, job, ok=False)
-            log.warning("ingestion_failed", document_id=str(job.document_id), reason="parse")
+            log.warning("ingestion_failed", document_id=str(job.subject_id), reason="parse")
         except ModelError as error:
             if await queue.retry_later(self._sessions, job):
                 await self._set_status(
                     job.org_id,
-                    job.document_id,
+                    job.subject_id,
                     "queued",
                     f"Waiting for the embedding model: {error}",
                 )
             else:
                 await self._set_status(
-                    job.org_id, job.document_id, "failed", f"Embedding failed repeatedly: {error}"
+                    job.org_id, job.subject_id, "failed", f"Embedding failed repeatedly: {error}"
                 )
-            log.warning("ingestion_deferred", document_id=str(job.document_id), error=str(error))
+            log.warning("ingestion_deferred", document_id=str(job.subject_id), error=str(error))
         except _DocumentGoneError:
             await queue.finish(self._sessions, job, ok=True)
         else:
             await queue.finish(self._sessions, job, ok=True)
         return True
 
-    async def _ingest(self, job: queue.IngestionJob) -> None:
+    async def _ingest(self, job: queue.Job) -> None:
         context = TenantContext(job.org_id)
         async with tenant_session(self._sessions, context) as db:
             row = (
@@ -287,7 +287,7 @@ class KnowledgeService:
                         "updated_at = now() WHERE id = :d "
                         "RETURNING knowledge_base_id, blob_key, media_type"
                     ),
-                    {"d": job.document_id},
+                    {"d": job.subject_id},
                 )
             ).one_or_none()
         if row is None:
@@ -310,7 +310,7 @@ class KnowledgeService:
         # duplicates or a half-indexed document.
         async with tenant_session(self._sessions, context) as db:
             await db.execute(
-                text("DELETE FROM app.chunks WHERE document_id = :d"), {"d": job.document_id}
+                text("DELETE FROM app.chunks WHERE document_id = :d"), {"d": job.subject_id}
             )
             chunk_ids = [uuid4() for _ in chunks]
             if chunks:
@@ -327,7 +327,7 @@ class KnowledgeService:
                             "id": chunk_id,
                             "o": job.org_id,
                             "k": row.knowledge_base_id,
-                            "d": job.document_id,
+                            "d": job.subject_id,
                             "n": c.ordinal,
                             "c": c.content,
                             "ps": c.page_start,
@@ -367,10 +367,10 @@ class KnowledgeService:
                     "n": len(chunks),
                     "t": document.text,
                     "m": json.dumps(document.page_map),
-                    "d": job.document_id,
+                    "d": job.subject_id,
                 },
             )
-        log.info("document_indexed", document_id=str(job.document_id), chunks=len(chunks))
+        log.info("document_indexed", document_id=str(job.subject_id), chunks=len(chunks))
 
 
 class _DocumentGoneError(Exception):

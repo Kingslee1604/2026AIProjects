@@ -39,6 +39,13 @@ class Settings(BaseSettings):
     openai_base_url: str | None = None
     openai_api_key: SecretStr | None = None
 
+    # Grounded answers (architecture §10.2). On CPU, `low_confidence_only` sends only claims
+    # whose quote was not found to the LLM verifier; `all` verifies every claim.
+    qa_top_k: int = Field(default=6, ge=1, le=20)
+    qa_max_distance: float = Field(default=0.5, gt=0, le=2)
+    qa_verifier_mode: Literal["all", "low_confidence_only", "off"] = "low_confidence_only"
+    qa_max_llm_calls: int = Field(default=12, ge=2, le=100)
+
     # Knowledge: where uploaded files are stored, and request size limits (baseline S5).
     blob_root: Path = Path("data/blobs")
     max_upload_mb: int = Field(default=25, ge=1, le=500)

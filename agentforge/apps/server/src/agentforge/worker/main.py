@@ -1,6 +1,6 @@
 """Worker main loop with graceful shutdown.
 
-Processes ingestion jobs (R1-13); the run engine (R1-24) plugs into `_tick` later. The
+Processes ingestion (R1-13) and answer (R1-17) jobs; the run engine (R1-24) plugs into `_tick`. The
 heartbeat runs as its own task, so a long job (embedding a big document on CPU) never makes
 the container look dead.
 """
@@ -42,14 +42,25 @@ class Worker:
         """Process queued work until the queue is empty, a batch is done, or stop is requested."""
         if self.services is None:
             return
+        handlers = {
+            "ingestion": self.services.knowledge.process_next_job,
+            "answer": self.services.qa.process_next_job,
+        }
+        idle: set[str] = set()
         for _ in range(MAX_JOBS_PER_TICK):
-            if self._stop.is_set():
-                return
-            try:
-                if not await self.services.knowledge.process_next_job():
+            # Alternate between queues so a big upload batch never starves questions.
+            for name, handler in handlers.items():
+                if self._stop.is_set():
                     return
-            except Exception:  # one bad job must not stop the worker; the lease will expire
-                log.exception("ingestion_job_crashed")
+                if name in idle:
+                    continue
+                try:
+                    if not await handler():
+                        idle.add(name)
+                except Exception:  # one bad job must not stop the worker; the lease will expire
+                    log.exception("job_crashed", queue=name)
+                    idle.add(name)
+            if len(idle) == len(handlers):
                 return
 
     async def run(self) -> None:

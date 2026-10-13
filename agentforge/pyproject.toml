@@ -66,6 +66,8 @@ forbidden_modules = [
   "agentforge.audit",
   "agentforge.models",
   "agentforge.knowledge",
+  "agentforge.agents",
+  "agentforge.qa",
   "agentforge.services",
   "agentforge.api",
   "agentforge.worker",
@@ -79,6 +81,8 @@ source_modules = [
   "agentforge.audit",
   "agentforge.models",
   "agentforge.knowledge",
+  "agentforge.agents",
+  "agentforge.qa",
 ]
 forbidden_modules = [
   "agentforge.api",
@@ -87,6 +91,12 @@ forbidden_modules = [
   "fastapi",
   "starlette",
 ]
+
+[[tool.importlinter.contracts]]
+name = "knowledge and models sit below agents and qa"
+type = "forbidden"
+source_modules = ["agentforge.knowledge", "agentforge.models", "agentforge.auth"]
+forbidden_modules = ["agentforge.agents", "agentforge.qa"]
 
 [[tool.importlinter.contracts]]
 name = "the sandboxed parser imports nothing from AgentForge"

@@ -1,6 +1,193 @@
 {
   "components": {
     "schemas": {
+      "AnswerOut": {
+        "properties": {
+          "agent_versions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Agent Versions",
+            "type": "object"
+          },
+          "answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          },
+          "claims": {
+            "items": {
+              "$ref": "#/components/schemas/ClaimOut"
+            },
+            "title": "Claims",
+            "type": "array"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "knowledge_base_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Knowledge Base Ids",
+            "type": "array"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "running",
+              "answered",
+              "insufficient_evidence",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "timings": {
+            "additionalProperties": true,
+            "title": "Timings",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "knowledge_base_ids",
+          "status",
+          "answer",
+          "confidence",
+          "reason",
+          "claims",
+          "evidence",
+          "agent_versions",
+          "error",
+          "timings",
+          "created_at",
+          "completed_at"
+        ],
+        "title": "AnswerOut",
+        "type": "object"
+      },
+      "AskIn": {
+        "properties": {
+          "knowledge_base_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Knowledge Base Ids",
+            "type": "array"
+          },
+          "question": {
+            "maxLength": 2000,
+            "minLength": 3,
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question",
+          "knowledge_base_ids"
+        ],
+        "title": "AskIn",
+        "type": "object"
+      },
+      "AskOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "AskOut",
+        "type": "object"
+      },
       "AuditEntryOut": {
         "properties": {
           "action": {
@@ -82,6 +269,92 @@
           "details"
         ],
         "title": "AuditEntryOut",
+        "type": "object"
+      },
+      "ClaimOut": {
+        "properties": {
+          "citations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Citations",
+            "type": "array"
+          },
+          "citations_valid": {
+            "title": "Citations Valid",
+            "type": "boolean"
+          },
+          "drafted_text": {
+            "title": "Drafted Text",
+            "type": "string"
+          },
+          "kept": {
+            "title": "Kept",
+            "type": "boolean"
+          },
+          "quote": {
+            "title": "Quote",
+            "type": "string"
+          },
+          "quote_found": {
+            "title": "Quote Found",
+            "type": "boolean"
+          },
+          "quote_supports_claim": {
+            "title": "Quote Supports Claim",
+            "type": "boolean"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "status": {
+            "enum": [
+              "verified",
+              "rescued",
+              "partial",
+              "dropped"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "verdict": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verdict"
+          }
+        },
+        "required": [
+          "text",
+          "citations",
+          "quote",
+          "citations_valid",
+          "quote_found",
+          "quote_supports_claim",
+          "drafted_text",
+          "verdict",
+          "reason",
+          "status",
+          "kept"
+        ],
+        "title": "ClaimOut",
         "type": "object"
       },
       "DocumentOut": {
@@ -170,6 +443,86 @@
           "updated_at"
         ],
         "title": "DocumentOut",
+        "type": "object"
+      },
+      "EvidenceOut": {
+        "properties": {
+          "char_end": {
+            "title": "Char End",
+            "type": "integer"
+          },
+          "char_start": {
+            "title": "Char Start",
+            "type": "integer"
+          },
+          "chunk_id": {
+            "format": "uuid",
+            "title": "Chunk Id",
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "document_id": {
+            "format": "uuid",
+            "title": "Document Id",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "page_end": {
+            "title": "Page End",
+            "type": "integer"
+          },
+          "page_start": {
+            "title": "Page Start",
+            "type": "integer"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "section_path": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Section Path",
+            "type": "array"
+          },
+          "vector_distance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vector Distance"
+          }
+        },
+        "required": [
+          "id",
+          "chunk_id",
+          "document_id",
+          "filename",
+          "page_start",
+          "page_end",
+          "char_start",
+          "char_end",
+          "section_path",
+          "content",
+          "score",
+          "vector_distance"
+        ],
+        "title": "EvidenceOut",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -613,6 +966,138 @@
         "summary": "Get Users",
         "tags": [
           "admin"
+        ]
+      }
+    },
+    "/v1/answers": {
+      "get": {
+        "operationId": "recent_answers_v1_answers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AnswerOut"
+                  },
+                  "title": "Response Recent Answers V1 Answers Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Recent Answers",
+        "tags": [
+          "answers"
+        ]
+      },
+      "post": {
+        "description": "Queue a question. Poll GET /v1/answers/{id} until the status is final.",
+        "operationId": "ask_v1_answers_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AskIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AskOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ask",
+        "tags": [
+          "answers"
+        ]
+      }
+    },
+    "/v1/answers/{answer_id}": {
+      "get": {
+        "operationId": "get_answer_v1_answers__answer_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "answer_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Answer Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnswerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Answer",
+        "tags": [
+          "answers"
         ]
       }
     },

@@ -38,6 +38,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/answers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recent Answers */
+        get: operations["recent_answers_v1_answers_get"];
+        put?: never;
+        /**
+         * Ask
+         * @description Queue a question. Poll GET /v1/answers/{id} until the status is final.
+         */
+        post: operations["ask_v1_answers_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/answers/{answer_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Answer */
+        get: operations["get_answer_v1_answers__answer_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/login": {
         parameters: {
             query?: never;
@@ -200,6 +238,67 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AnswerOut */
+        AnswerOut: {
+            /** Agent Versions */
+            agent_versions: {
+                [key: string]: string;
+            };
+            /** Answer */
+            answer: string | null;
+            /** Claims */
+            claims: components["schemas"]["ClaimOut"][];
+            /** Completed At */
+            completed_at: string | null;
+            /** Confidence */
+            confidence: ("high" | "medium" | "low") | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Error */
+            error: string | null;
+            /** Evidence */
+            evidence: components["schemas"]["EvidenceOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Knowledge Base Ids */
+            knowledge_base_ids: string[];
+            /** Question */
+            question: string;
+            /** Reason */
+            reason: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "running" | "answered" | "insufficient_evidence" | "failed";
+            /** Timings */
+            timings: {
+                [key: string]: unknown;
+            };
+        };
+        /** AskIn */
+        AskIn: {
+            /** Knowledge Base Ids */
+            knowledge_base_ids: string[];
+            /** Question */
+            question: string;
+        };
+        /** AskOut */
+        AskOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+        };
         /** AuditEntryOut */
         AuditEntryOut: {
             /** Action */
@@ -225,6 +324,34 @@ export interface components {
             target: string | null;
             /** Trace Id */
             trace_id: string | null;
+        };
+        /** ClaimOut */
+        ClaimOut: {
+            /** Citations */
+            citations: string[];
+            /** Citations Valid */
+            citations_valid: boolean;
+            /** Drafted Text */
+            drafted_text: string;
+            /** Kept */
+            kept: boolean;
+            /** Quote */
+            quote: string;
+            /** Quote Found */
+            quote_found: boolean;
+            /** Quote Supports Claim */
+            quote_supports_claim: boolean;
+            /** Reason */
+            reason: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "verified" | "rescued" | "partial" | "dropped";
+            /** Text */
+            text: string;
+            /** Verdict */
+            verdict: string | null;
         };
         /** DocumentOut */
         DocumentOut: {
@@ -262,6 +389,39 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** EvidenceOut */
+        EvidenceOut: {
+            /** Char End */
+            char_end: number;
+            /** Char Start */
+            char_start: number;
+            /**
+             * Chunk Id
+             * Format: uuid
+             */
+            chunk_id: string;
+            /** Content */
+            content: string;
+            /**
+             * Document Id
+             * Format: uuid
+             */
+            document_id: string;
+            /** Filename */
+            filename: string;
+            /** Id */
+            id: string;
+            /** Page End */
+            page_end: number;
+            /** Page Start */
+            page_start: number;
+            /** Score */
+            score: number;
+            /** Section Path */
+            section_path: string[];
+            /** Vector Distance */
+            vector_distance: number | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -463,6 +623,101 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MemberOut"][];
+                };
+            };
+        };
+    };
+    recent_answers_v1_answers_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnswerOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ask_v1_answers_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AskIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AskOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_answer_v1_answers__answer_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                answer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnswerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

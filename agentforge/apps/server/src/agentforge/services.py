@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
+from agentforge.agents.registry import AgentRegistry
 from agentforge.core.settings import Settings
 from agentforge.db.engine import create_app_engine, create_sessionmaker
 from agentforge.knowledge.blobs import LocalBlobStore
@@ -12,6 +13,8 @@ from agentforge.knowledge.retrieval import Retriever
 from agentforge.knowledge.service import KnowledgeService
 from agentforge.models import ModelGateway, build_gateway
 from agentforge.models.recorder import DbRecorder
+from agentforge.qa.pipeline import GroundedAnswerer, QAConfig
+from agentforge.qa.service import QAService
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,9 +25,22 @@ class Services:
     embedding_table: EmbeddingTable
     knowledge: KnowledgeService
     retriever: Retriever
+    agents: AgentRegistry
+    qa: QAService
 
     async def close(self) -> None:
         await self.engine.dispose()
+
+
+def qa_config(settings: Settings) -> QAConfig:
+    return QAConfig(
+        chat_model=settings.chat_model,
+        fallback_models=settings.chat_fallback_models,
+        top_k=settings.qa_top_k,
+        max_distance=settings.qa_max_distance,
+        verifier_mode=settings.qa_verifier_mode,
+        max_llm_calls=settings.qa_max_llm_calls,
+    )
 
 
 def build_services(settings: Settings, *, pool_size: int = 5) -> Services:
@@ -34,6 +50,10 @@ def build_services(settings: Settings, *, pool_size: int = 5) -> Services:
     sessions = create_sessionmaker(engine)
     gateway = build_gateway(settings, DbRecorder(sessions))
     table = table_for(settings.embedding_model, fake=settings.model_provider == "fake")
+    retriever = Retriever(
+        sessions, gateway, embedding_model=settings.embedding_model, embedding_table=table
+    )
+    agents = AgentRegistry(sessions)
     return Services(
         engine=engine,
         sessions=sessions,
@@ -46,7 +66,7 @@ def build_services(settings: Settings, *, pool_size: int = 5) -> Services:
             embedding_model=settings.embedding_model,
             embedding_table=table,
         ),
-        retriever=Retriever(
-            sessions, gateway, embedding_model=settings.embedding_model, embedding_table=table
-        ),
+        retriever=retriever,
+        agents=agents,
+        qa=QAService(sessions, GroundedAnswerer(gateway, retriever, agents, qa_config(settings))),
     )
