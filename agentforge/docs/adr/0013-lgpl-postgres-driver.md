@@ -1,6 +1,6 @@
 # ADR-0013: Allow the LGPL psycopg driver as a named exception
 
-- **Status:** Proposed (needs owner decision)
+- **Status:** Accepted (owner approved 2026-10-13)
 - **Date:** 2026-10-13
 - **Context source:** [License verification 2026-10-13](../licenses/verification-2026-10-13.md), finding F1
 
@@ -24,7 +24,7 @@ shipping its license text and making its source available, which the upstream pr
 publishes. Many permissively licensed projects depend on psycopg on these terms. This is a
 practical reading, not legal advice.
 
-## Decision (proposed)
+## Decision
 
 1. Allow `psycopg`, `psycopg-binary`, and `psycopg-pool` as **named exceptions** in
    `licenses/policy.toml`, scoped to those three packages only. LGPL stays off the general
@@ -35,14 +35,15 @@ practical reading, not legal advice.
 3. Keep `asyncpg` (Apache-2.0) as the documented fallback. If the custom engine wins ADR-2,
    reconsider whether one driver can be dropped.
 
-The exceptions are added to `policy.toml` by the task that first installs psycopg (R1-05), and
-only after this ADR is accepted.
+The exceptions are recorded in `licenses/policy.toml`. Each approves exactly `LGPL-3.0-only` for
+one package, so if psycopg ever publishes a different license, the gate fails and the decision
+is reviewed again.
 
 ## Alternatives
 
 | Option | Effect |
 |---|---|
-| **A. Named exception (proposed)** | All three engine candidates remain possible; one driver |
+| **A. Named exception (chosen)** | All three engine candidates remain possible; one driver |
 | B. Ban LGPL entirely, use asyncpg only | Rules out DBOS and the LangGraph checkpointer before the M3 prototypes even run; forces the custom engine |
 | C. Allow LGPL generally | Simpler policy, but any future LGPL package would enter without review |
 

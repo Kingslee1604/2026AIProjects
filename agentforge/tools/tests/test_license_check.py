@@ -72,6 +72,22 @@ def test_exception_overrides_missing_metadata_for_dev_scope_only() -> None:
     assert "dev-only" in evaluate([khroma_shipped], POLICY)[0].problem
 
 
+def test_adr_0013_psycopg_exception_allows_its_lgpl_license_when_shipped() -> None:
+    psycopg = Package("pypi", "psycopg", "3.3.6", "LGPL-3.0-only", "shipped")
+    assert evaluate([psycopg], POLICY) == []
+
+
+def test_other_lgpl_packages_are_still_blocked() -> None:
+    other = Package("pypi", "some-lgpl-lib", "1.0.0", "LGPL-3.0-only", "shipped")
+    assert len(evaluate([other], POLICY)) == 1
+
+
+def test_exception_fails_when_package_license_changes() -> None:
+    relicensed = Package("pypi", "psycopg", "4.0.0", "GPL-3.0-only", "shipped")
+    violations = evaluate([relicensed], POLICY)
+    assert "license changed from approved" in violations[0].problem
+
+
 def test_workspace_packages_are_skipped() -> None:
     assert evaluate([pkg(None, name="agentforge")], POLICY) == []
 

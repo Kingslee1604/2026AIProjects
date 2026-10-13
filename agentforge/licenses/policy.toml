@@ -37,7 +37,32 @@ spdx = [
 ]
 
 # Per-package exceptions: when registry metadata is missing or wrong, or an ADR approves a
-# license outside the lists above. Each one records the verified license and why.
+# license outside the lists above. Each one approves exactly one verified license for one
+# package; if the package later publishes a different license, the gate fails for re-review.
+
+# ADR-0013 (accepted 2026-10-13): psycopg 3 is LGPL-3.0-only and required by DBOS and the
+# LangGraph Postgres checkpointer. Allowed unmodified, installed as a normal package, with its
+# license text and source link shipped in THIRD_PARTY_LICENSES. No other LGPL package is allowed.
+[[exception]]
+ecosystem = "pypi"
+name = "psycopg"
+license = "LGPL-3.0-only"
+scope = "any"
+reason = "ADR-0013"
+
+[[exception]]
+ecosystem = "pypi"
+name = "psycopg-binary"
+license = "LGPL-3.0-only"
+scope = "any"
+reason = "ADR-0013"
+
+[[exception]]
+ecosystem = "pypi"
+name = "psycopg-pool"
+license = "LGPL-3.0-only"
+scope = "any"
+reason = "ADR-0013"
 
 [[exception]]
 ecosystem = "npm"

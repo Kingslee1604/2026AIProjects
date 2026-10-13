@@ -23,7 +23,7 @@ Release 1 task **R1-02**. Closes the `[VERIFY]` items in architecture §20.2 tha
 
 | # | Finding | Impact | Action |
 |---|---|---|---|
-| F1 | **`psycopg` 3 (and `psycopg-binary`, `psycopg-pool`) is `LGPL-3.0-only`.** It is the Postgres driver the design prefers (architecture §0), and it is a required dependency of **DBOS** and **LangGraph's Postgres checkpointer**, two of the three engine candidates | LGPL is not in the allowlist, so the gate would block it | ❗ Decide via [ADR-0013](../adr/0013-lgpl-postgres-driver.md) (proposed: allow unmodified psycopg as a named exception) |
+| F1 | **`psycopg` 3 (and `psycopg-binary`, `psycopg-pool`) is `LGPL-3.0-only`.** It is the Postgres driver the design prefers (architecture §0), and it is a required dependency of **DBOS** and **LangGraph's Postgres checkpointer**, two of the three engine candidates | LGPL is not in the allowlist, so the gate would block it | ✅ Resolved: [ADR-0013](../adr/0013-lgpl-postgres-driver.md) accepted 2026-10-13; the three psycopg packages are named exceptions, all other LGPL stays blocked |
 | F2 | `elkjs` (EPL-2.0), pulled in by `mermaid` for docs validation | Development only | ✅ Allowed under `dev_only`; the gate fails if it ever becomes a shipped dependency |
 | F3 | `khroma` has no license field in `package.json` | Development only | ✅ Verified MIT from its repository and shipped license file; recorded as an exception |
 | F4 | `pypdfium2` wheels bundle PDFium and its libraries (FreeType, libjpeg-turbo, OpenJPEG, LCMS, ICU, …) under permissive licenses | Their notices must ship with AgentForge images | ⚠️ Include `pypdfium2`'s bundled license files in `THIRD_PARTY_LICENSES` (task R1-50) |
@@ -46,7 +46,7 @@ first adds the package.
 | opentelemetry-api / -sdk / -exporter-otlp-proto-http | 1.45.0 | Apache-2.0 | S | R1-04 | ✅ |
 | sqlalchemy | 2.1.1 | MIT | S | R1-05 | ✅ |
 | alembic | 1.20.0 | MIT | S | R1-05 | ✅ |
-| **psycopg / psycopg-binary / psycopg-pool** | 3.3.6 / 3.3.6 / 3.3.3 | **LGPL-3.0-only** | S | R1-05 | ❗ F1 |
+| **psycopg / psycopg-binary / psycopg-pool** | 3.3.6 / 3.3.6 / 3.3.3 | **LGPL-3.0-only** | S | R1-05 | ⚠️ F1 (ADR-0013 exception) |
 | asyncpg (alternative driver) | 0.31.0 | Apache-2.0 | S | R1-05 | ✅ |
 | pgvector (Python client) | 0.5.0 | MIT | S | R1-13 | ✅ |
 | argon2-cffi | 25.1.0 | MIT | S | R1-06 | ✅ |
@@ -151,7 +151,6 @@ automatically.
 
 ## Still open
 
-- **F1** decision (ADR-0013).
 - DBOS Conductor and LangGraph Platform terms: not needed, because neither is used. Confirmed
   during the engine spikes (R1-21, R1-22) that the libraries work without them.
 - `THIRD_PARTY_LICENSES.md` is generated at release time (R1-50) from the lockfiles, including

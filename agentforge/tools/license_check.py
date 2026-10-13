@@ -157,12 +157,21 @@ def evaluate(packages: list[Package], policy: Policy) -> list[Violation]:
         expression = package.license
         exception = policy.exceptions.get((package.ecosystem, package.name.lower()))
         if exception is not None:
+            # An exception approves exactly one verified license for one package. Missing
+            # metadata is accepted (that is often why the exception exists); a different
+            # published license means the package changed and must be re-reviewed.
             if exception.scope == "dev" and package.scope != "dev":
                 violations.append(
                     Violation(package, f"exception is dev-only but package is {package.scope}")
                 )
-                continue
-            expression = exception.license
+            elif expression and expression != exception.license:
+                violations.append(
+                    Violation(
+                        package,
+                        f"license changed from approved {exception.license!r} to {expression!r}",
+                    )
+                )
+            continue
         if not expression:
             violations.append(Violation(package, "license unknown (no usable metadata)"))
             continue
