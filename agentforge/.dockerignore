@@ -1,8 +1,15 @@
-# Only pyproject.toml, uv.lock, and apps/server are needed to build the server image.
+# Allow-list: only what the server and web images need.
 *
 !pyproject.toml
 !uv.lock
 !apps/server/pyproject.toml
 !apps/server/README.md
 !apps/server/src/**
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!apps/web/**
+apps/web/node_modules
+apps/web/.next
+apps/web/*.tsbuildinfo
 **/__pycache__

@@ -3,3 +3,8 @@ packages:
 
 # Supply-chain policy: only install versions published at least 14 days ago (minutes).
 minimumReleaseAge: 20160
+
+# Dependency install scripts are blocked unless listed here as true (pnpm default).
+allowBuilds:
+  # eslint's resolver ships its native binary as a platform package; the script is a fallback.
+  unrs-resolver: false

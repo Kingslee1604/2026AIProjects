@@ -21,11 +21,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     from agentforge.auth.cli_args import add_user_commands
 
     add_user_commands(commands.add_parser("user", help="Manage user accounts (no public sign-up)"))
+    commands.add_parser("openapi", help="Print the API's OpenAPI schema (JSON)")
     commands.add_parser("version", help="Print the version")
     args = parser.parse_args(argv)
 
     if args.command == "version":
         print(__version__)
+    elif args.command == "openapi":
+        import json
+
+        from agentforge.api.app import create_app
+        from agentforge.core.settings import Settings
+
+        schema = create_app(Settings(env="development", log_level="ERROR")).openapi()
+        print(json.dumps(schema, indent=2, sort_keys=True))
     elif args.command == "user":
         from agentforge.auth.cli import run_user_command
 

@@ -14,6 +14,10 @@ build/
 node_modules/
 .next/
 .pnpm-store/
+*.tsbuildinfo
+next-env.d.ts
+test-results/
+playwright-report/
 
 # Downloaded datasets are never committed, in any project. Kept at the root (not only in each
 # project's .gitignore) so the rule survives switching to a branch that lacks the project.
