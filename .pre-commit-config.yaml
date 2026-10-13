@@ -1,0 +1,23 @@
+# All hooks are local: they use the versions pinned in each project
+# (agentforge/scripts/install-dev-tools.sh, uv.lock, pnpm-lock.yaml) instead of downloading their own.
+# pre-commit runs from the repository root, so project hooks cd into their project folder.
+repos:
+  - repo: local
+    hooks:
+      - id: gitleaks
+        name: gitleaks (block secrets in staged changes)
+        entry: gitleaks git --pre-commit --staged --redact --no-banner --config .gitleaks.toml
+        language: system
+        pass_filenames: false
+      - id: agentforge-ruff
+        name: agentforge ruff (lint + format)
+        entry: bash -c 'cd agentforge && uv run --frozen ruff check . && uv run --frozen ruff format .'
+        language: system
+        files: ^agentforge/.*\.py$
+        pass_filenames: false
+      - id: agentforge-prettier
+        name: agentforge prettier
+        entry: bash -c 'cd agentforge && pnpm exec prettier --check .'
+        language: system
+        files: ^agentforge/.*\.(json|ya?ml|m?js|ts|tsx|css)$
+        pass_filenames: false

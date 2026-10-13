@@ -1,0 +1,8 @@
+{
+  "include": ["apps/server/src", "apps/server/tests"],
+  "strict": ["apps/server/src"],
+  "venvPath": ".",
+  "venv": ".venv",
+  "pythonVersion": "3.12",
+  "reportMissingTypeStubs": "warning"
+}

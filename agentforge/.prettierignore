@@ -1,0 +1,12 @@
+# Environments and caches (the repo-wide .gitignore lives one level up, where Prettier doesn't read it).
+.venv/
+node_modules/
+.pytest_cache/
+.ruff_cache/
+
+# Markdown is hand-formatted (wide tables, Mermaid); Python is formatted by ruff.
+*.md
+*.py
+pnpm-lock.yaml
+uv.lock
+LICENSE

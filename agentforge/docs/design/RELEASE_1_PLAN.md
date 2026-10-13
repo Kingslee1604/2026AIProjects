@@ -1,0 +1,306 @@
+# AgentForge AI — Release 1 Implementation Plan (v0.2, for review)
+
+| Field | Value |
+|---|---|
+| Status | **APPROVED (2026-10-12).** Start with R1-01. Decisions D1–D5 in architecture §23 |
+| Reference machine | Dell Inspiron 15 3520: i7-1255U, 16 GB RAM, Intel Iris Xe (CPU-only inference). See architecture §23.1 |
+| Date | 2026-10-09 |
+| Architecture | [ARCHITECTURE_DESIGN.md](ARCHITECTURE_DESIGN.md) v0.2 |
+| Release | R1 "Portfolio demo" → tag `v0.1.0` |
+| Capacity assumption | One experienced engineer, 15–20 focused hours/week |
+
+All hours and weeks below are **Estimates** (±30%). Nothing here is Measured. Measured values are produced by tasks R1-36, R1-40, and R1-49, and stored with raw data in `bench/results/`.
+
+---
+
+## 1. Release 1 goal
+
+> A person can clone the repository, run one command, and use AgentForge **live on their own machine**: ingest private documents, ask grounded questions with verified citations, run the security-questionnaire workflow with durable fan-out, review flagged answers, and export the result. An MCP host can query the same knowledge base read-only. Anyone can browse a labeled replay of a real recorded run on a public static site. Every item in the R1 security baseline has evidence.
+
+### 1.1 In scope
+
+- Foundations: repository, CI with security and license gates, Compose stack, Postgres with forced RLS, auth with 2 roles, audit log.
+- Knowledge: PDF/DOCX/MD/TXT upload, sandboxed parsing, chunking, Ollama embeddings, hybrid retrieval with RRF, search tester.
+- Model gateway: Ollama + fake provider, structured outputs, repair, fallback, call accounting.
+- Template #2 **Grounded knowledge Q&A** (first live demo).
+- Engine decision: prototypes of DBOS, LangGraph, and a custom Postgres engine against shared hard gates → ADR-2.
+- Template #1 **Security questionnaire** (flagship): durable fan-out, verification, per-item review, idempotent XLSX export, cancel, retry from step.
+- Trace UI with live SSE, review queue.
+- **Read-only MCP server** (`search_knowledge`, `answer_with_citations`, `get_run`) with API keys.
+- Eval CLI and committed retrieval/grounding baseline.
+- Static replay site, demo video, docs, `v0.1.0` release.
+
+### 1.2 Explicitly not in R1
+
+MCP client and any MCP tool execution (R2, shipped together with its governance controls); MCP stdio and the stdio bridge; outbound tools (`http_request`, `webhook`); visual workflow editing or graph viewer; agent builder UI; more than 2 roles; multi-org UI; SSO; eval UI and judge calibration; observability stack beyond optional Jaeger; reranker; XLSX/CSV knowledge documents; hosted live demo; billing.
+
+---
+
+## 2. Milestones
+
+| Milestone | Outcome | Effort (Estimate) | Cumulative | Calendar at 15–20 h/wk |
+|---|---|---|---|---|
+| **M1 Foundations** | Secure skeleton: repo, CI, Compose, RLS, auth, UI shell | 67 h | 67 h | weeks 4–5 |
+| **M2 Grounded Q&A live** | **First live demo:** upload Northwind docs, ask a question, get verified, cited claims | 98 h | 165 h | weeks 8–11 |
+| **M3 Engine decision** | Three prototypes measured against hard gates. ADR-2 accepted | 29 h | 194 h | weeks 10–13 |
+| **M4 Questionnaire live** | **Flagship live demo:** 12-question live run (full 40 recorded), crash recovery, review, export | 85 h | 279 h | weeks 14–19 |
+| **M5 Release v0.1.0** | MCP server, eval baseline, E2E tests, security evidence, replay, docs, release | 73 h | 352 h | weeks 18–24 |
+
+Each milestone ends with a short demo recording (private) and a re-estimate of the remaining milestones using the actual/estimated ratio so far.
+
+```mermaid
+flowchart LR
+    M1["M1 Foundations<br/>67 h"] --> M2["M2 Grounded Q and A live<br/>98 h"]
+    M2 --> M3["M3 Engine decision<br/>29 h"]
+    M3 --> M4["M4 Questionnaire live<br/>85 h"]
+    M4 --> M5["M5 Release v0.1.0<br/>73 h"]
+    M2 -.->|"MCP server depends on<br/>retrieval and Q and A"| M5
+```
+
+---
+
+## 3. Backlog
+
+Conventions:
+- **ID** `R1-nn`. **Est** = focused hours (Estimate). **Deps** = tasks that must be done first.
+- Every task also meets the global Definition of Done (§6).
+- Acceptance criteria are written to be checkable by a test, a script, or a file in the repository.
+
+### 3.1 M1 Foundations (67 h)
+
+| ID | Task | Est | Deps | Acceptance criteria |
+|---|---|---|---|---|
+| R1-01 | **Repository bootstrap.** New repo inside the WSL2 filesystem. Monorepo layout (§16 of the architecture). `uv` (Python 3.12/3.13), `pnpm`, ruff, pyright, ESLint/Prettier, pre-commit, `.editorconfig`, Apache-2.0 `LICENSE` + `NOTICE`, `SECURITY.md`, README skeleton. `make docs-check` runs the Mermaid validator over `docs/` | 5 | — | `make check` runs lint + type + tests green on the empty project. `make docs-check` passes on both design docs. Pre-commit blocks a planted fake secret (gitleaks) |
+| R1-02 | **Dependency verification and pinning.** Close every [VERIFY] in architecture §20.2 for R1 dependencies. Record version, license, and source URL. Pin versions in lockfiles. License allowlist job (`pip-licenses`, `license-checker`). Model license registry file | 6 | R1-01 | `docs/licenses/verification-<date>.md` lists every R1 dependency with license + source. CI fails when a test adds a GPL package. `models.yaml` records the upstream license per default model |
+| R1-03 | **Compose stack.** `postgres` (pgvector image pinned by digest), `api`, `worker`, `web`. Health checks, named volumes, ports bound to `127.0.0.1`. Host Ollama via `host.docker.internal`. Optional `ollama` and `jaeger` profiles. `make up/down/logs/doctor` | 8 | R1-01 | Fresh clone → `make up` → all services healthy on Linux CI and documented Windows/WSL2. `make doctor` reports Docker, RAM, WSL limits, Ollama reachability, and missing models with actionable messages. It warns when `.wslconfig` has no memory cap or when free RAM is below what the selected model needs |
+| R1-04 | **Backend skeleton.** FastAPI app factory, settings (pydantic-settings), structlog JSON with `trace_id`, OTel SDK (console exporter, OTLP optional), error model, `/healthz`, `/v1` router, OpenAPI. Worker entrypoint with graceful shutdown | 5 | R1-01 | `/healthz` 200. A request log line carries `trace_id`. The worker stops cleanly on SIGTERM within 10 s (Target) |
+| R1-05 | **Database foundation.** SQLAlchemy 2 + Alembic. Roles: `agentforge_owner` (migrations), `agentforge_app` (no BYPASSRLS), `agentforge_engine` (engine schema). Schemas `app` and `engine`. `TenantContext` + transaction helper doing `SET LOCAL app.org_id`. RLS policy template. **Schema lint:** every `app` table with `org_id` has RLS enabled and forced. Seed of one org and workspace | 12 | R1-03, R1-04 | Lint test fails when a test creates an `app` table without forced RLS. A query without tenant context returns 0 rows (test). Migrations run up/down in CI. Driver choice (psycopg 3 vs asyncpg) recorded, defaulting to psycopg 3 unless R1-02 finds a blocker |
+| R1-06 | **Auth and RBAC.** Users, argon2id, server-side sessions (hashed opaque IDs), CSRF tokens, session rotation, idle and absolute timeouts, logout-everywhere, login rate limit. Roles Admin/Member + `can_review`. Static permission matrix + `authorize()`. CLI: `agentforge user create/disable/reset-password`. No open sign-up | 12 | R1-05 | Integration tests: cookie flags, CSRF rejection, rotation on login, lockout/rate limit returns 429, Member cannot call admin routes, route inventory test shows every non-public route requires auth (S2, S3) |
+| R1-07 | **Audit log.** Append-only table (INSERT/SELECT grants only). Writer used by auth, API keys, reviews, deletion | 3 | R1-05 | UPDATE/DELETE as the app role fails (test). Login and logout produce audit rows (test) |
+| R1-08 | **Frontend skeleton.** Next.js (App Router, standalone output), Tailwind, shadcn/ui, auth pages, app shell, TanStack Query, generated API client from OpenAPI, Next rewrites so `/api` is same-origin. Sanitized markdown renderer with remote images disabled | 10 | R1-04, R1-06 | Log in/out works in the browser. Type-check passes against the generated client. Renderer test: `<img src=http://…>` and raw HTML are not rendered (S7) |
+| R1-09 | **CI pipeline.** GitHub Actions: lint, type, unit, integration (testcontainers Postgres + pgvector), migrations, gitleaks, pip-audit, OSV-Scanner/npm audit, Trivy image scan, Syft SBOM, license job, docs-check | 6 | R1-01, R1-03 | Pipeline green on main. A planted vulnerable dependency on a branch fails the scan job. SBOM artifact attached to the CI run |
+
+**M1 exit:** `make up` → log in as a CLI-created admin → empty app shell. CI green with all gates.
+
+### 3.2 M2 Grounded Q&A live (98 h)
+
+| ID | Task | Est | Deps | Acceptance criteria |
+|---|---|---|---|---|
+| R1-10 | **Model gateway.** `generate`, `generate_structured`, `embed`. Providers: `ollama` (chat with JSON-schema `format`, embeddings), `fake` (deterministic per prompt hash, configurable latency, fault injection: timeout, invalid JSON, error), `openai_compatible` (minimal). Pydantic validation, one repair retry, ordered fallback list. `llm_calls` rows with tokens, latency, model digest | 12 | R1-05 | Unit tests: repair path, fallback on invalid output, timeout classification. With Ollama running, a smoke test returns schema-valid JSON from the default model. Each call writes one `llm_calls` row |
+| R1-11 | **Blob store and KB model.** `BlobStore` interface + local volume implementation (keys under `org/{org_id}/`). `knowledge_bases`, `documents` tables with RLS. Streamed upload API with size limit, magic-byte and extension checks | 6 | R1-05, R1-06 | Oversized, mismatched-type, and empty files are rejected with clear errors (tests). Cross-tenant fetch of a document returns 404 |
+| R1-12 | **Sandboxed parsing.** Parse in a subprocess with timeout, CPU/memory rlimits, no network (Linux container). pypdfium2 + pdfplumber (PDF), python-docx (DOCX), MD, TXT. Output: normalized text, page map, headings, tables as markdown | 10 | R1-11 | Fixtures: decompression bomb, malformed PDF, 2,000-page PDF, and a 0-byte file are rejected or time out **without crashing the worker** (S5). Page numbers are correct on the fixture set |
+| R1-13 | **Ingestion jobs, chunking, embedding, indexes.** `ingestion_jobs` table claimed with `FOR UPDATE SKIP LOCKED` (ADR-12). Structure-aware chunker keeping page and character spans. Batch embeddings via the gateway. `chunk_embeddings_<model_key>` with HNSW. `tsvector` GIN index. Status events | 10 | R1-10, R1-12 | Upload of the Northwind corpus reaches `ready` end-to-end. A worker restart mid-ingestion leaves no duplicate chunks (test). Re-index replaces chunks atomically |
+| R1-14 | **Hybrid retrieval.** Vector top-k + FTS top-k, KB filter + RLS, RRF fusion, `hnsw.iterative_scan` enabled. `Retriever` interface. Search API returning vector, FTS, and fused ranks with scores | 10 | R1-13 | Unit tests for RRF. Integration test: results never include another org's or another KB's chunks. Search API returns per-channel ranks |
+| R1-15 | **Northwind demo corpus.** ~8–10 self-authored policy documents (CC-BY-4.0, clearly fictional), a 40-question questionnaire (XLSX) including ~6 unanswerable questions, a 12-question live-demo subset (includes 2 unanswerable questions and 1 question that retrieves the injected document), 2 documents with embedded prompt-injection text, and a gold set (answer + evidence spans) | 12 | — (can start any time) | Files under `demo/corpus/` with license headers. Gold set validates against its JSON schema. Every gold span resolves to text in a parsed document (script) |
+| R1-16 | **Agent definitions and prompt assembly.** YAML agent templates → immutable `agent_versions` on seed (checksum). Prompt assembly with labeled untrusted-content blocks. Budget object (steps, LLM calls, tokens, wall clock) enforced by the runtime | 6 | R1-10 | Changing a YAML file creates a new version rather than mutating the old one. A budget overrun raises `budget_exceeded` (test) |
+| R1-17 | **Grounded answer pipeline (template #2).** Retrieve → draft structured `claims[]` with `citation_chunk_ids` → abstention gate → verifier: mechanical checks (cited IDs ∈ retrieved set, quote string-match) + LLM entailment per claim. Modes `all` / `low_confidence_only`. Persist `claims` | 16 | R1-14, R1-16 | Fabricated citation IDs are flagged (test with fake LLM). Unanswerable gold questions produce "Insufficient evidence" at the configured threshold. All outputs are persisted with links to `llm_calls` and retrievals |
+| R1-18 | **UI: knowledge bases.** KB list and create, drag-and-drop upload with live ingestion status, document table, delete, search tester showing vector/FTS/fused ranks | 8 | R1-08, R1-14 | Playwright (fake LLM): create KB → upload → status reaches ready → search shows results. axe: no serious or critical issues |
+| R1-19 | **UI: Ask page.** Question box, KB selector, answer with claims colored by support status, source panel with document, page, and highlighted span, "insufficient evidence" state, link to call details | 8 | R1-08, R1-17 | Playwright: ask → colored claims → clicking a claim shows the cited passage. Keyboard-only flow works |
+
+**M2 exit (first live demo):** with Ollama on the host, a Northwind question returns verified, cited claims in the UI. An unanswerable question abstains. Recording saved privately. **The R1 security baseline items relevant so far (S1–S7, S11) are already enforced.**
+
+### 3.3 M3 Engine decision (29 h)
+
+Prototype protocol: architecture §7.3. Each prototype lives in `spikes/engine/<candidate>/`, implements the `RunEngine` port for the **same mini-flow**, and runs the **same conformance tests**. Each candidate gets a hard cap of 7 h. A candidate that cannot pass a hard gate within its cap is scored "fail" for that gate.
+
+| ID | Task | Est | Deps | Acceptance criteria |
+|---|---|---|---|---|
+| R1-20 | **Conformance harness.** `RunEngine` port (start, cancel, signal_review, status). Mini-flow spec: plan → 20 items (fake LLM) with `max_parallelism=4` → review wait → idempotent export. Tests for hard gates H1–H8 (kill -9 loop, review wait + restart, concurrency probe, export counter with epochs, cancel timing, engine-table content check, start atomicity fault injection, run_events emission) | 5 | R1-05, R1-10 | The harness runs against a stub adapter and fails in the expected places. The test list maps 1:1 to H1–H8 |
+| R1-21 | **DBOS prototype.** Workflow + steps, queue with concurrency limit, durable wait for the review signal, cancel. Verify: multi-process recovery behavior without Conductor; async support; where step outputs are stored (must hold IDs only) | 7 | R1-20 | Conformance report: pass/fail per gate with logs. Notes on recovery semantics and on psycopg 3 coexistence |
+| R1-22 | **LangGraph prototype.** StateGraph + Postgres checkpointer, `Send` fan-out, `interrupt()` for review, plus the minimal job queue/lease needed to resume after a crash. No LangGraph Platform | 7 | R1-20 | Conformance report as above. Lines of code split into graph vs. custom queue |
+| R1-23 | **Custom Postgres prototype.** `engine.jobs` with `SKIP LOCKED` leases and heartbeats, step checkpoints, successor enqueue in the same transaction, approval suspension, cancel flag | 7 | R1-20 | Conformance report as above |
+| R1-24 | **ADR-2 decision.** Score table (hard gates, LOC, concepts, test ergonomics, Measured recovery time, async fit, dependency weight, API stability). **Rule:** choose the simplest candidate that passes every hard gate. Delete the losing adapters from the main code path (spikes kept for the record) | 3 | R1-21, R1-22, R1-23 | `docs/adr/0002-durable-execution.md` accepted, with raw test output committed. The conformance tests (H1–H8) move into permanent CI against the chosen adapter |
+
+**M3 exit:** ADR-2 accepted with measured evidence. If no candidate passes every gate, the fallback is the custom engine, with a re-estimate of M4 (+15–25 h Estimate) recorded in the ADR.
+
+### 3.4 M4 Questionnaire live (85 h)
+
+| ID | Task | Est | Deps | Acceptance criteria |
+|---|---|---|---|---|
+| R1-30 | **Runs, run events, SSE.** `runs`, `run_items`, `step_records`, `run_events` (RLS). `pg_notify` with IDs only. SSE endpoint with `Last-Event-ID` resume. Run service on the `RunEngine` port | 10 | R1-24 | SSE reconnect with `Last-Event-ID` gets no gaps and no duplicates (test). Another org's run stream returns 404 |
+| R1-31 | **Questionnaire import.** XLSX/CSV → validated items (question text, optional section and ID column mapping). Limits on rows and cell size | 4 | R1-11 | Northwind questionnaire imports 40 items. Malformed and oversized files are rejected (tests) |
+| R1-32 | **Planner step.** Classifies items (answerable type, compound question split, search-query rewrite) with structured output | 5 | R1-16, R1-30 | Fake-LLM test covers split and passthrough. Planner output persisted as references only |
+| R1-33 | **Questionnaire workflow on the chosen engine.** Plan → bounded fan-out (per item: retrieve, draft, verify) → join → route (supported and high-confidence → auto-accept candidate; others → review) → review wait → export. Budgets, cancel, retry from step (new epoch) | 12 | R1-17, R1-30, R1-32 | With the fake LLM, a 40-item run completes. Cancel stops new steps within 2 s (Target, measured in test). Retry from a failed item step re-runs only that subtree |
+| R1-34 | **Review service.** `review_batches`, `review_items`. Per-item approve, edit-and-approve, reject with reason. "Approve all supported" bulk action. Batch completion sends `signal_review`. Audit entries | 8 | R1-07, R1-33 | Decisions are recorded per item. Signal is sent exactly once per batch (test). A Member without `can_review` gets 403. Audit rows written |
+| R1-35 | **Export tool.** `export_xlsx` writes answers, status, and citations into a copy of the questionnaire. Artifact keyed by `H(run, node, epoch)` (unique). Authorized download endpoint | 5 | R1-33, R1-34 | Crash during export → exactly one artifact (H4 test). New epoch → new artifact. Download by another org → 404 |
+| R1-36 | **Durability and fault-injection tests.** Kill the worker at random points across 50 fake-LLM runs. Inject Ollama timeouts and invalid JSON. Record recovery time | 8 | R1-33, R1-35 | 50/50 runs complete. 0 duplicate artifacts. 0 re-executed completed item steps (counter). Recovery time distribution saved to `bench/results/` (Measured) |
+| R1-37 | **UI: new run and run list.** Choose template, KB, upload questionnaire, start. Run list with status chips and filters | 5 | R1-08, R1-30 | Playwright: start a run → it appears in the list with live status |
+| R1-38 | **UI: run detail / trace view.** Header with budgets used. Step list grouped by phase, with parallel item lanes. Side panel tabs: input, output, LLM calls (prompt, response, tokens, latency, model), retrievals (chunks + scores), events. Live via SSE. Cancel and retry-from-step buttons | 14 | R1-30, R1-37 | Playwright: live updates appear without reload. Opening a step shows its LLM calls. Cancel and retry work from the UI |
+| R1-39 | **UI: review queue and item review.** Queue with counts. Split view: question + answer with colored claims / cited passages at page. Approve, edit and approve, reject with reason. Keyboard shortcuts (A, E, R, J/K). Bulk "approve all supported" | 14 | R1-34, R1-19 | Playwright: review 3 items with keyboard only → export becomes available. axe: no serious or critical issues |
+
+**M4 exit (flagship live demo):** live Ollama run of the 12-question demo subset on the reference machine (the full 40-question run completes and is recorded, without a time limit), worker killed mid-run and recovered visibly in the trace, review of flagged items, export downloaded. Recording saved privately.
+
+### 3.5 M5 Release v0.1.0 (73 h)
+
+| ID | Task | Est | Deps | Acceptance criteria |
+|---|---|---|---|---|
+| R1-40 | **Eval harness and baseline.** CLI `agentforge eval run --dataset northwind`: recall@5/10/20, MRR, filtered vs. exact recall, citation validity, unsupported-claim rate, abstention precision/recall, structured-output validity per model. JSON + Markdown report. Model selection for defaults | 6 | R1-17, R1-15 | Baseline committed under `docs/evaluation/` with hardware manifest, model digests, and git SHA (Measured). Default chat and embedding models chosen and justified from this report |
+| R1-41 | **Deletion.** Delete document and KB: rows, chunks, embeddings, blobs. Verification query | 3 | R1-13 | Test asserts no residual rows or blobs after deletion. Audit entry written |
+| R1-42 | **API keys.** Workspace-scoped, prefix + hashed secret, scopes (`api:read`, `api:write`, `mcp:use`), expiry, last-used, revoke. Settings UI to create (secret shown once) and revoke | 5 | R1-06, R1-07 | Revoked or expired key → 401. Scope enforcement tests. Create and revoke are audited |
+| R1-43 | **MCP server (read-only).** Official `mcp` SDK 2.x mounted at `/mcp` (Streamable HTTP, stateless). Supports 2026-07-28 and legacy (2025-11-25) clients via the SDK. Tools: `search_knowledge`, `answer_with_citations` (progress notifications), `get_run`. Deterministic tool order and `ttlMs`. Bearer API key with `mcp:use` → `TenantContext`. Origin validation. Rate limit. Audit with `clientInfo` | 12 | R1-14, R1-17, R1-30, R1-42 | MCP Inspector connects, lists exactly 3 tools, and gets cited results (screenshot + log in `docs/`). A request with a bad Origin is rejected. A key without `mcp:use` → 401/403 |
+| R1-44 | **MCP server security tests.** Cross-tenant suite over `/mcp`. Tool-list snapshot test (fails if any non-read-only tool appears). Rate-limit test. Legacy-client and 2026-07-28 client smoke tests using the SDK client | 5 | R1-43 | All tests in CI (S9) |
+| R1-45 | **E2E and accessibility.** Playwright journeys with the fake LLM: (1) login → KB → upload → ask; (2) questionnaire → review → export; (3) API key → MCP search. axe-core on core pages. Manual keyboard pass recorded | 8 | R1-39, R1-43 | Journeys green in CI. 0 serious/critical axe violations. Keyboard checklist committed |
+| R1-46 | **Security baseline evidence.** Fill the S1–S15 table (architecture §13.6) with links to tests and CI runs. Prompt-injection report from the eval set (S10). Threat model doc for R1 | 6 | R1-44, R1-45, R1-40 | `docs/security/r1-baseline.md` has evidence for every item. Any gap blocks the release |
+| R1-47 | **Record-demo and static replay.** `make record-demo` runs both templates live and captures `run_events`, claims, and documents to `demo/recordings/` with hardware, model, and date stamps. Static export of the trace and review components in read-only replay mode. Persistent "Recorded run" banner. Deploy workflow to static hosting | 10 | R1-38, R1-39 | Replay site builds with no backend calls (network test). Banner present on every page. Deployed URL works |
+| R1-48 | **Documentation.** README (problem → GIF → architecture → 3-command quickstart → Measured results with links → ADRs → roadmap). Guides: Windows/WSL2 install, models, configuration. Architecture docs (C4 context and container), ADRs 1–12. CONTRIBUTING (DCO), CODE_OF_CONDUCT | 8 | R1-46 | A fresh reader following the quickstart reaches the Ask page (tested once on a clean WSL2 instance; time-to-demo recorded) |
+| R1-49 | **Measurements.** On the reference machine (Inspiron 15 3520, CPU-only): end-to-end run time for the 12-question subset and the full 40 questions, peak memory (WSL + Ollama), tokens per run, per-step latency, retrieval p50/p95 at demo scale, enqueue→start p95 (fake LLM). Hardware manifest auto-collected | 4 | R1-36, R1-40 | `bench/results/<date>-<machine>/` with raw JSON + summary. The README cites only these numbers |
+| R1-50 | **Demo video and release.** 3–5 minute video following the walkthrough (§7). Tag `v0.1.0`, GHCR images with SBOM, CHANGELOG | 6 | R1-47, R1-48, R1-49 | Release page with images, SBOM, changelog, and video link |
+
+**M5 exit = R1 done:** see §5.
+
+### 3.6 Effort summary
+
+| Milestone | Tasks | Effort (Estimate) |
+|---|---|---|
+| M1 | R1-01 … R1-09 | 67 h |
+| M2 | R1-10 … R1-19 | 98 h |
+| M3 | R1-20 … R1-24 | 29 h |
+| M4 | R1-30 … R1-39 | 85 h |
+| M5 | R1-40 … R1-50 | 73 h |
+| **Total** | 45 tasks | **352 h** |
+
+---
+
+## 4. Dependencies and critical path
+
+```mermaid
+flowchart LR
+    T01["01 repo"] --> T03["03 compose"]
+    T01 --> T04["04 backend"]
+    T03 --> T05["05 database and RLS"]
+    T04 --> T05
+    T05 --> T06["06 auth"]
+    T06 --> T08["08 frontend"]
+    T05 --> T10["10 model gateway"]
+    T05 --> T11["11 blobs and KB"]
+    T11 --> T12["12 parsing"]
+    T12 --> T13["13 ingestion"]
+    T10 --> T13
+    T13 --> T14["14 retrieval"]
+    T10 --> T16["16 agents"]
+    T14 --> T17["17 grounded answers"]
+    T16 --> T17
+    T17 --> T19["19 Ask UI"]
+    T08 --> T19
+    T10 --> T20["20 engine harness"]
+    T20 --> T21["21 DBOS"]
+    T20 --> T22["22 LangGraph"]
+    T20 --> T23["23 custom"]
+    T21 --> T24["24 ADR-2"]
+    T22 --> T24
+    T23 --> T24
+    T24 --> T30["30 runs and SSE"]
+    T30 --> T33["33 questionnaire workflow"]
+    T17 --> T33
+    T33 --> T34["34 reviews"]
+    T34 --> T35["35 export"]
+    T35 --> T36["36 durability tests"]
+    T34 --> T39["39 review UI"]
+    T30 --> T38["38 trace UI"]
+    T14 --> T43["43 MCP server"]
+    T17 --> T43
+    T43 --> T44["44 MCP tests"]
+    T39 --> T45["45 E2E"]
+    T44 --> T45
+    T45 --> T46["46 security evidence"]
+    T38 --> T47["47 replay"]
+    T39 --> T47
+    T46 --> T48["48 docs"]
+    T47 --> T50["50 release"]
+    T48 --> T50
+```
+
+**Critical path (Estimate):** 01 → 03 → 05 → 10 → 13 → 14 → 17 → 20 → 21/22/23 → 24 → 30 → 33 → 34 → 39 → 45 → 46 → 48 → 50. Because there is only one engineer, "parallel" tasks are sequenced in the order of the tables above. The graph shows which reorderings are safe.
+
+**Safe to do any time:** R1-15 (corpus writing) is the best task for low-energy sessions. R1-02 (verification) must be done before each dependency is added.
+
+---
+
+## 5. Release 1 exit criteria
+
+| # | Criterion | Evidence |
+|---|---|---|
+| E1 | Fresh clone → `make up && make demo` → both templates run live on Windows/WSL2 and Linux | Recorded time-to-demo (Measured) in the README |
+| E2 | Engine hard gates H1–H8 pass in CI against the chosen adapter | CI report |
+| E3 | 50-run chaos test: 0 lost runs, 0 duplicate artifacts, 0 re-executed completed steps | `bench/results/` |
+| E4 | Security baseline S1–S15 has evidence for every item | `docs/security/r1-baseline.md` |
+| E5 | MCP Inspector interop with the read-only server. Cross-tenant suite covers `/mcp` | Log + CI |
+| E6 | Eval baseline committed. Default models justified by it | `docs/evaluation/` |
+| E7 | E2E journeys green. 0 serious/critical axe violations | CI |
+| E8 | Public replay live with banners. Video published | URLs |
+| E9 | Every number in the README is backed by a raw result file | Link check |
+| E10 | License allowlist green. SBOM published. No unresolved critical/high CVEs | CI + release assets |
+
+---
+
+## 6. Definition of Done (every task)
+
+- Code reviewed against the acceptance criteria. For a solo developer this is a self-review checklist in the PR description, plus the `/code-review` pass.
+- Tests added at the right layer. CI green, including security and license gates.
+- Tenant context respected. Any new `app` table has forced RLS and is in the cross-tenant suite.
+- No secrets or document content in logs.
+- Docs updated (README section, guide, or ADR) when behavior or a decision changed.
+- Actual hours recorded next to the estimate (for re-estimation at each milestone).
+
+---
+
+## 7. End-to-end demo walkthrough (R1, about 8 minutes, live)
+
+**Setup before the demo (not shown):** reference machine with heavy desktop apps closed (browser down to the demo tabs; chat and Discord apps closed) to free about 2–3 GB of RAM; Ollama running with the default CPU-tier models pulled and warmed up by one question; `make up && make demo` done; browser logged in as `demo-admin`; second tab with MCP Inspector; terminal ready to kill the worker. **Fallback:** if live inference is too slow on the day, switch to the static replay and say so explicitly.
+
+| # | Time | Action | What the audience sees | What is real |
+|---|---|---|---|---|
+| 1 | 0:00 | Open the landing page in the app. One sentence: "self-hosted, evidence-grounded, human-supervised agent workflows. Everything you'll see runs locally on this machine with open-weight models." | Dashboard with the Northwind KB and two templates | Live |
+| 2 | 0:30 | Knowledge → Northwind KB → upload one more policy PDF | Live ingestion status: parsing → chunking → embedding → ready | Live (sandboxed parse, Ollama embeddings) |
+| 3 | 1:15 | Search tester: "encryption at rest" | Vector rank, FTS rank, fused rank per passage | Live hybrid retrieval |
+| 4 | 1:45 | Ask page: "How long are access logs retained?" | Claims colored green/amber. Click a claim → the policy page with the highlighted span | Live generation + verification |
+| 5 | 2:30 | Ask: "Do you hold FedRAMP authorization?" (deliberately unanswerable) | "Insufficient evidence in knowledge base" | Live abstention |
+| 6 | 3:00 | Templates → Security questionnaire → upload the 12-question demo XLSX → Start. (Mention that the full 40-question run is in the public replay) | Trace view: plan step, then parallel item lanes filling in live | Live durable fan-out |
+| 7 | 3:45 | In the terminal: `docker compose kill worker` and then `docker compose up -d worker` (or the compose restart policy) | Trace pauses. Then a `recovered` event, and only unfinished items continue. Completed items keep their original timestamps | Live crash recovery |
+| 8 | 4:45 | Open an item's step → LLM calls tab | Prompt (with labeled untrusted evidence), response, tokens, latency, model digest | Live trace data |
+| 9 | 5:15 | Review queue (flagged items) | Item with a red, unsupported claim. Item from the injected document, where the injection did not trigger any action | Live |
+| 10 | 5:45 | Review with keyboard: approve one, edit and approve one, reject one with reason, then "approve all supported" | Batch complete → run resumes → export step | Live |
+| 11 | 6:30 | Download the XLSX | Answers, status, and citations per question | Live, idempotent artifact |
+| 12 | 7:00 | MCP Inspector → connect to `/mcp` with an `mcp:use` key → `answer_with_citations` | The same cited, verified answer through MCP. Tool list shows only 3 read-only tools | Live |
+| 13 | 7:40 | Close: "Approvals are deliberately not available through MCP. In Release 2, AgentForge also calls MCP servers, with hash-pinned tool snapshots and approval gates." Show the eval baseline page in the docs | Committed Measured baseline | Recorded data, labeled |
+
+**Numbers to have ready (Measured in R1-49, not before):** end-to-end run time for the 12-question subset and the full 40 questions on the demo machine, recovery time after the kill, recall@10 baseline.
+
+---
+
+## 8. Cut list if R1 runs late (in order)
+
+Security and correctness items are never cut: S1–S15, H1–H8, RLS, cross-tenant tests.
+
+**Decision D2 (2026-10-12):** the MCP server (order 4) is cut before the static replay (order 5). The replay is the primary public demo, because the reference machine is CPU-only. If R1 is on time, both ship.
+
+| Order | Cut | Saves (Estimate) | Consequence |
+|---|---|---|---|
+| 1 | R1-38 trace view → simple step table without parallel lanes | ~6 h | Less visual. Data unchanged |
+| 2 | R1-19/R1-39 polish: keyboard shortcuts, bulk action | ~5 h | Slower reviews in the demo |
+| 3 | R1-12 DOCX parsing (keep PDF, MD, TXT) | ~3 h | Corpus authored in MD/PDF only |
+| 4 | R1-43/R1-44 MCP server → moves to R2 | ~17 h | R1 demo loses step 12. R2 delivers the server and client together |
+| 5 | R1-47 static replay → video only | ~8 h | Public demo is the video only |
+| 6 | R1-22 or R1-23 prototype → paper evaluation if the first two prototypes clearly separate | ~7 h | Weaker ADR-2 evidence. Only allowed if DBOS passes every gate with margin |
+
+Maximum saving ≈ 46 h → R1 ≈ 306 h.
+
+---
+
+## 9. Risks specific to Release 1
+
+| Risk | Signal | Response |
+|---|---|---|
+| Local model too slow even for the 12-question live run (**expected risk: CPU-only reference machine**) | Measured E2E > ~8 min for the subset | Verifier in `low_confidence_only` mode. Reduce the subset to 8 questions. Pre-warm the model. Full run always available in the replay |
+| Memory pressure (16 GB shared by Windows, WSL, and Ollama) | Paging or Ollama out-of-memory during runs | `.wslconfig` cap (6 GB + 4 GB swap). CPU-tier models only. Close desktop apps for real-model work. Fake LLM for daily development |
+| Structured output invalid too often on the CPU model | Validity < 95% (Target) in R1-40 | Switch default model per the eval. Smaller steps. Stronger repair prompt |
+| Engine prototypes all fail a gate | M3 report | Custom engine with re-estimated M4. Gate failures documented in the ADR |
+| Windows/WSL2 setup friction | `make doctor` failures | Document fixes. Keep the fake-LLM path working without Ollama |
+| Corpus writing takes longer than planned | R1-15 > 16 h | Reduce to 6 documents and 30 questions. Keep the unanswerable and injection items |
+| Motivation dips mid-release | Two weeks with < 8 h | Milestones are demoable on their own. Pick an M2 or M4 recording to share |
+
+---
+
+## 10. After Release 1
+
+At the R1 retrospective: compute the actual/estimate ratio, re-estimate R2 at task level, and confirm R2's order. Proposed R2 order: governed MCP client with demo trust portal and adversarial suite → eval UI and judge calibration → chaos and scale benchmarks → hosted-demo gate and invite-only live demo.

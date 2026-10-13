@@ -1,0 +1,36 @@
+# Workspace root. Not a distributable package: the product lives in apps/server.
+[project]
+name = "agentforge-workspace"
+version = "0.0.0"
+requires-python = ">=3.12,<3.14"
+dependencies = ["agentforge"]
+
+[dependency-groups]
+dev = ["pytest", "ruff"]
+
+[tool.uv]
+package = false
+# Supply-chain policy: only resolve releases that are at least ~2 weeks old.
+# Move this date forward deliberately when updating dependencies.
+exclude-newer = "2026-09-28T00:00:00Z"
+
+[tool.uv.workspace]
+members = ["apps/server"]
+
+[tool.uv.sources]
+agentforge = { workspace = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["apps/server/src", "apps/server/tests"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "S", "C4", "SIM", "RUF", "PT"]
+
+[tool.ruff.lint.per-file-ignores]
+"apps/server/tests/**" = ["S101"]
+
+[tool.pytest.ini_options]
+testpaths = ["apps/server/tests"]
+addopts = "-ra --strict-markers --strict-config"

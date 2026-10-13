@@ -1,0 +1,14 @@
+title = "AgentForge gitleaks config"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Dependency, build, and environment directories"
+paths = [
+  '''(^|/)node_modules/''',
+  '''(^|/)\.venv/''',
+  '''(^|/)\.git/''',
+  '''(^|/)uv\.lock$''',
+  '''(^|/)pnpm-lock\.yaml$''',
+]

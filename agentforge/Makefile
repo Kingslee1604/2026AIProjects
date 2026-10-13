@@ -1,0 +1,41 @@
+SHELL := /usr/bin/env bash
+.SHELLFLAGS := -euo pipefail -c
+.DEFAULT_GOAL := help
+
+.PHONY: help tools setup lint format typecheck test docs-check secrets-scan check
+
+help: ## Show available targets
+	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
+
+tools: ## Install pinned developer tools into ~/.local (uv, node, pnpm, gitleaks, pre-commit)
+	./scripts/install-dev-tools.sh
+
+setup: ## Install project dependencies from lockfiles and enable git hooks
+	uv sync --frozen
+	pnpm install --frozen-lockfile
+	pre-commit install
+
+lint: ## Lint Python (ruff) and check formatting (ruff, prettier)
+	uv run --frozen ruff check .
+	uv run --frozen ruff format --check .
+	pnpm exec prettier --check .
+
+format: ## Apply formatting
+	uv run --frozen ruff check --fix .
+	uv run --frozen ruff format .
+	pnpm exec prettier --write .
+
+typecheck: ## Type-check Python (pyright, strict on the agentforge package)
+	pnpm exec pyright
+
+test: ## Run the test suite
+	uv run --frozen pytest
+
+docs-check: ## Validate every Mermaid diagram under docs/
+	node scripts/docs-check.mjs docs
+
+secrets-scan: ## Scan the working tree for secrets
+	gitleaks dir . --no-banner --redact --config ../.gitleaks.toml
+
+check: lint typecheck test docs-check secrets-scan ## Run every check (same gates as CI)
+	@echo "All checks passed."
