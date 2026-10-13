@@ -3,7 +3,7 @@ SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
 .PHONY: help tools setup lint format typecheck test docs-check secrets-scan licenses check \
-	up down logs ps doctor user-create user-list api-client api-client-check web-build e2e ci-tools security models-smoke
+	up down logs ps doctor user-create user-list api-client api-client-check web-build e2e ci-tools security models-smoke demo-build demo-check
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -87,7 +87,13 @@ secrets-scan: ## Scan the working tree for secrets (local git-ignored .env files
 licenses: ## Fail if any dependency's license is outside licenses/policy.toml
 	uv run --frozen python -m tools.license_check
 
-check: api-client-check lint typecheck test docs-check secrets-scan licenses ## Run every check (same gates as CI)
+demo-build: ## Build the Northwind demo corpus and questionnaires into demo/build/
+	uv run --frozen python -m tools.demo_corpus build
+
+demo-check: ## Verify the demo questionnaire, gold set, and every evidence quote
+	uv run --frozen python -m tools.demo_corpus check
+
+check: api-client-check lint typecheck test docs-check demo-check secrets-scan licenses ## Run every check (same gates as CI)
 	@echo "All checks passed."
 
 ci-tools: ## Install the CI security scanners (Trivy, Syft, OSV-Scanner, pip-audit)

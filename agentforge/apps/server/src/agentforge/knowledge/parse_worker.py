@@ -51,8 +51,12 @@ def parse_pdf(path: Path) -> list[dict[str, Any]]:
             textpage.close()
             page.close()
             for part in re.split(r"\n\s*\n", text):
-                if part.strip():
-                    blocks.append({"page": index + 1, "text": part.strip(), "heading": None})
+                # Line breaks inside a PDF paragraph are layout, not content: rejoin words
+                # hyphenated at a line end, and turn the remaining breaks into spaces.
+                paragraph = re.sub(r"(\w)-\n(\w)", r"\1\2", part.strip())
+                paragraph = re.sub(r"\s*\n\s*", " ", paragraph)
+                if paragraph:
+                    blocks.append({"page": index + 1, "text": paragraph, "heading": None})
         return blocks
     finally:
         document.close()
