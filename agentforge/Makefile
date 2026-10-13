@@ -2,7 +2,7 @@ SHELL := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 .DEFAULT_GOAL := help
 
-.PHONY: help tools setup lint format typecheck test docs-check secrets-scan check
+.PHONY: help tools setup lint format typecheck test docs-check secrets-scan licenses check
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -37,5 +37,8 @@ docs-check: ## Validate every Mermaid diagram under docs/
 secrets-scan: ## Scan the working tree for secrets
 	gitleaks dir . --no-banner --redact --config ../.gitleaks.toml
 
-check: lint typecheck test docs-check secrets-scan ## Run every check (same gates as CI)
+licenses: ## Fail if any dependency's license is outside licenses/policy.toml
+	uv run --frozen python -m tools.license_check
+
+check: lint typecheck test docs-check secrets-scan licenses ## Run every check (same gates as CI)
 	@echo "All checks passed."

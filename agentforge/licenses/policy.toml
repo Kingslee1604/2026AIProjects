@@ -1,0 +1,47 @@
+# AgentForge dependency license policy (architecture §20, Release 1 task R1-02).
+# Enforced by `make licenses` (tools/license_check.py), which is part of `make check`.
+#
+# Scopes:
+#   shipped - runtime dependencies that end up in AgentForge images or installs
+#   dev     - tooling used only to develop, test, or document AgentForge (never shipped)
+# A license expression passes when it is satisfiable from the lists below
+# ("A OR B" needs one allowed side, "A AND B" needs both).
+
+[allowed]
+# Permissive licenses (and MPL-2.0, which is file-level copyleft) allowed in any scope.
+spdx = [
+  "0BSD",
+  "Apache-2.0",
+  "BlueOak-1.0.0",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "CC0-1.0",
+  "ISC",
+  "MIT",
+  "MIT-0",
+  "MPL-2.0",
+  "PostgreSQL",
+  "PSF-2.0",
+  "Python-2.0",
+  "Unicode-3.0",
+  "Unicode-DFS-2016",
+  "Unlicense",
+  "Zlib",
+]
+
+[dev_only]
+# Allowed only for development-only dependencies. Must never reach a shipped install.
+spdx = [
+  "CC-BY-4.0", # data files in tooling
+  "EPL-2.0",   # elkjs, pulled in by mermaid (docs diagram validation only)
+]
+
+# Per-package exceptions: when registry metadata is missing or wrong, or an ADR approves a
+# license outside the lists above. Each one records the verified license and why.
+
+[[exception]]
+ecosystem = "npm"
+name = "khroma"
+license = "MIT"
+scope = "dev"
+reason = "package.json has no license field; the repository and the license file shipped in the package are MIT (verified 2026-10-13). Pulled in by mermaid."
