@@ -30,12 +30,14 @@ make tools   # pinned uv, Node.js, pnpm, gitleaks, pre-commit into ~/.local (che
 make setup   # dependencies from lockfiles + git hooks
 make check   # lint, type-check, tests, diagram validation, secret scan, license gate
 make doctor  # checks Docker, memory, Ollama, models, and ports, with fix-it hints
-make up      # starts Postgres, API, and worker; waits until all are healthy
+make up      # starts Postgres, migrations, API, and worker; waits until all are healthy
+make user-create EMAIL=you@example.com ROLE=admin   # there is no public sign-up
 ```
 
-The API is then at <http://127.0.0.1:8000/healthz> (interactive docs at `/docs`). Every port is
-bound to `127.0.0.1` only. `make down` stops the stack and keeps the data; `make logs` follows
-the logs. `make up` creates `.env` with a random database password on first run.
+The API is then at <http://127.0.0.1:8000/healthz> (interactive docs at `/docs`; sign in with
+`POST /v1/auth/login`). Every port is bound to `127.0.0.1` only. `make down` stops the stack and
+keeps the data; `make logs` follows the logs. `make up` creates `.env` with random database
+passwords on first run.
 
 Requires Docker (on Windows: Docker Desktop with WSL Integration enabled for your distro) and
 [Ollama](https://ollama.com) on the host. `make help` lists every target.

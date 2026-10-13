@@ -1,7 +1,8 @@
 """FastAPI application factory."""
 
 import time
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable, Mapping
+from contextlib import asynccontextmanager
 
 from fastapi import APIRouter, FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
@@ -11,9 +12,12 @@ from opentelemetry.propagate import extract
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from agentforge import __version__
+from agentforge.api import admin_routes, auth_routes
+from agentforge.auth.service import AuthService
 from agentforge.core.logging import configure_logging, get_logger
 from agentforge.core.settings import Settings, get_settings
 from agentforge.core.telemetry import configure_tracing, current_trace_id
+from agentforge.db.engine import create_app_engine, create_sessionmaker
 
 log = get_logger("agentforge.api")
 tracer = trace.get_tracer("agentforge.api")
@@ -21,7 +25,26 @@ tracer = trace.get_tracer("agentforge.api")
 PROBLEM_JSON = "application/problem+json"
 
 
-def problem(status: int, title: str, detail: str | None = None) -> JSONResponse:
+# Routes reachable without a session. Every other route must require authentication;
+# tests/integration/test_auth.py enforces this for every registered route (baseline S2).
+PUBLIC_ROUTES = frozenset(
+    {
+        ("GET", "/healthz"),
+        ("GET", "/v1/meta"),
+        ("POST", "/v1/auth/login"),
+        ("GET", "/openapi.json"),
+        ("GET", "/docs"),
+        ("GET", "/docs/oauth2-redirect"),
+    }
+)
+
+
+def problem(
+    status: int,
+    title: str,
+    detail: str | None = None,
+    headers: Mapping[str, str] | None = None,
+) -> JSONResponse:
     """RFC 9457 problem details, always carrying the trace ID for support and debugging."""
     body: dict[str, object] = {"type": "about:blank", "title": title, "status": status}
     if detail:
@@ -29,12 +52,12 @@ def problem(status: int, title: str, detail: str | None = None) -> JSONResponse:
     trace_id = current_trace_id()
     if trace_id:
         body["trace_id"] = trace_id
-    return JSONResponse(body, status_code=status, media_type=PROBLEM_JSON)
+    return JSONResponse(body, status_code=status, media_type=PROBLEM_JSON, headers=headers)
 
 
 async def _http_error(_request: Request, exc: Exception) -> Response:
     if isinstance(exc, StarletteHTTPException):
-        return problem(exc.status_code, str(exc.detail))
+        return problem(exc.status_code, str(exc.detail), headers=exc.headers)
     return await _unhandled_error(_request, exc)
 
 
@@ -80,12 +103,30 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     configure_logging(settings.log_level, settings.log_format)
     configure_tracing(settings)
 
+    @asynccontextmanager
+    async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
+        if settings.database_url is None:  # API without a database: /healthz and /v1/meta only
+            yield
+            return
+        engine = create_app_engine(settings.database_url)
+        sessions = create_sessionmaker(engine)
+        app.state.sessions = sessions
+        app.state.auth = AuthService(sessions, settings)
+        try:
+            yield
+        finally:
+            await engine.dispose()
+
     app = FastAPI(
         title="AgentForge API",
         version=__version__,
         docs_url="/docs" if settings.env != "production" else None,
         redoc_url=None,
+        lifespan=lifespan,
     )
+    app.state.settings = settings
+    app.state.auth = None
+    app.state.sessions = None
     app.middleware("http")(_trace_and_log)
     app.add_exception_handler(StarletteHTTPException, _http_error)
     app.add_exception_handler(RequestValidationError, _validation_error)
@@ -101,4 +142,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"name": "agentforge", "version": __version__, "env": settings.env}
 
     app.include_router(v1)
+    app.include_router(auth_routes.router)
+    app.include_router(admin_routes.router)
     return app

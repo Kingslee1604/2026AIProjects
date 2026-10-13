@@ -3,7 +3,7 @@ SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
 .PHONY: help tools setup lint format typecheck test docs-check secrets-scan licenses check \
-	up down logs ps doctor
+	up down logs ps doctor user-create user-list
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -32,6 +32,13 @@ logs: ## Follow logs from all services
 
 ps: ## Show service status and health
 	docker compose ps
+
+user-create: ## Create a user: make user-create EMAIL=you@example.com [ROLE=admin|member] (prompts for password)
+	@test -n "$(EMAIL)" || { echo "Usage: make user-create EMAIL=you@example.com [ROLE=admin]"; exit 2; }
+	docker compose run --rm api user create --email "$(EMAIL)" --role "$(or $(ROLE),member)"
+
+user-list: ## List users in the default organization
+	docker compose run --rm --no-deps api user list
 
 lint: ## Lint Python (ruff), module boundaries (import-linter), formatting (ruff, prettier)
 	uv run --frozen ruff check .

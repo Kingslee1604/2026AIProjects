@@ -4,7 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -33,6 +33,23 @@ class Settings(BaseSettings):
     # schema owner and is only needed by `agentforge migrate`.
     database_url: SecretStr | None = None
     migration_database_url: SecretStr | None = None
+
+    # Sessions (security baseline S3). Cookies are Secure whenever served over TLS; production
+    # refuses to start without it.
+    cookie_secure: bool = False
+    session_idle_minutes: int = Field(default=120, ge=5)
+    session_absolute_hours: int = Field(default=12, ge=1)
+
+    # Brute-force protection: failed logins within the window, per email and per client IP.
+    login_window_minutes: int = Field(default=15, ge=1)
+    login_max_failures_per_email: int = Field(default=5, ge=1)
+    login_max_failures_per_ip: int = Field(default=20, ge=1)
+
+    @model_validator(mode="after")
+    def _production_requires_secure_cookies(self) -> "Settings":
+        if self.env == "production" and not self.cookie_secure:
+            raise ValueError("AGENTFORGE_COOKIE_SECURE must be true in production (TLS required)")
+        return self
 
 
 @lru_cache

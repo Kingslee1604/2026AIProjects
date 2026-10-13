@@ -35,7 +35,8 @@ src = ["apps/server/src", "apps/server/tests", "."]
 select = ["E", "W", "F", "I", "B", "UP", "S", "C4", "SIM", "RUF", "PT"]
 
 [tool.ruff.lint.per-file-ignores]
-"apps/server/tests/**" = ["S101"]
+# Tests use asserts and throwaway test passwords.
+"apps/server/tests/**" = ["S101", "S105", "S106"]
 "tools/tests/**" = ["S101"]
 # Repository tooling runs fixed commands (uv, pnpm) found on PATH; no user input reaches them.
 "tools/license_check.py" = ["S603", "S607"]
@@ -48,6 +49,7 @@ addopts = "-ra --strict-markers --strict-config"
 # Module boundaries (architecture §5.4), checked by `make lint` via import-linter.
 [tool.importlinter]
 root_package = "agentforge"
+include_external_packages = true
 
 [[tool.importlinter.contracts]]
 name = "core is infrastructure: it never imports db, api, or worker"
@@ -56,10 +58,16 @@ source_modules = ["agentforge.core"]
 forbidden_modules = ["agentforge.db", "agentforge.api", "agentforge.worker"]
 
 [[tool.importlinter.contracts]]
-name = "db is infrastructure: it never imports api or worker"
+name = "db is infrastructure: it never imports auth, api, or worker"
 type = "forbidden"
 source_modules = ["agentforge.db"]
-forbidden_modules = ["agentforge.api", "agentforge.worker"]
+forbidden_modules = ["agentforge.auth", "agentforge.api", "agentforge.worker"]
+
+[[tool.importlinter.contracts]]
+name = "auth is a domain module: it never imports api or worker (HTTP stays in api)"
+type = "forbidden"
+source_modules = ["agentforge.auth"]
+forbidden_modules = ["agentforge.api", "agentforge.worker", "fastapi", "starlette"]
 
 [[tool.importlinter.contracts]]
 name = "api and worker are independent process types"

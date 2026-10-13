@@ -18,11 +18,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         "migrate", help="Upgrade the database schema and seed defaults (runs as schema owner)"
     )
     migrate.add_argument("--revision", default="head", help="Target revision (default: head)")
+    from agentforge.auth.cli import add_user_commands
+
+    add_user_commands(commands.add_parser("user", help="Manage user accounts (no public sign-up)"))
     commands.add_parser("version", help="Print the version")
     args = parser.parse_args(argv)
 
     if args.command == "version":
         print(__version__)
+    elif args.command == "user":
+        from agentforge.auth.cli import run_user_command
+
+        return run_user_command(args)
     elif args.command == "migrate":
         from agentforge.core.logging import configure_logging, get_logger
         from agentforge.core.settings import get_settings

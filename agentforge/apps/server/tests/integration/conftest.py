@@ -1,5 +1,6 @@
 """Real Postgres for integration tests: the same image and role setup as the Compose stack."""
 
+import os
 import secrets
 import time
 from collections.abc import Iterator
@@ -11,6 +12,11 @@ from sqlalchemy import text
 
 from agentforge.db.engine import create_sync_engine
 from agentforge.db.migrate import seed_defaults, upgrade
+
+# Ryuk (testcontainers' reaper container) intermittently fails its port-mapping check on Docker
+# Desktop. The `database` fixture stops its own container in a context manager, so the reaper
+# is not needed; set TESTCONTAINERS_RYUK_DISABLED=false to opt back in.
+os.environ.setdefault("TESTCONTAINERS_RYUK_DISABLED", "true")
 
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
 INITDB_DIR = PROJECT_ROOT / "deploy" / "postgres" / "initdb"
