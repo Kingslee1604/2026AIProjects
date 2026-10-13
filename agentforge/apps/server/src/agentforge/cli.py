@@ -1,4 +1,4 @@
-"""Command-line entry point: `agentforge api | worker | version`."""
+"""Command-line entry point: `agentforge api | worker | healthcheck | version`."""
 
 import argparse
 import sys
@@ -12,6 +12,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("api", help="Run the HTTP API server")
     commands.add_parser("worker", help="Run the background worker")
+    health = commands.add_parser("healthcheck", help="Exit 0 if a local process is healthy")
+    health.add_argument("target", choices=["api", "worker"])
     commands.add_parser("version", help="Print the version")
     args = parser.parse_args(argv)
 
@@ -36,6 +38,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         from agentforge.worker.main import run_worker
 
         run_worker()
+    elif args.command == "healthcheck":
+        from agentforge.core.health import api_is_healthy, worker_is_healthy
+        from agentforge.core.settings import get_settings
+
+        settings = get_settings()
+        healthy = api_is_healthy(settings) if args.target == "api" else worker_is_healthy(settings)
+        return 0 if healthy else 1
     return 0
 
 

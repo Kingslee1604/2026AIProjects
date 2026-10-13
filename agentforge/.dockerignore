@@ -1,0 +1,8 @@
+# Only pyproject.toml, uv.lock, and apps/server are needed to build the server image.
+*
+!pyproject.toml
+!uv.lock
+!apps/server/pyproject.toml
+!apps/server/README.md
+!apps/server/src/**
+**/__pycache__

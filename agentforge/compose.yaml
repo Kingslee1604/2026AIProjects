@@ -1,0 +1,81 @@
+# AgentForge local stack. Start with `make up` (creates .env with a random database password).
+# Every published port is bound to 127.0.0.1 only (security baseline S1).
+# Ollama runs on the host by default; `--profile ollama` runs it in a container instead.
+name: agentforge
+
+x-server: &server
+  image: agentforge-server:dev
+  build:
+    context: .
+    dockerfile: deploy/docker/server.Dockerfile
+  environment: &server-env
+    AGENTFORGE_ENV: development
+    AGENTFORGE_LOG_LEVEL: ${AGENTFORGE_LOG_LEVEL:-INFO}
+    AGENTFORGE_OLLAMA_BASE_URL: ${AGENTFORGE_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+    AGENTFORGE_DATABASE_URL: postgresql://agentforge_owner:${POSTGRES_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  depends_on:
+    postgres:
+      condition: service_healthy
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg18-trixie@sha256:9d9c930220cb9bf2f956d10a8f909cf9973d9672ca0278aef2c1e6facccad2e0
+    environment:
+      POSTGRES_DB: agentforge
+      POSTGRES_USER: agentforge_owner
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run "make up", which creates .env}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentforge_owner -d agentforge"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  api:
+    <<: *server
+    command: ["api"]
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "agentforge", "healthcheck", "api"]
+      interval: 10s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+  worker:
+    <<: *server
+    command: ["worker"]
+    healthcheck:
+      test: ["CMD", "agentforge", "healthcheck", "worker"]
+      interval: 10s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+  ollama:
+    profiles: [ollama]
+    image: ollama/ollama:0.40.3@sha256:adca95a12c2b386a8f9a995e7fa0600e187e3323b5e5522f5a6c3b1ec73eff99
+    # Port 11435 on the host avoids clashing with a host-native Ollama on 11434.
+    # Point the stack at it with AGENTFORGE_OLLAMA_BASE_URL=http://ollama:11434 in .env.
+    ports:
+      - "127.0.0.1:11435:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  ollama:
