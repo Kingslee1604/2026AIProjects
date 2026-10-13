@@ -1,0 +1,67 @@
+{
+  "doc_id": "fixture-doc-1",
+  "title": "Fixture: Beta-Blocker Dosing Guideline",
+  "source_type": "guideline",
+  "license": "test-fixture",
+  "resolved_url": "https://example.invalid/fixture-doc-1",
+  "elements": [
+    {
+      "element_id": "fixture-doc-1-heading-1",
+      "type": "section_header",
+      "page": 1,
+      "section": "Introduction",
+      "text": "Introduction"
+    },
+    {
+      "element_id": "fixture-doc-1-text-1",
+      "type": "text",
+      "page": 1,
+      "section": "Introduction",
+      "text": "Beta-blockers are a first-line therapy for heart failure with reduced ejection fraction."
+    },
+    {
+      "element_id": "fixture-doc-1-text-2",
+      "type": "text",
+      "page": 1,
+      "section": "Introduction",
+      "text": "This guideline summarizes dosing recommendations for adults."
+    },
+    {
+      "element_id": "fixture-doc-1-heading-2",
+      "type": "section_header",
+      "page": 2,
+      "section": "Dosing",
+      "text": "Dosing"
+    },
+    {
+      "element_id": "fixture-doc-1-table-1",
+      "type": "table",
+      "page": 2,
+      "section": "Dosing",
+      "caption": "Table 1. Recommended starting and target doses",
+      "markdown": "| Drug | Starting dose | Target dose |\n| --- | --- | --- |\n| Metoprolol succinate | 12.5-25 mg once daily | 200 mg once daily |\n| Carvedilol | 3.125 mg twice daily | 25-50 mg twice daily |\n| Bisoprolol | 1.25 mg once daily | 10 mg once daily |"
+    },
+    {
+      "element_id": "fixture-doc-1-heading-3",
+      "type": "section_header",
+      "page": 3,
+      "section": "Monitoring",
+      "text": "Monitoring"
+    },
+    {
+      "element_id": "fixture-doc-1-figure-1",
+      "type": "figure",
+      "page": 3,
+      "section": "Monitoring",
+      "caption_original": "Figure 1. Titration flowchart for beta-blocker initiation",
+      "vlm_description": "A flowchart showing four sequential steps from initial low-dose beta-blocker prescription through gradual up-titration with heart rate and blood pressure checks at each step."
+    },
+    {
+      "element_id": "fixture-doc-1-text-3",
+      "type": "text",
+      "page": 3,
+      "section": "Monitoring",
+      "text": "Patients should be monitored for bradycardia and hypotension during up-titration."
+    }
+  ]
+}

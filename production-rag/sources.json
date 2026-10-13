@@ -1,0 +1,48 @@
+{
+  "_comment": "Data provenance manifest for the cardiology corpus. Guideline URLs below were verified by hand (not guessed) at plan time. The PMC and DailyMed sections are resolved dynamically at download time via NCBI/DailyMed's documented public APIs (scripts/download_corpus.py) so we never hand-guess article/label URLs. scripts/download_corpus.py appends the exact resolved URL + retrieval date + license for every file it downloads into data/raw/manifest.json, which is the authoritative, reproducible record of what's actually in the corpus.",
+
+  "guidelines": [
+    {
+      "id": "who-hypertension-2021",
+      "title": "WHO Guideline for the pharmacological treatment of hypertension in adults (2021)",
+      "url": "https://iris.who.int/server/api/core/bitstreams/f062769d-f075-4a00-87af-0a2106e0bd04/content",
+      "publisher": "World Health Organization",
+      "license": "CC BY-NC-SA 3.0 IGO (WHO standard reuse license)"
+    },
+    {
+      "id": "who-cvd-risk-management",
+      "title": "Prevention of cardiovascular disease: guidelines for assessment and management of total cardiovascular risk",
+      "url": "https://iris.who.int/bitstream/handle/10665/43235/9241593253_eng.pdf",
+      "publisher": "World Health Organization",
+      "license": "CC BY-NC-SA 3.0 IGO (WHO standard reuse license)"
+    },
+    {
+      "id": "who-rheumatic-heart-disease",
+      "title": "WHO guideline on the prevention and diagnosis of rheumatic fever and rheumatic heart disease",
+      "url": "https://iris.who.int/server/api/core/bitstreams/fbd835e1-b9b7-414a-b6aa-9c279472bbdf/content",
+      "publisher": "World Health Organization",
+      "license": "CC BY-NC-SA 3.0 IGO (WHO standard reuse license)"
+    }
+  ],
+
+  "dailymed_drugs": {
+    "_comment": "Cardiovascular drug labels, resolved to SETIDs via the DailyMed v2 /spls.json search endpoint at download time.",
+    "search_terms": [
+      "atorvastatin",
+      "metoprolol succinate",
+      "warfarin sodium",
+      "apixaban",
+      "ticagrelor",
+      "furosemide",
+      "lisinopril",
+      "amiodarone"
+    ],
+    "labels_per_term": 1
+  },
+
+  "pmc_open_access": {
+    "_comment": "Cardiology case reports / review articles from the PMC Open Access Subset, commercial-use-allowed licenses only, resolved via NCBI E-utilities esearch + the PMC OA Web Service (oa.fcgi) at download time.",
+    "esearch_query": "(cardiology[Title] OR cardiac[Title] OR arrhythmia[Title] OR \"heart failure\"[Title] OR \"coronary artery disease\"[Title]) AND (\"case report\" OR review) AND pmc cc by license[filter]",
+    "max_results": 60
+  }
+}

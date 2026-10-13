@@ -1,0 +1,1992 @@
+[
+  {
+    "id": "who-hypertension-2021",
+    "source_type": "guideline",
+    "title": "WHO Guideline for the pharmacological treatment of hypertension in adults (2021)",
+    "resolved_url": "https://iris.who.int/server/api/core/bitstreams/f062769d-f075-4a00-87af-0a2106e0bd04/content",
+    "license": "CC BY-NC-SA 3.0 IGO (WHO standard reuse license)",
+    "local_path": "data\\raw\\guidelines\\who-hypertension-2021.pdf",
+    "sha256": "57f6376d5c9bc4ea6c44873625547c8a5443d5a6ad8c8c422733681563db05fb",
+    "retrieved_at": "2026-07-26T01:09:45.258291+00:00"
+  },
+  {
+    "id": "who-cvd-risk-management",
+    "source_type": "guideline",
+    "title": "Prevention of cardiovascular disease: guidelines for assessment and management of total cardiovascular risk",
+    "resolved_url": "https://iris.who.int/bitstream/handle/10665/43235/9241593253_eng.pdf",
+    "license": "CC BY-NC-SA 3.0 IGO (WHO standard reuse license)",
+    "local_path": "data\\raw\\guidelines\\who-cvd-risk-management.pdf",
+    "sha256": "a859cc83d11508435744f1ce4fb6f39396083c22e60bea3f872887eb2dd1863f",
+    "retrieved_at": "2026-07-26T01:09:45.364412+00:00"
+  },
+  {
+    "id": "who-rheumatic-heart-disease",
+    "source_type": "guideline",
+    "title": "WHO guideline on the prevention and diagnosis of rheumatic fever and rheumatic heart disease",
+    "resolved_url": "https://iris.who.int/server/api/core/bitstreams/fbd835e1-b9b7-414a-b6aa-9c279472bbdf/content",
+    "license": "CC BY-NC-SA 3.0 IGO (WHO standard reuse license)",
+    "local_path": "data\\raw\\guidelines\\who-rheumatic-heart-disease.pdf",
+    "sha256": "74d2b4d4e420ff4525500559b6c098abc83cab8ca6ce777fd1016ade839ea257",
+    "retrieved_at": "2026-07-26T01:09:45.619787+00:00"
+  },
+  {
+    "id": "dailymed-86841382-4229-4e03-958e-3ac22639efd4",
+    "source_type": "dailymed",
+    "title": "ATORVASTATIN CALCIUM TABLET, FILM COATED [TEVA PHARMACEUTICALS USA, INC.]",
+    "resolved_url": "https://dailymed.nlm.nih.gov/dailymed/downloadpdffile.cfm?setId=86841382-4229-4e03-958e-3ac22639efd4",
+    "license": "Public domain (FDA-approved structured product label)",
+    "local_path": "data\\raw\\drug_labels\\atorvastatin_86841382-4229-4e03-958e-3ac22639efd4.pdf",
+    "sha256": "49f1398fc4968c326bc3ef025921d68df98fc3fd4e5b92d5455baa44b9ea72ac",
+    "retrieved_at": "2026-07-26T01:09:49.862159+00:00"
+  },
+  {
+    "id": "dailymed-d7f6200f-d600-4a13-9434-b77f99057ae8",
+    "source_type": "dailymed",
+    "title": "METOPROLOL SUCCINATE TABLET, FILM COATED, EXTENDED RELEASE [PROFICIENT RX LP]",
+    "resolved_url": "https://dailymed.nlm.nih.gov/dailymed/downloadpdffile.cfm?setId=d7f6200f-d600-4a13-9434-b77f99057ae8",
+    "license": "Public domain (FDA-approved structured product label)",
+    "local_path": "data\\raw\\drug_labels\\metoprolol_succinate_d7f6200f-d600-4a13-9434-b77f99057ae8.pdf",
+    "sha256": "85bc1c03c510d65b5f0a938b23ae9b994787776b0182827bedb435fbc74aeee8",
+    "retrieved_at": "2026-07-26T01:09:51.290941+00:00"
+  },
+  {
+    "id": "dailymed-541c9a70-adaf-4ef3-94ba-ad4e70dfa057",
+    "source_type": "dailymed",
+    "title": "WARFARIN SODIUM (WARFARIN) TABLET [A-S MEDICATION SOLUTIONS]",
+    "resolved_url": "https://dailymed.nlm.nih.gov/dailymed/downloadpdffile.cfm?setId=541c9a70-adaf-4ef3-94ba-ad4e70dfa057",
+    "license": "Public domain (FDA-approved structured product label)",
+    "local_path": "data\\raw\\drug_labels\\warfarin_sodium_541c9a70-adaf-4ef3-94ba-ad4e70dfa057.pdf",
+    "sha256": "64d4956d338d71e0012166563d258761b32673d4cc4af8c5a66c3f05ec228328",
+    "retrieved_at": "2026-07-26T01:09:52.435682+00:00"
+  },
+  {
+    "id": "dailymed-a454cd24-0c6d-46e8-b1e4-197388606175",
+    "source_type": "dailymed",
+    "title": "ELIQUIS (APIXABAN) TABLET, FILM COATED [CARDINAL HEALTH 107, LLC]",
+    "resolved_url": "https://dailymed.nlm.nih.gov/dailymed/downloadpdffile.cfm?setId=a454cd24-0c6d-46e8-b1e4-197388606175",
+    "license": "Public domain (FDA-approved structured product label)",
+    "local_path": "data\\raw\\drug_labels\\apixaban_a454cd24-0c6d-46e8-b1e4-197388606175.pdf",
+    "sha256": "3497f1b2b96c135339a44835b4ff7760ecaf1f7be00c470ecdf510bd5321e6cd",
+    "retrieved_at": "2026-07-26T01:09:54.608075+00:00"
+  },
+  {
+    "id": "dailymed-557351f1-47b7-216d-e063-6394a90afb51",
+    "source_type": "dailymed",
+    "title": "TICAGRELOR TABLET, FILM COATED [REDPHARM DRUG]",
+    "resolved_url": "https://dailymed.nlm.nih.gov/dailymed/downloadpdffile.cfm?setId=557351f1-47b7-216d-e063-6394a90afb51",
+    "license": "Public domain (FDA-approved structured product label)",
+    "local_path": "data\\raw\\drug_labels\\ticagrelor_557351f1-47b7-216d-e063-6394a90afb51.pdf",
+    "sha256": "2758c390ff58d559d476560a3e31543371c12dc14ef06bbf1537e0ed8ecac0ff",
+    "retrieved_at": "2026-07-26T01:09:58.103407+00:00"
+  },
+  {
+    "id": "dailymed-1531876c-9bba-405c-83d7-d6a2dc881032",
+    "source_type": "dailymed",
+    "title": "FUROSEMIDE TABLET [COVETRUS NORTH AMERICA]",
+    "resolved_url": "https://dailymed.nlm.nih.gov/dailymed/downloadpdffile.cfm?setId=1531876c-9bba-405c-83d7-d6a2dc881032",
+    "license": "Public domain (FDA-approved structured product label)",
+    "local_path": "data\\raw\\drug_labels\\furosemide_1531876c-9bba-405c-83d7-d6a2dc881032.pdf",
+    "sha256": "e63debfd839a28abac3ba61e092b176e3ff0ca4bd652e39ac48925bf51f72221",
+    "retrieved_at": "2026-07-26T01:09:58.992816+00:00"
+  },
+  {
+    "id": "dailymed-0e6364a4-6d66-4151-8197-d45e2a762895",
+    "source_type": "dailymed",
+    "title": "LISINOPRIL TABLET [AUROBINDO PHARMA LIMITED]",
+    "resolved_url": "https://dailymed.nlm.nih.gov/dailymed/downloadpdffile.cfm?setId=0e6364a4-6d66-4151-8197-d45e2a762895",
+    "license": "Public domain (FDA-approved structured product label)",
+    "local_path": "data\\raw\\drug_labels\\lisinopril_0e6364a4-6d66-4151-8197-d45e2a762895.pdf",
+    "sha256": "c559dd20292b5649eee556f801eae6c88d12cf4e50afa3e95b5f50a64efbfa5e",
+    "retrieved_at": "2026-07-26T01:10:00.049328+00:00"
+  },
+  {
+    "id": "dailymed-51a88e8e-da02-4b97-9e7e-442fbffd908d",
+    "source_type": "dailymed",
+    "title": "AMIODARONE HYDROCHLORIDE TABLET [REMEDYREPACK INC.]",
+    "resolved_url": "https://dailymed.nlm.nih.gov/dailymed/downloadpdffile.cfm?setId=51a88e8e-da02-4b97-9e7e-442fbffd908d",
+    "license": "Public domain (FDA-approved structured product label)",
+    "local_path": "data\\raw\\drug_labels\\amiodarone_51a88e8e-da02-4b97-9e7e-442fbffd908d.pdf",
+    "sha256": "0721ea889f7062c6031cbb6617f59a2c54fc961fc6379691243f3b8a37243ee5",
+    "retrieved_at": "2026-07-26T01:10:00.786220+00:00"
+  },
+  {
+    "id": "PMC13391955-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391955",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/PMC13391955.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955.pdf",
+    "sha256": "72a5a381f30024a22a5eac11d755e7c745cc9e4e358511b04a4ad377fe9584a5",
+    "retrieved_at": "2026-07-26T01:10:12.958767+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g001.jpg",
+    "sha256": "6ac663ea33b7006c0ddafce249ed2559a501420d696212b5688a68156a39c5af",
+    "retrieved_at": "2026-07-26T01:10:13.141735+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g002.jpg",
+    "sha256": "594acf7d5693f29107546ea488cc483bdf3435bc0bd13cf3825a0259c0208113",
+    "retrieved_at": "2026-07-26T01:10:13.383041+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g003.jpg",
+    "sha256": "2159adb225ebd1088fa1916cdbfa1bad62c1e3bb43084062885dc6c60adfa07a",
+    "retrieved_at": "2026-07-26T01:10:13.532438+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g004.jpg",
+    "sha256": "547f845eb1f6ed29b782d529b399e753c8fd8728e0ea516f31321393291863a0",
+    "retrieved_at": "2026-07-26T01:10:13.682592+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g005.jpg",
+    "sha256": "08471ff7f19386d46af5737854d7bca7864aed38ba3b202b9df1c1d9d67a1384",
+    "retrieved_at": "2026-07-26T01:10:13.832198+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g006.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g006.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g006.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g006.jpg",
+    "sha256": "6807cce23504a2d0cd126e0773fb94ec17c87d87e5f9423cfa9610be2cc588fe",
+    "retrieved_at": "2026-07-26T01:10:13.973638+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g007.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g007.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g007.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g007.jpg",
+    "sha256": "19095856a83014488d577215b31a9ce59c69cb90837cceec8603785dc13c45de",
+    "retrieved_at": "2026-07-26T01:10:14.123023+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g008.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g008.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g008.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g008.jpg",
+    "sha256": "516c8400f53cf256e092a04af92f1edf7e1498df737fbb427098f58485017833",
+    "retrieved_at": "2026-07-26T01:10:14.256860+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g009.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g009.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g009.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g009.jpg",
+    "sha256": "45dfd0d7c3083963a8f35255b8d6572893f115206ff2f2ca9c3d65343e413429",
+    "retrieved_at": "2026-07-26T01:10:14.439690+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g010.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g010.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g010.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g010.jpg",
+    "sha256": "3438339cff3ed275d82f62d8e3e1d4f92d1cc4d292f3ab411f0c94a7677444f5",
+    "retrieved_at": "2026-07-26T01:10:14.572615+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g011.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g011.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g011.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g011.jpg",
+    "sha256": "e022c70819fdbd9ebd0a0d81a0b74e411f1d97e2b3c1f41ef4bcc7bfd4e9c737",
+    "retrieved_at": "2026-07-26T01:10:14.739064+00:00"
+  },
+  {
+    "id": "PMC13391955-fcell-14-1824533-g012.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391955 figure fcell-14-1824533-g012.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391955.1/fcell-14-1824533-g012.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391955_images\\fcell-14-1824533-g012.jpg",
+    "sha256": "96db37cfb08bd21a40148417dd8e6f0b8f87185f65c809a2364335c466f8cdc1",
+    "retrieved_at": "2026-07-26T01:10:14.922077+00:00"
+  },
+  {
+    "id": "PMC13391323-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391323",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/PMC13391323.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323.pdf",
+    "sha256": "b52ca9150c1ac0c09f4d676ef5686168543ff868300af3a47a49c3ce0a54ab92",
+    "retrieved_at": "2026-07-26T01:10:18.524562+00:00"
+  },
+  {
+    "id": "PMC13391323-fphys-17-1838821-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391323 figure fphys-17-1838821-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/fphys-17-1838821-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323_images\\fphys-17-1838821-g001.jpg",
+    "sha256": "a973faf80d0d2b49dc1c10ba2928429fca8f0703137b12a2298c8f4b197e673c",
+    "retrieved_at": "2026-07-26T01:10:18.674234+00:00"
+  },
+  {
+    "id": "PMC13391323-fphys-17-1838821-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391323 figure fphys-17-1838821-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/fphys-17-1838821-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323_images\\fphys-17-1838821-g002.jpg",
+    "sha256": "b38e5da5d9df0ea9faff2e4178de81c054374b68b6d9a4703cea5fb76719d8eb",
+    "retrieved_at": "2026-07-26T01:10:18.848555+00:00"
+  },
+  {
+    "id": "PMC13391323-fphys-17-1838821-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391323 figure fphys-17-1838821-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/fphys-17-1838821-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323_images\\fphys-17-1838821-g003.jpg",
+    "sha256": "a9c11d26d178821bdd3a27ee03858ae0c60a87f2943f5752a3527f941de098a1",
+    "retrieved_at": "2026-07-26T01:10:19.023408+00:00"
+  },
+  {
+    "id": "PMC13391323-fphys-17-1838821-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391323 figure fphys-17-1838821-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/fphys-17-1838821-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323_images\\fphys-17-1838821-g004.jpg",
+    "sha256": "11c2317efe29ad0c93e53128c3a437297904929d0ab99a0b686f8dbf2a9572e9",
+    "retrieved_at": "2026-07-26T01:10:19.156360+00:00"
+  },
+  {
+    "id": "PMC13391323-fphys-17-1838821-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391323 figure fphys-17-1838821-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/fphys-17-1838821-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323_images\\fphys-17-1838821-g005.jpg",
+    "sha256": "3cc6466ea44afdae6b6598c06e614820d63325f65fbbef1ff369a72b68feb6ae",
+    "retrieved_at": "2026-07-26T01:10:19.297676+00:00"
+  },
+  {
+    "id": "PMC13391323-fphys-17-1838821-g006.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391323 figure fphys-17-1838821-g006.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/fphys-17-1838821-g006.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323_images\\fphys-17-1838821-g006.jpg",
+    "sha256": "0040aa04081e9d1c391cadf6efa82eae77f6263173492cee16ae1e8f1efa6bc1",
+    "retrieved_at": "2026-07-26T01:10:19.422376+00:00"
+  },
+  {
+    "id": "PMC13391323-fphys-17-1838821-g007.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391323 figure fphys-17-1838821-g007.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/fphys-17-1838821-g007.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323_images\\fphys-17-1838821-g007.jpg",
+    "sha256": "efc3531cc06c09fe12489477073c04deaba08cd09642f2e432c72de0b0c1bd41",
+    "retrieved_at": "2026-07-26T01:10:19.588856+00:00"
+  },
+  {
+    "id": "PMC13391323-fphys-17-1838821-g008.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391323 figure fphys-17-1838821-g008.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/fphys-17-1838821-g008.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323_images\\fphys-17-1838821-g008.jpg",
+    "sha256": "dfbbbd8c64e54dc2c2ffca40970ee00cae7b68398eef69f97351e296461bb1cd",
+    "retrieved_at": "2026-07-26T01:10:19.746966+00:00"
+  },
+  {
+    "id": "PMC13391323-fphys-17-1838821-g009.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391323 figure fphys-17-1838821-g009.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/fphys-17-1838821-g009.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323_images\\fphys-17-1838821-g009.jpg",
+    "sha256": "d8633669d6f6d76f765122bf98d39170ccd2d3fc34406cf3d4719ae8869f39e5",
+    "retrieved_at": "2026-07-26T01:10:19.946471+00:00"
+  },
+  {
+    "id": "PMC13391323-fphys-17-1838821-g010.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391323 figure fphys-17-1838821-g010.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/fphys-17-1838821-g010.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323_images\\fphys-17-1838821-g010.jpg",
+    "sha256": "a3759d182afee1129f6468b94df25291a40be845ab0a515181ccdfaab922f672",
+    "retrieved_at": "2026-07-26T01:10:20.079087+00:00"
+  },
+  {
+    "id": "PMC13391323-fphys-17-1838821-g011.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391323 figure fphys-17-1838821-g011.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391323.1/fphys-17-1838821-g011.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391323_images\\fphys-17-1838821-g011.jpg",
+    "sha256": "19c64525ce43687c41578f84ecf0947eb1f58931bb108838093f70b655b76543",
+    "retrieved_at": "2026-07-26T01:10:20.232725+00:00"
+  },
+  {
+    "id": "PMC13395530-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13395530",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13395530.1/PMC13395530.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13395530.pdf",
+    "sha256": "322c3d5043a54917796bccfc9408c3f6cbe9c81fed73153e354d98f2a9cb7852",
+    "retrieved_at": "2026-07-26T01:10:20.962115+00:00"
+  },
+  {
+    "id": "PMC13391499-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391499",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391499.1/PMC13391499.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391499.pdf",
+    "sha256": "849cab12acb34ef2a04ba8273730010b83a792333a642cae24eb0f2e7facc368",
+    "retrieved_at": "2026-07-26T01:10:21.862694+00:00"
+  },
+  {
+    "id": "PMC13391499-fped-14-1888687-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391499 figure fped-14-1888687-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391499.1/fped-14-1888687-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391499_images\\fped-14-1888687-g001.jpg",
+    "sha256": "fb98188d63cb9615af8005d37d20c86a4403fe7a7820ecf949d4e672b74df6b7",
+    "retrieved_at": "2026-07-26T01:10:22.005341+00:00"
+  },
+  {
+    "id": "PMC13391499-fped-14-1888687-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391499 figure fped-14-1888687-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391499.1/fped-14-1888687-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391499_images\\fped-14-1888687-g002.jpg",
+    "sha256": "ce5b2578dd88cda6b79f7deb52304b6cf72eec39881c450a6eaf1af449da4b3e",
+    "retrieved_at": "2026-07-26T01:10:22.169472+00:00"
+  },
+  {
+    "id": "PMC13391499-fped-14-1888687-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391499 figure fped-14-1888687-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391499.1/fped-14-1888687-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391499_images\\fped-14-1888687-g003.jpg",
+    "sha256": "181822abcfd40789aaaa42761f05f3d3076a5af01c7fb03083067e7b4673a815",
+    "retrieved_at": "2026-07-26T01:10:22.294046+00:00"
+  },
+  {
+    "id": "PMC13391499-fped-14-1888687-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391499 figure fped-14-1888687-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391499.1/fped-14-1888687-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391499_images\\fped-14-1888687-g004.jpg",
+    "sha256": "b5502443b235ec91f3cd476ab09fbd2871f4f7c315cec1ba713b53f61c1ee69f",
+    "retrieved_at": "2026-07-26T01:10:22.433305+00:00"
+  },
+  {
+    "id": "PMC13391499-fped-14-1888687-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391499 figure fped-14-1888687-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391499.1/fped-14-1888687-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391499_images\\fped-14-1888687-g005.jpg",
+    "sha256": "45cc737f750a30d9eec73f9ecaeeeec1eb11467861c0ca9764a19bc8c3eaf40a",
+    "retrieved_at": "2026-07-26T01:10:22.582519+00:00"
+  },
+  {
+    "id": "PMC13391499-fped-14-1888687-g006.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391499 figure fped-14-1888687-g006.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391499.1/fped-14-1888687-g006.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391499_images\\fped-14-1888687-g006.jpg",
+    "sha256": "f1c98d8d11e0b053c36f5e4649e4c720ecbfb5a686a8045856799cc70b3bd09f",
+    "retrieved_at": "2026-07-26T01:10:22.772556+00:00"
+  },
+  {
+    "id": "PMC13391832-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391832",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391832.1/PMC13391832.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391832.pdf",
+    "sha256": "d93c3b5cee24832cc5d0bdcaac13ef436bcee4838c235187f7b38a92d9f7c6e2",
+    "retrieved_at": "2026-07-26T01:10:23.481220+00:00"
+  },
+  {
+    "id": "PMC13391950-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391950",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391950.1/PMC13391950.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391950.pdf",
+    "sha256": "f6c1ce7333426b6f2e8a5f30108d1f228ea8c13b02553ca15f95100f9b622be1",
+    "retrieved_at": "2026-07-26T01:10:24.277863+00:00"
+  },
+  {
+    "id": "PMC13391950-fped-14-1822341-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391950 figure fped-14-1822341-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391950.1/fped-14-1822341-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391950_images\\fped-14-1822341-g001.jpg",
+    "sha256": "be938ac8601ba3460c5f7b1158f6c4c7868f96473a2dbf0011bb2c8b5ba8c2aa",
+    "retrieved_at": "2026-07-26T01:10:24.482467+00:00"
+  },
+  {
+    "id": "PMC13391950-fped-14-1822341-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391950 figure fped-14-1822341-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391950.1/fped-14-1822341-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391950_images\\fped-14-1822341-g002.jpg",
+    "sha256": "98441db55c405380a3822d72a1980ad5e299b880a22092a23dcc69af5a115b61",
+    "retrieved_at": "2026-07-26T01:10:24.634067+00:00"
+  },
+  {
+    "id": "PMC13391848-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391848",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391848.1/PMC13391848.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391848.pdf",
+    "sha256": "6c5100d58c69a59aa8a6d7b3d625589cbf9f58d4b386edd0ae1681964b1bc637",
+    "retrieved_at": "2026-07-26T01:10:25.357866+00:00"
+  },
+  {
+    "id": "PMC13391848-fped-14-1672692-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391848 figure fped-14-1672692-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391848.1/fped-14-1672692-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391848_images\\fped-14-1672692-g001.jpg",
+    "sha256": "3fb592c95bf975b04b1bb073ac9793c5e837edc16e7750bdd0232d818a1ee862",
+    "retrieved_at": "2026-07-26T01:10:25.506490+00:00"
+  },
+  {
+    "id": "PMC13391848-fped-14-1672692-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391848 figure fped-14-1672692-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391848.1/fped-14-1672692-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391848_images\\fped-14-1672692-g002.jpg",
+    "sha256": "e501843bc3afa803dcb2dbc46524039f255eee0819d2e783a366ae7b03dc512b",
+    "retrieved_at": "2026-07-26T01:10:25.673952+00:00"
+  },
+  {
+    "id": "PMC13391934-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391934",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391934.1/PMC13391934.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391934.pdf",
+    "sha256": "6b4a0bb5cb3b3f3764da3905613d493a65454f7926ff2959b9736023f9e9fc77",
+    "retrieved_at": "2026-07-26T01:10:26.486035+00:00"
+  },
+  {
+    "id": "PMC13391934-fcvm-13-1853937-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391934 figure fcvm-13-1853937-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391934.1/fcvm-13-1853937-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391934_images\\fcvm-13-1853937-g001.jpg",
+    "sha256": "c48b222a21f77a37cae28c8c22d17bdeb5c3d42489ddc12e9d404ad6d0328548",
+    "retrieved_at": "2026-07-26T01:10:26.652499+00:00"
+  },
+  {
+    "id": "PMC13391934-fcvm-13-1853937-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391934 figure fcvm-13-1853937-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391934.1/fcvm-13-1853937-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391934_images\\fcvm-13-1853937-g002.jpg",
+    "sha256": "5bcdf1cff7526cfbf42c8dc04a3949632d69b73b8b21bc7d61b97a057fddc9e7",
+    "retrieved_at": "2026-07-26T01:10:26.825632+00:00"
+  },
+  {
+    "id": "PMC13391841-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391841",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391841.1/PMC13391841.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391841.pdf",
+    "sha256": "f110638bea7630b65c231dff8b5c69646827dd8a2b93f65ed1e09d371cc242ca",
+    "retrieved_at": "2026-07-26T01:10:27.615689+00:00"
+  },
+  {
+    "id": "PMC13391841-fcvm-13-1794242-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391841 figure fcvm-13-1794242-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391841.1/fcvm-13-1794242-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391841_images\\fcvm-13-1794242-g001.jpg",
+    "sha256": "fa0a2e84b059b0f9f3dca0a1119ec31e4aba4a0da47f94c6052023940cf10c3e",
+    "retrieved_at": "2026-07-26T01:10:27.747961+00:00"
+  },
+  {
+    "id": "PMC13391841-fcvm-13-1794242-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391841 figure fcvm-13-1794242-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391841.1/fcvm-13-1794242-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391841_images\\fcvm-13-1794242-g002.jpg",
+    "sha256": "a4eaea89e33ad55dac5f4055776772570a8258487489a2c1eb4bb74c85c7faf8",
+    "retrieved_at": "2026-07-26T01:10:27.888440+00:00"
+  },
+  {
+    "id": "PMC13391834-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391834",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391834.1/PMC13391834.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391834.pdf",
+    "sha256": "67d69164af6cac8130281a72a80119bce196c3845c68cfabfe2b79b03091859e",
+    "retrieved_at": "2026-07-26T01:10:28.983395+00:00"
+  },
+  {
+    "id": "PMC13391834-fcvm-13-1875972-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391834 figure fcvm-13-1875972-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391834.1/fcvm-13-1875972-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391834_images\\fcvm-13-1875972-g001.jpg",
+    "sha256": "428edbaa824f0714cbc301d77cc5f508039d60922ca33a94fa193169e5d80d03",
+    "retrieved_at": "2026-07-26T01:10:29.119934+00:00"
+  },
+  {
+    "id": "PMC13391834-fcvm-13-1875972-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391834 figure fcvm-13-1875972-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391834.1/fcvm-13-1875972-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391834_images\\fcvm-13-1875972-g002.jpg",
+    "sha256": "400b53730fdc71e5798d976f808981024bdeec350ab9ba630814fab718bcbd4f",
+    "retrieved_at": "2026-07-26T01:10:29.261993+00:00"
+  },
+  {
+    "id": "PMC13391834-fcvm-13-1875972-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391834 figure fcvm-13-1875972-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391834.1/fcvm-13-1875972-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391834_images\\fcvm-13-1875972-g003.jpg",
+    "sha256": "3b6de8a3ba40611e62f3b47bfa351048eedb887b3b338c135ed69c5a475e6bf1",
+    "retrieved_at": "2026-07-26T01:10:29.468820+00:00"
+  },
+  {
+    "id": "PMC13391834-fcvm-13-1875972-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391834 figure fcvm-13-1875972-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391834.1/fcvm-13-1875972-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391834_images\\fcvm-13-1875972-g004.jpg",
+    "sha256": "c78f5b157eecba64d66d6afc10cc4f9aadf462716a83c0ed40ff57b83911ed15",
+    "retrieved_at": "2026-07-26T01:10:29.616597+00:00"
+  },
+  {
+    "id": "PMC13391839-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391839",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391839.1/PMC13391839.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391839.pdf",
+    "sha256": "95f98e7243a8ae4b841ef5dc83fa24ec204fe2dfa0988a9987b3b72e0cff8ffe",
+    "retrieved_at": "2026-07-26T01:10:30.781528+00:00"
+  },
+  {
+    "id": "PMC13391839-fcvm-13-1772415-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391839 figure fcvm-13-1772415-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391839.1/fcvm-13-1772415-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391839_images\\fcvm-13-1772415-g001.jpg",
+    "sha256": "6f97b48df4bdab153df34b563c7759ba27226e361d3d4f6e3ad33326130392d8",
+    "retrieved_at": "2026-07-26T01:10:30.925077+00:00"
+  },
+  {
+    "id": "PMC13391839-fcvm-13-1772415-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391839 figure fcvm-13-1772415-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391839.1/fcvm-13-1772415-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391839_images\\fcvm-13-1772415-g002.jpg",
+    "sha256": "dfa62e438e89e5157875b5df520e4872a20f11d9600cb715442e3beafea58940",
+    "retrieved_at": "2026-07-26T01:10:31.091908+00:00"
+  },
+  {
+    "id": "PMC13391839-fcvm-13-1772415-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391839 figure fcvm-13-1772415-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391839.1/fcvm-13-1772415-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391839_images\\fcvm-13-1772415-g003.jpg",
+    "sha256": "0126ad4ff0668dcc8ed1e7fac15dd027c06bab5c8bf2d54fe4434b238d0841ca",
+    "retrieved_at": "2026-07-26T01:10:31.224067+00:00"
+  },
+  {
+    "id": "PMC13391839-fcvm-13-1772415-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391839 figure fcvm-13-1772415-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391839.1/fcvm-13-1772415-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391839_images\\fcvm-13-1772415-g004.jpg",
+    "sha256": "d36195626cca659c70adc56f33840cfc64010b177cdc7054164b1ca2bedf245b",
+    "retrieved_at": "2026-07-26T01:10:31.408688+00:00"
+  },
+  {
+    "id": "PMC13391839-fcvm-13-1772415-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391839 figure fcvm-13-1772415-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391839.1/fcvm-13-1772415-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391839_images\\fcvm-13-1772415-g005.jpg",
+    "sha256": "d091130ba5ff8de175b9290e1e41a3f37c61d6776339f3bc769571fa2eb0a5dc",
+    "retrieved_at": "2026-07-26T01:10:31.542615+00:00"
+  },
+  {
+    "id": "PMC13391839-fcvm-13-1772415-g006.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391839 figure fcvm-13-1772415-g006.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391839.1/fcvm-13-1772415-g006.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391839_images\\fcvm-13-1772415-g006.jpg",
+    "sha256": "31e057fb06d714642c43b3b405ef36d9aaf86ea5fa3229eab7ad740cffd52a76",
+    "retrieved_at": "2026-07-26T01:10:31.674463+00:00"
+  },
+  {
+    "id": "PMC13391839-fcvm-13-1772415-g007.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391839 figure fcvm-13-1772415-g007.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391839.1/fcvm-13-1772415-g007.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391839_images\\fcvm-13-1772415-g007.jpg",
+    "sha256": "66bf3bc46b8278fb4b82a4deeca0b815711ef72473cd8b27099a86dea93fa065",
+    "retrieved_at": "2026-07-26T01:10:31.871601+00:00"
+  },
+  {
+    "id": "PMC13393736-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13393736",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13393736.1/PMC13393736.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13393736.pdf",
+    "sha256": "1ccc48bb34e0064d7987845da7f888591fe4a01e0eb96f36fe380a2ba7e4a952",
+    "retrieved_at": "2026-07-26T01:10:32.802233+00:00"
+  },
+  {
+    "id": "PMC13391830-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391830",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391830.1/PMC13391830.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391830.pdf",
+    "sha256": "6e49a2a7663c60337a7fbafc7ee7058c98534d93869b48453c15a76abc353ab1",
+    "retrieved_at": "2026-07-26T01:10:33.501677+00:00"
+  },
+  {
+    "id": "PMC13391830-fspor-08-1809042-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391830 figure fspor-08-1809042-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391830.1/fspor-08-1809042-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391830_images\\fspor-08-1809042-g001.jpg",
+    "sha256": "cd94da36201e882bebdcdbc307b6020f638b7aa176aa7ed8968eb2e841aab9f0",
+    "retrieved_at": "2026-07-26T01:10:33.636779+00:00"
+  },
+  {
+    "id": "PMC13392665-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13392665",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392665.1/PMC13392665.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392665.pdf",
+    "sha256": "7e807c46052d4f55df42f89dac72e4ca6d20079de1e4636e732798a2db39db57",
+    "retrieved_at": "2026-07-26T01:10:34.433939+00:00"
+  },
+  {
+    "id": "PMC13392665-Vetworld-19-2279-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13392665 figure Vetworld-19-2279-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392665.1/Vetworld-19-2279-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392665_images\\Vetworld-19-2279-g001.jpg",
+    "sha256": "f823af406c816f8048f4d5c671d4f52a9b312fc485666e39751d20a82bdf5175",
+    "retrieved_at": "2026-07-26T01:10:34.617744+00:00"
+  },
+  {
+    "id": "PMC13392665-Vetworld-19-2279-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13392665 figure Vetworld-19-2279-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392665.1/Vetworld-19-2279-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392665_images\\Vetworld-19-2279-g002.jpg",
+    "sha256": "893b832c4cc7d32ef708c0afc657273dc7e9a6d1b7751ff14c333ce65deecbbd",
+    "retrieved_at": "2026-07-26T01:10:34.756461+00:00"
+  },
+  {
+    "id": "PMC13392665-Vetworld-19-2279-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13392665 figure Vetworld-19-2279-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392665.1/Vetworld-19-2279-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392665_images\\Vetworld-19-2279-g003.jpg",
+    "sha256": "9436547ca9f7da6b85344920d0571087ff4479e758bdff895eb068f301e197ed",
+    "retrieved_at": "2026-07-26T01:10:34.888080+00:00"
+  },
+  {
+    "id": "PMC13392665-Vetworld-19-2279-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13392665 figure Vetworld-19-2279-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392665.1/Vetworld-19-2279-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392665_images\\Vetworld-19-2279-g004.jpg",
+    "sha256": "2f9968f374544c2c87199f70e9eec71f86206acfd9308a21814bbe1bb81881a7",
+    "retrieved_at": "2026-07-26T01:10:35.043449+00:00"
+  },
+  {
+    "id": "PMC13392665-Vetworld-19-2279-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13392665 figure Vetworld-19-2279-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392665.1/Vetworld-19-2279-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392665_images\\Vetworld-19-2279-g005.jpg",
+    "sha256": "eecb7a6d7fdd5141b1c03e20a7d0d102dcd602672760f1531b5ff787dbe1066b",
+    "retrieved_at": "2026-07-26T01:10:35.217860+00:00"
+  },
+  {
+    "id": "PMC13393807-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13393807",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13393807.1/PMC13393807.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13393807.pdf",
+    "sha256": "b4eaf566608fa3c4b9d51b0ffeb3bb75037a2e0e7063ac605f8d3a07a71116bc",
+    "retrieved_at": "2026-07-26T01:10:36.111948+00:00"
+  },
+  {
+    "id": "PMC13391853-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391853",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391853.1/PMC13391853.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391853.pdf",
+    "sha256": "38d5c3546dcea5976bda320d2280bb91085e4beaa938907b4a5c6fc42d6bfcca",
+    "retrieved_at": "2026-07-26T01:10:36.807983+00:00"
+  },
+  {
+    "id": "PMC13391853-fmed-13-1894821-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13391853 figure fmed-13-1894821-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391853.1/fmed-13-1894821-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391853_images\\fmed-13-1894821-g001.jpg",
+    "sha256": "d7528a1798fad16558ca0dd4717d7ebc4a9b866560dbe42098d922432623b35a",
+    "retrieved_at": "2026-07-26T01:10:36.919709+00:00"
+  },
+  {
+    "id": "PMC13395405-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13395405",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13395405.1/PMC13395405.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13395405.pdf",
+    "sha256": "6ac51909d2e9d102484a1f0812910053ebcd1c41af6edf2c210cb58cd268d16e",
+    "retrieved_at": "2026-07-26T01:10:37.654728+00:00"
+  },
+  {
+    "id": "PMC13392818-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13392818",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392818.1/PMC13392818.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392818.pdf",
+    "sha256": "3cc530a261f734324326b019acd6d5ce38ac76701ba8a0bb48af7401b7933d20",
+    "retrieved_at": "2026-07-26T01:10:38.582272+00:00"
+  },
+  {
+    "id": "PMC13392818-MI-2026-2804249-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13392818 figure MI-2026-2804249-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392818.1/MI-2026-2804249-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392818_images\\MI-2026-2804249-g001.jpg",
+    "sha256": "30a007abbfac274d2461753cca6faae32644c8b310da1c27d2860dac4f5a8697",
+    "retrieved_at": "2026-07-26T01:10:38.709634+00:00"
+  },
+  {
+    "id": "PMC13392818-MI-2026-2804249-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13392818 figure MI-2026-2804249-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392818.1/MI-2026-2804249-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392818_images\\MI-2026-2804249-g002.jpg",
+    "sha256": "e24ab989bc965a85634c930cdbc24e6191d2e05f6e6c8a638b85e89387038639",
+    "retrieved_at": "2026-07-26T01:10:38.846993+00:00"
+  },
+  {
+    "id": "PMC13392818-MI-2026-2804249-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13392818 figure MI-2026-2804249-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392818.1/MI-2026-2804249-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392818_images\\MI-2026-2804249-g003.jpg",
+    "sha256": "a9bddbe0c892dabc55e76439d856de72023661a1636b1e4f51176e43a78550bf",
+    "retrieved_at": "2026-07-26T01:10:38.990224+00:00"
+  },
+  {
+    "id": "PMC13392818-MI-2026-2804249-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13392818 figure MI-2026-2804249-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392818.1/MI-2026-2804249-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392818_images\\MI-2026-2804249-g004.jpg",
+    "sha256": "f683d80a0698f4564bbba3a8225e66d9e446c77d5f5a52d65715ba48326e0162",
+    "retrieved_at": "2026-07-26T01:10:39.138609+00:00"
+  },
+  {
+    "id": "PMC13392818-MI-2026-2804249-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13392818 figure MI-2026-2804249-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392818.1/MI-2026-2804249-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392818_images\\MI-2026-2804249-g005.jpg",
+    "sha256": "532d7a4d4a05becff66a3b8374c7545bd8d24dc04b671d39468aa4588b8bcd6d",
+    "retrieved_at": "2026-07-26T01:10:39.322480+00:00"
+  },
+  {
+    "id": "PMC13392229-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13392229",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392229.1/PMC13392229.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392229.pdf",
+    "sha256": "2f1cc7c9ff1336404f4becb57173d007090123062524086ccc11a12168b360c7",
+    "retrieved_at": "2026-07-26T01:10:40.247665+00:00"
+  },
+  {
+    "id": "PMC13391439-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391439",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391439.1/PMC13391439.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391439.pdf",
+    "sha256": "a7df8fc275131221579219921dee5381085fbf31f73f12645c7f3cbba794d6e0",
+    "retrieved_at": "2026-07-26T01:10:41.062297+00:00"
+  },
+  {
+    "id": "PMC13395074-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13395074",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13395074.1/PMC13395074.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13395074.pdf",
+    "sha256": "4abd1c47e8d25b904a6f4097b0ded86821c4d88da006595b83ee7dbdc91ab15a",
+    "retrieved_at": "2026-07-26T01:10:45.590948+00:00"
+  },
+  {
+    "id": "PMC13394753-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13394753",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394753.1/PMC13394753.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394753.pdf",
+    "sha256": "fd5102a22dbb34d4ce3c981a8c1a83abfdb0ccfb281fc120ff502d948db7357a",
+    "retrieved_at": "2026-07-26T01:10:49.525704+00:00"
+  },
+  {
+    "id": "PMC13394753-EPH-9999-0-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394753 figure EPH-9999-0-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394753.1/EPH-9999-0-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394753_images\\EPH-9999-0-g001.jpg",
+    "sha256": "de04a33530176a71e59622644de1cdda5ce40d578db0cb0807ae6fc9d2bfd2b8",
+    "retrieved_at": "2026-07-26T01:10:49.700980+00:00"
+  },
+  {
+    "id": "PMC13394753-EPH-9999-0-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394753 figure EPH-9999-0-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394753.1/EPH-9999-0-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394753_images\\EPH-9999-0-g002.jpg",
+    "sha256": "c391c0cb43890f05834a94585dd4ff59ba8cdde2cd7a2665c1aa9f9e0fbb38e9",
+    "retrieved_at": "2026-07-26T01:10:49.833509+00:00"
+  },
+  {
+    "id": "PMC13394753-EPH-9999-0-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394753 figure EPH-9999-0-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394753.1/EPH-9999-0-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394753_images\\EPH-9999-0-g003.jpg",
+    "sha256": "3229f97979b1417c3abab4304eac7803d5b6dc4784ae4d9f26d6f13b1d48bbf5",
+    "retrieved_at": "2026-07-26T01:10:50.066426+00:00"
+  },
+  {
+    "id": "PMC13394753-EPH-9999-0-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394753 figure EPH-9999-0-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394753.1/EPH-9999-0-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394753_images\\EPH-9999-0-g004.jpg",
+    "sha256": "0b966ddb03c04c00ddd25e49dd1cab5faa5ba849eac9b977738925db468b9f14",
+    "retrieved_at": "2026-07-26T01:10:50.207557+00:00"
+  },
+  {
+    "id": "PMC13394753-EPH-9999-0-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394753 figure EPH-9999-0-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394753.1/EPH-9999-0-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394753_images\\EPH-9999-0-g005.jpg",
+    "sha256": "587f2ad33f48cdc4dbefdc70ed572f1f582938fe85a1f7d6f922db53afe122d7",
+    "retrieved_at": "2026-07-26T01:10:50.357625+00:00"
+  },
+  {
+    "id": "PMC13394753-EPH-9999-0-g006.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394753 figure EPH-9999-0-g006.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394753.1/EPH-9999-0-g006.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394753_images\\EPH-9999-0-g006.jpg",
+    "sha256": "96f5918c5ae1f0e05b2a35e4958ec33c23b89677bb64940101704ad1b4e72259",
+    "retrieved_at": "2026-07-26T01:10:50.525852+00:00"
+  },
+  {
+    "id": "PMC13392232-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13392232",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392232.1/PMC13392232.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392232.pdf",
+    "sha256": "efb4db0348d4cd303e1de7a084ab47c848f68ba46e25ddf3d1eb312022f3e73a",
+    "retrieved_at": "2026-07-26T01:10:53.011086+00:00"
+  },
+  {
+    "id": "PMC13395088-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13395088",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13395088.1/PMC13395088.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13395088.pdf",
+    "sha256": "bbc6cd9a9f6004f94353001d5ed4df0eff54c1b03f0052954bcef9716d46c281",
+    "retrieved_at": "2026-07-26T01:10:54.225462+00:00"
+  },
+  {
+    "id": "PMC13394035-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13394035",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394035.1/PMC13394035.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394035.pdf",
+    "sha256": "2b00651a12c8bbfd77d9b0c872165ebfa3810a0aad29052dbb72fb86337a6e60",
+    "retrieved_at": "2026-07-26T01:10:55.847880+00:00"
+  },
+  {
+    "id": "PMC13394035-EPH-9999-0-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394035 figure EPH-9999-0-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394035.1/EPH-9999-0-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394035_images\\EPH-9999-0-g001.jpg",
+    "sha256": "614f385dd6b1d1e053cf52015ac15f0237ac2b922d92b04fb2fcf7f001e2f47c",
+    "retrieved_at": "2026-07-26T01:10:56.113973+00:00"
+  },
+  {
+    "id": "PMC13394035-EPH-9999-0-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394035 figure EPH-9999-0-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394035.1/EPH-9999-0-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394035_images\\EPH-9999-0-g002.jpg",
+    "sha256": "a21bae00dc3f1aa8d4608538b1b212d3e7f48f53cd4cc02037907b3f91a4e456",
+    "retrieved_at": "2026-07-26T01:10:56.255341+00:00"
+  },
+  {
+    "id": "PMC13394035-EPH-9999-0-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394035 figure EPH-9999-0-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394035.1/EPH-9999-0-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394035_images\\EPH-9999-0-g003.jpg",
+    "sha256": "8c465683654b7f9147cfd71c34acefd0e4f9e4c784f7c412332d909b5ad58e80",
+    "retrieved_at": "2026-07-26T01:10:56.379998+00:00"
+  },
+  {
+    "id": "PMC13394035-EPH-9999-0-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394035 figure EPH-9999-0-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394035.1/EPH-9999-0-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394035_images\\EPH-9999-0-g004.jpg",
+    "sha256": "59950d93e8cbf9c7a2887f5112eb203f63a97365db55ebac8b65a9350e6429fc",
+    "retrieved_at": "2026-07-26T01:10:56.527468+00:00"
+  },
+  {
+    "id": "PMC13394035-EPH-9999-0-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394035 figure EPH-9999-0-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394035.1/EPH-9999-0-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394035_images\\EPH-9999-0-g005.jpg",
+    "sha256": "866a2586080da17158d5df7eccfd7effc04b67037a81454d92753abdfcee8abb",
+    "retrieved_at": "2026-07-26T01:10:56.654790+00:00"
+  },
+  {
+    "id": "PMC13393138-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13393138",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13393138.1/PMC13393138.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13393138.pdf",
+    "sha256": "f525bc460c1a4f1ffa2812a9cbb584970a50cd1afbe12216f57b6e63eea2a64b",
+    "retrieved_at": "2026-07-26T01:11:00.214534+00:00"
+  },
+  {
+    "id": "PMC13393798-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13393798",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13393798.1/PMC13393798.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13393798.pdf",
+    "sha256": "13a4eb560a40c35d5e8b16688fcf73e5bfb1797fa9a9f678d3d22b6c020119f7",
+    "retrieved_at": "2026-07-26T01:11:01.021766+00:00"
+  },
+  {
+    "id": "PMC13391468-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391468",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391468.1/PMC13391468.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391468.pdf",
+    "sha256": "515b4063716fb54b110af8d926e4ec21431cc13af309e9c1f690ba649217fad6",
+    "retrieved_at": "2026-07-26T01:11:02.095104+00:00"
+  },
+  {
+    "id": "PMC13395091-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13395091",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13395091.1/PMC13395091.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13395091.pdf",
+    "sha256": "7e1853f37f773f7f1fc4cdef32e202796b6e6a9e39d3d6b51ccecf1dd9fb485a",
+    "retrieved_at": "2026-07-26T01:11:03.251265+00:00"
+  },
+  {
+    "id": "PMC13392176-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13392176",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13392176.1/PMC13392176.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13392176.pdf",
+    "sha256": "fa5a5ec20dc55d69e09afdc9ab31d1cb82d84f302e03403170becc26ae9363a2",
+    "retrieved_at": "2026-07-26T01:11:04.066505+00:00"
+  },
+  {
+    "id": "PMC13391810-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391810",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391810.1/PMC13391810.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391810.pdf",
+    "sha256": "72eae5dd29ee580e93b7ce1ee3b79925129d096f2682e990916330dcbee35e9c",
+    "retrieved_at": "2026-07-26T01:11:04.873266+00:00"
+  },
+  {
+    "id": "PMC13391824-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13391824",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13391824.1/PMC13391824.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13391824.pdf",
+    "sha256": "7d745b046611fbf1f47c0c0ec442e45516cf74bf5bbc7488976a97c6fcf30aa2",
+    "retrieved_at": "2026-07-26T01:11:05.688145+00:00"
+  },
+  {
+    "id": "PMC13394579-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13394579",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394579.1/PMC13394579.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394579.pdf",
+    "sha256": "f0604c5c4b0bd1cf78552426f428d92ba3dc6e71ff96e6c7f852709fde66d03a",
+    "retrieved_at": "2026-07-26T01:11:06.553954+00:00"
+  },
+  {
+    "id": "PMC13394579-EPH-9999-0-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394579 figure EPH-9999-0-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394579.1/EPH-9999-0-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394579_images\\EPH-9999-0-g001.jpg",
+    "sha256": "6d4fccfb1b4283329b994612dc520937bad58d19020d4176dd1c1b31e74d7655",
+    "retrieved_at": "2026-07-26T01:11:06.720724+00:00"
+  },
+  {
+    "id": "PMC13394579-EPH-9999-0-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394579 figure EPH-9999-0-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394579.1/EPH-9999-0-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394579_images\\EPH-9999-0-g002.jpg",
+    "sha256": "d2db52ee416e156f7f2ab6afca361c599b1e7a9b68e47f9557d2faa42de54431",
+    "retrieved_at": "2026-07-26T01:11:06.844847+00:00"
+  },
+  {
+    "id": "PMC13394579-EPH-9999-0-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394579 figure EPH-9999-0-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394579.1/EPH-9999-0-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394579_images\\EPH-9999-0-g003.jpg",
+    "sha256": "7ba54dd713ddc830d5ef6c9a89d5a246e643e3d5af2277efb189e6239e5a9fc7",
+    "retrieved_at": "2026-07-26T01:11:07.019557+00:00"
+  },
+  {
+    "id": "PMC13394579-EPH-9999-0-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394579 figure EPH-9999-0-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394579.1/EPH-9999-0-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394579_images\\EPH-9999-0-g004.jpg",
+    "sha256": "8df39edca85baf0d827207cf4ff458a357c5ef5dd7d637e0ec2113e8a7c63fa6",
+    "retrieved_at": "2026-07-26T01:11:07.169423+00:00"
+  },
+  {
+    "id": "PMC13394774-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13394774",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394774.1/PMC13394774.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394774.pdf",
+    "sha256": "1b63107650b47ef6d19ffef2cad2ae31de5f2bcbce52ff36a5937d6c7d9ba8ee",
+    "retrieved_at": "2026-07-26T01:11:08.051018+00:00"
+  },
+  {
+    "id": "PMC13394774-EPH-9999-0-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394774 figure EPH-9999-0-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394774.1/EPH-9999-0-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394774_images\\EPH-9999-0-g001.jpg",
+    "sha256": "173bfdc6cb157e3e593f853535f5c5781706d8b65996b0285e189870155c1800",
+    "retrieved_at": "2026-07-26T01:11:08.192582+00:00"
+  },
+  {
+    "id": "PMC13394774-EPH-9999-0-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394774 figure EPH-9999-0-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394774.1/EPH-9999-0-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394774_images\\EPH-9999-0-g002.jpg",
+    "sha256": "0e0b84d0f84b7580a45d1ca7f925be0493a0c6ecd377f8ef0bae109741321805",
+    "retrieved_at": "2026-07-26T01:11:08.333979+00:00"
+  },
+  {
+    "id": "PMC13394774-EPH-9999-0-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394774 figure EPH-9999-0-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394774.1/EPH-9999-0-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394774_images\\EPH-9999-0-g003.jpg",
+    "sha256": "d527902fee60fc854ddb94e51f8813647a2c1bd20bb27ef5d864a2ff1a1c7032",
+    "retrieved_at": "2026-07-26T01:11:08.466919+00:00"
+  },
+  {
+    "id": "PMC13394774-EPH-9999-0-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13394774 figure EPH-9999-0-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13394774.1/EPH-9999-0-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13394774_images\\EPH-9999-0-g004.jpg",
+    "sha256": "7cbf84b851ea8e50ddd589553766491aed0f599fa556fa894dcdbcfb1acdb37d",
+    "retrieved_at": "2026-07-26T01:11:08.608615+00:00"
+  },
+  {
+    "id": "PMC13388907-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13388907",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388907.1/PMC13388907.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388907.pdf",
+    "sha256": "10f3a694cf818bec07f316eb7dadb6a0204f6463a1fdccbeeec717f6503dee2d",
+    "retrieved_at": "2026-07-26T01:11:09.473554+00:00"
+  },
+  {
+    "id": "PMC13388907-fcvm-13-1802210-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388907 figure fcvm-13-1802210-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388907.1/fcvm-13-1802210-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388907_images\\fcvm-13-1802210-g001.jpg",
+    "sha256": "6f52248204a897bb20ec1cca90c06114064b3d32193820258f8b2d96304f35f0",
+    "retrieved_at": "2026-07-26T01:11:09.614528+00:00"
+  },
+  {
+    "id": "PMC13388907-fcvm-13-1802210-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388907 figure fcvm-13-1802210-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388907.1/fcvm-13-1802210-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388907_images\\fcvm-13-1802210-g002.jpg",
+    "sha256": "334c4b5b4d6077851278cd13d2eef4c1f84d751da9ea56221e82117c0404daf7",
+    "retrieved_at": "2026-07-26T01:11:09.764675+00:00"
+  },
+  {
+    "id": "PMC13388907-fcvm-13-1802210-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388907 figure fcvm-13-1802210-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388907.1/fcvm-13-1802210-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388907_images\\fcvm-13-1802210-g003.jpg",
+    "sha256": "ed9f9f250d1c3f54979bc07da61dded7a6f6d84cde35f6598b4e4e3b1ea3ba16",
+    "retrieved_at": "2026-07-26T01:11:09.922741+00:00"
+  },
+  {
+    "id": "PMC13388907-fcvm-13-1802210-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388907 figure fcvm-13-1802210-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388907.1/fcvm-13-1802210-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388907_images\\fcvm-13-1802210-g004.jpg",
+    "sha256": "9ed9d1f20a053a02bfac56d2e93ad06af9251f63ea28d923c60bb6294a9e17d9",
+    "retrieved_at": "2026-07-26T01:11:10.047504+00:00"
+  },
+  {
+    "id": "PMC13388907-fcvm-13-1802210-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388907 figure fcvm-13-1802210-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388907.1/fcvm-13-1802210-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388907_images\\fcvm-13-1802210-g005.jpg",
+    "sha256": "ed457dee354bbf275c3eff7595316b0bb7d3808d104b32325b6c5e64fde368e0",
+    "retrieved_at": "2026-07-26T01:11:10.205420+00:00"
+  },
+  {
+    "id": "PMC13388907-fcvm-13-1802210-g006.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388907 figure fcvm-13-1802210-g006.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388907.1/fcvm-13-1802210-g006.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388907_images\\fcvm-13-1802210-g006.jpg",
+    "sha256": "f169d9753d7c7fab6d619e7be19d173f8ffe4b074cfbfaf6c3bb65b80f821cfe",
+    "retrieved_at": "2026-07-26T01:11:10.380358+00:00"
+  },
+  {
+    "id": "PMC13388907-fcvm-13-1802210-g007.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388907 figure fcvm-13-1802210-g007.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388907.1/fcvm-13-1802210-g007.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388907_images\\fcvm-13-1802210-g007.jpg",
+    "sha256": "85bd5035fdb4f372fb3ef856a4eb56541cc18ef5b40065177ea18866a2a6be8b",
+    "retrieved_at": "2026-07-26T01:11:10.529925+00:00"
+  },
+  {
+    "id": "PMC13388907-fcvm-13-1802210-g008.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388907 figure fcvm-13-1802210-g008.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388907.1/fcvm-13-1802210-g008.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388907_images\\fcvm-13-1802210-g008.jpg",
+    "sha256": "0244373bd56322def2d1322b7e29a2f12fcc851c1c49f9955b69330e8c52a8bc",
+    "retrieved_at": "2026-07-26T01:11:10.697066+00:00"
+  },
+  {
+    "id": "PMC13388907-fcvm-13-1802210-g009.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388907 figure fcvm-13-1802210-g009.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388907.1/fcvm-13-1802210-g009.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388907_images\\fcvm-13-1802210-g009.jpg",
+    "sha256": "691759465562fc7c6d5dab3c164a88eba9a991c6090d80826cc3cc411c49c000",
+    "retrieved_at": "2026-07-26T01:11:10.829642+00:00"
+  },
+  {
+    "id": "PMC13388891-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13388891",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388891.1/PMC13388891.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388891.pdf",
+    "sha256": "cc85eb8d743a664a66a27bcf96e26bb13f2f18bd6e23c8a52145b1ce9fb374de",
+    "retrieved_at": "2026-07-26T01:11:11.669545+00:00"
+  },
+  {
+    "id": "PMC13388891-fcvm-13-1761019-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388891 figure fcvm-13-1761019-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388891.1/fcvm-13-1761019-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388891_images\\fcvm-13-1761019-g001.jpg",
+    "sha256": "93b8911628b7a3da68d8da8783abfc824dc2cac6b405bb25de67a4aae9364cd0",
+    "retrieved_at": "2026-07-26T01:11:11.860980+00:00"
+  },
+  {
+    "id": "PMC13388891-fcvm-13-1761019-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388891 figure fcvm-13-1761019-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388891.1/fcvm-13-1761019-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388891_images\\fcvm-13-1761019-g002.jpg",
+    "sha256": "b6c5cb6d4f9fc37e4432c2ce65d672ec933c973c56777fabd5bfe12c80b1b629",
+    "retrieved_at": "2026-07-26T01:11:12.001981+00:00"
+  },
+  {
+    "id": "PMC13388876-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13388876",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388876.1/PMC13388876.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388876.pdf",
+    "sha256": "27b6a04920bdd3a737c640180cfaac990da727ca5f922b539843f8ead4b0c3b4",
+    "retrieved_at": "2026-07-26T01:11:12.809205+00:00"
+  },
+  {
+    "id": "PMC13388876-fcvm-13-1863805-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388876 figure fcvm-13-1863805-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388876.1/fcvm-13-1863805-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388876_images\\fcvm-13-1863805-g001.jpg",
+    "sha256": "ddc6cb30416dfc43c1fbffa92d31e351d30a174fc548df3cd6c660071114bdaf",
+    "retrieved_at": "2026-07-26T01:11:12.967668+00:00"
+  },
+  {
+    "id": "PMC13388876-fcvm-13-1863805-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388876 figure fcvm-13-1863805-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388876.1/fcvm-13-1863805-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388876_images\\fcvm-13-1863805-g002.jpg",
+    "sha256": "36795f4fbc857312f932ade9b5f98a43c2ba2405692e25e01143bb313e2d3f7b",
+    "retrieved_at": "2026-07-26T01:11:13.117189+00:00"
+  },
+  {
+    "id": "PMC13388876-fcvm-13-1863805-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388876 figure fcvm-13-1863805-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388876.1/fcvm-13-1863805-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388876_images\\fcvm-13-1863805-g003.jpg",
+    "sha256": "07b31ccb6f24289638fdbdcbb2e992bd5276d09ac08b296ef33a8909d36bd3d4",
+    "retrieved_at": "2026-07-26T01:11:13.287383+00:00"
+  },
+  {
+    "id": "PMC13388876-fcvm-13-1863805-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13388876 figure fcvm-13-1863805-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388876.1/fcvm-13-1863805-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388876_images\\fcvm-13-1863805-g004.jpg",
+    "sha256": "c828d63b998ea79340dc80ad9eb1df95ed390de87872448b7a44b58a926332e0",
+    "retrieved_at": "2026-07-26T01:11:13.408387+00:00"
+  },
+  {
+    "id": "PMC13390688-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13390688",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390688.1/PMC13390688.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390688.pdf",
+    "sha256": "b34deb122c395402ca84a9d0c06704adb94943c029ad059d5c6e35841dce919e",
+    "retrieved_at": "2026-07-26T01:11:14.356614+00:00"
+  },
+  {
+    "id": "PMC13390004-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13390004",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390004.1/PMC13390004.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390004.pdf",
+    "sha256": "d292c9b5a3f204412c839cc5ec9dd7373ba7e62ed3173f32fa9452400971e294",
+    "retrieved_at": "2026-07-26T01:11:15.546207+00:00"
+  },
+  {
+    "id": "PMC13390013-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13390013",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390013.1/PMC13390013.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390013.pdf",
+    "sha256": "f43ad67d7c70cb7c864881733227508b7f94fb6cdd9285e80fd286cc32d2a5e4",
+    "retrieved_at": "2026-07-26T01:11:16.286640+00:00"
+  },
+  {
+    "id": "PMC13390013-EMMI-2026-8562238-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13390013 figure EMMI-2026-8562238-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390013.1/EMMI-2026-8562238-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390013_images\\EMMI-2026-8562238-g001.jpg",
+    "sha256": "da298e291abea6a8ddb403369cf168b319fd8929dc7839619b46cdc47c1bce94",
+    "retrieved_at": "2026-07-26T01:11:16.427910+00:00"
+  },
+  {
+    "id": "PMC13389884-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13389884",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13389884.1/PMC13389884.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13389884.pdf",
+    "sha256": "8a0ce4ea34b63b2b46d17d2b93ea3964f90c74e63e3f42532258b4f52d61b165",
+    "retrieved_at": "2026-07-26T01:11:17.143208+00:00"
+  },
+  {
+    "id": "PMC13389884-PJMS-42-7-1743-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13389884 figure PJMS-42-7-1743-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13389884.1/PJMS-42-7-1743-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13389884_images\\PJMS-42-7-1743-g001.jpg",
+    "sha256": "723037c4fa630b74213a22c708238901949ecdaad735fd9fd72d9c691573787d",
+    "retrieved_at": "2026-07-26T01:11:17.292881+00:00"
+  },
+  {
+    "id": "PMC13389884-PJMS-42-7-1743-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13389884 figure PJMS-42-7-1743-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13389884.1/PJMS-42-7-1743-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13389884_images\\PJMS-42-7-1743-g002.jpg",
+    "sha256": "1df68779b27d38c2603f922332ac995af06a1c62d1b67970abe63bdad8674432",
+    "retrieved_at": "2026-07-26T01:11:17.417704+00:00"
+  },
+  {
+    "id": "PMC13389901-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13389901",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13389901.1/PMC13389901.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13389901.pdf",
+    "sha256": "353eb27986ab085fb74b7612b602f7d3786d79006b6cf237b0bb9e7806c0b1e4",
+    "retrieved_at": "2026-07-26T01:11:18.099788+00:00"
+  },
+  {
+    "id": "PMC13389350-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13389350",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13389350.1/PMC13389350.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13389350.pdf",
+    "sha256": "56124afea75b763492ab279112470c7f11c84ff189b6b01799e1bbcfea0b7181",
+    "retrieved_at": "2026-07-26T01:11:19.746925+00:00"
+  },
+  {
+    "id": "PMC13389350-MP-53-0-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13389350 figure MP-53-0-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13389350.1/MP-53-0-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13389350_images\\MP-53-0-g001.jpg",
+    "sha256": "b67b0bb31ebb1e55ef631e63a9c746b47560e32410049ef68137adf6e44a13ed",
+    "retrieved_at": "2026-07-26T01:11:19.888989+00:00"
+  },
+  {
+    "id": "PMC13389350-MP-53-0-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13389350 figure MP-53-0-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13389350.1/MP-53-0-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13389350_images\\MP-53-0-g002.jpg",
+    "sha256": "91f6f67fe207888bf3ba1f63805f19adda2f1c443b775a731b75c8af8fc4f076",
+    "retrieved_at": "2026-07-26T01:11:20.014454+00:00"
+  },
+  {
+    "id": "PMC13389350-MP-53-0-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13389350 figure MP-53-0-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13389350.1/MP-53-0-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13389350_images\\MP-53-0-g003.jpg",
+    "sha256": "ae6589eff9f41fbabe1004e94c5df1192c1d62afacf1d2d698d0721bc080137a",
+    "retrieved_at": "2026-07-26T01:11:20.147469+00:00"
+  },
+  {
+    "id": "PMC13389350-MP-53-0-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13389350 figure MP-53-0-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13389350.1/MP-53-0-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13389350_images\\MP-53-0-g004.jpg",
+    "sha256": "cd19139b49085a6dfb217099e91dc0012c6cbd11d13aabefe276eea7aaa37558",
+    "retrieved_at": "2026-07-26T01:11:20.281356+00:00"
+  },
+  {
+    "id": "PMC13389350-MP-53-0-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13389350 figure MP-53-0-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13389350.1/MP-53-0-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13389350_images\\MP-53-0-g005.jpg",
+    "sha256": "abfdc6023763edd0ab8d8032046911264285024ad15fc2f75194472a51cfed0e",
+    "retrieved_at": "2026-07-26T01:11:20.451231+00:00"
+  },
+  {
+    "id": "PMC13389350-MP-53-0-g006.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13389350 figure MP-53-0-g006.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13389350.1/MP-53-0-g006.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13389350_images\\MP-53-0-g006.jpg",
+    "sha256": "2725047238abb9a46ff03b9ca0febbbafa5bc125b207a881862c7706c08182a8",
+    "retrieved_at": "2026-07-26T01:11:20.645222+00:00"
+  },
+  {
+    "id": "PMC13390475-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13390475",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390475.1/PMC13390475.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390475.pdf",
+    "sha256": "b5824a0ffe66173628141c6a141513dda2f6aea964ec08067eee6066fc81db95",
+    "retrieved_at": "2026-07-26T01:11:21.469916+00:00"
+  },
+  {
+    "id": "PMC13390156-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13390156",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390156.1/PMC13390156.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390156.pdf",
+    "sha256": "a4237364f16667aa191d3f1c517c8b32a9a4bbe501bdad51403c87f27e1da1da",
+    "retrieved_at": "2026-07-26T01:11:22.373358+00:00"
+  },
+  {
+    "id": "PMC13388613-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13388613",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388613.1/PMC13388613.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388613.pdf",
+    "sha256": "af60335797a7debfc0ece4d5b858038f807ce002824d0417d5799fb40dde29f6",
+    "retrieved_at": "2026-07-26T01:11:23.290460+00:00"
+  },
+  {
+    "id": "PMC13378760-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13378760",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13378760.1/PMC13378760.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13378760.pdf",
+    "sha256": "3edf45aab0583254f0c9e603748640f534075ace6e70d4c8a0629bbba95045ce",
+    "retrieved_at": "2026-07-26T01:11:24.243674+00:00"
+  },
+  {
+    "id": "PMC13378760-cir-154-271-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13378760 figure cir-154-271-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13378760.1/cir-154-271-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13378760_images\\cir-154-271-g001.jpg",
+    "sha256": "1a32db7b45d594d81dda595ca6e527aa278326bd38f8e8e32c136d2348ee844d",
+    "retrieved_at": "2026-07-26T01:11:24.424501+00:00"
+  },
+  {
+    "id": "PMC13378760-cir-154-271-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13378760 figure cir-154-271-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13378760.1/cir-154-271-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13378760_images\\cir-154-271-g002.jpg",
+    "sha256": "9742ba5fdc6648537038f1fd30d16722de1582aab3b925d0a0fc42f48061cff0",
+    "retrieved_at": "2026-07-26T01:11:24.585320+00:00"
+  },
+  {
+    "id": "PMC13378760-cir-154-271-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13378760 figure cir-154-271-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13378760.1/cir-154-271-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13378760_images\\cir-154-271-g003.jpg",
+    "sha256": "4ca150abf6ba77424fd76b72adf54e17bbaf0884abe2c39a7d4fcb0ea2164449",
+    "retrieved_at": "2026-07-26T01:11:24.837105+00:00"
+  },
+  {
+    "id": "PMC13378760-cir-154-271-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13378760 figure cir-154-271-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13378760.1/cir-154-271-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13378760_images\\cir-154-271-g004.jpg",
+    "sha256": "3195e478f22b66feef672656a87a016dfee54c3d3a5d31ae95449a44eeb54b59",
+    "retrieved_at": "2026-07-26T01:11:27.305673+00:00"
+  },
+  {
+    "id": "PMC13390989-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13390989",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390989.1/PMC13390989.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390989.pdf",
+    "sha256": "29a9906b4088312632df6e5b6ce622b4c832399b59d045132b18bed9dd73107e",
+    "retrieved_at": "2026-07-26T01:11:30.525174+00:00"
+  },
+  {
+    "id": "PMC13390989-hhf-19-e013718-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13390989 figure hhf-19-e013718-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390989.1/hhf-19-e013718-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390989_images\\hhf-19-e013718-g001.jpg",
+    "sha256": "44fc21d7154c5cb251b6abcd121e834675b40dff991b6e469105937590ea7a61",
+    "retrieved_at": "2026-07-26T01:11:31.049765+00:00"
+  },
+  {
+    "id": "PMC13390989-hhf-19-e013718-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13390989 figure hhf-19-e013718-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390989.1/hhf-19-e013718-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390989_images\\hhf-19-e013718-g002.jpg",
+    "sha256": "b72921667ce0266a6e1debf7b07c5de8531106867e374f238e009839dbe343dd",
+    "retrieved_at": "2026-07-26T01:11:31.261635+00:00"
+  },
+  {
+    "id": "PMC13390989-hhf-19-e013718-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13390989 figure hhf-19-e013718-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390989.1/hhf-19-e013718-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390989_images\\hhf-19-e013718-g003.jpg",
+    "sha256": "d0b3a7427f3219084aafc5771124b698611b4de50769edcd9dccaa4111085732",
+    "retrieved_at": "2026-07-26T01:11:31.696864+00:00"
+  },
+  {
+    "id": "PMC13390989-hhf-19-e013718-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13390989 figure hhf-19-e013718-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390989.1/hhf-19-e013718-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390989_images\\hhf-19-e013718-g004.jpg",
+    "sha256": "781ce7e7586d4c3dc71e444f35b8e2efe0d17eb10707ed086e415704c92f2ce3",
+    "retrieved_at": "2026-07-26T01:11:32.009944+00:00"
+  },
+  {
+    "id": "PMC13390989-hhf-19-e013718-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13390989 figure hhf-19-e013718-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390989.1/hhf-19-e013718-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390989_images\\hhf-19-e013718-g005.jpg",
+    "sha256": "5d504a976986fd2372ad11d7492b9253d8ae20841f6716495bd974c85f1d7c88",
+    "retrieved_at": "2026-07-26T01:11:32.225138+00:00"
+  },
+  {
+    "id": "PMC13390989-hhf-19-e013718-g006.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13390989 figure hhf-19-e013718-g006.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390989.1/hhf-19-e013718-g006.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390989_images\\hhf-19-e013718-g006.jpg",
+    "sha256": "d5eaf4d0772bb7e407d1c9d4cc4d2207ce14f034ea2835b89919b731a5808d8b",
+    "retrieved_at": "2026-07-26T01:11:32.440108+00:00"
+  },
+  {
+    "id": "PMC13390230-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13390230",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390230.1/PMC13390230.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390230.pdf",
+    "sha256": "2e6ab449274c2548f3739e8e3a56643060fcd9f8fb9066a3014991857316ea73",
+    "retrieved_at": "2026-07-26T01:11:35.448784+00:00"
+  },
+  {
+    "id": "PMC13390214-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13390214",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13390214.1/PMC13390214.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13390214.pdf",
+    "sha256": "aa8bd9ab08513f09155a5511ab5655d0cddd0527ef1b4d190c2a3642bdabdf0d",
+    "retrieved_at": "2026-07-26T01:11:38.169040+00:00"
+  },
+  {
+    "id": "PMC13388646-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13388646",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388646.1/PMC13388646.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388646.pdf",
+    "sha256": "6e28b87345e05206204d3b9915d574c397eb781910b41e1e7cbabf63e96ecfd1",
+    "retrieved_at": "2026-07-26T01:11:39.350614+00:00"
+  },
+  {
+    "id": "PMC13388533-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13388533",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388533.1/PMC13388533.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388533.pdf",
+    "sha256": "2c1a81a1a61c07dbd9d5f46319c2b6cdb5c89d6bdd3d20cef098c8719bc7c53c",
+    "retrieved_at": "2026-07-26T01:11:41.097330+00:00"
+  },
+  {
+    "id": "PMC13388772-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13388772",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13388772.1/PMC13388772.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13388772.pdf",
+    "sha256": "1104879f36c3ff2865661cbc24dfefc6ff28d95eb656a14a912cfaaf63f1cf34",
+    "retrieved_at": "2026-07-26T01:11:42.045521+00:00"
+  },
+  {
+    "id": "PMC13385215-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13385215",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13385215.1/PMC13385215.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13385215.pdf",
+    "sha256": "2aa0bc687b762aed159defae481a6e5180fc9dfc14707bb36084524642c5f467",
+    "retrieved_at": "2026-07-26T01:11:42.702716+00:00"
+  },
+  {
+    "id": "PMC13385026-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13385026",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13385026.1/PMC13385026.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13385026.pdf",
+    "sha256": "8b10971cb91a039a265f46d915d3e5efd2b3b2c57d30fa8dacbfe5bcbae63d28",
+    "retrieved_at": "2026-07-26T01:11:43.576050+00:00"
+  },
+  {
+    "id": "PMC13385026-fcvm-13-1884926-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13385026 figure fcvm-13-1884926-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13385026.1/fcvm-13-1884926-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13385026_images\\fcvm-13-1884926-g001.jpg",
+    "sha256": "8a9de3840d331f1345e2583e4a477b173592e3d2658fd9ecf45ad865347da473",
+    "retrieved_at": "2026-07-26T01:11:43.708685+00:00"
+  },
+  {
+    "id": "PMC13385054-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13385054",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13385054.1/PMC13385054.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13385054.pdf",
+    "sha256": "a59448dacd73d4cd440bf464eb7353857e3032c2366f4be7065641141df5bb35",
+    "retrieved_at": "2026-07-26T01:11:45.056943+00:00"
+  },
+  {
+    "id": "PMC13385054-fcvm-13-1868144-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13385054 figure fcvm-13-1868144-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13385054.1/fcvm-13-1868144-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13385054_images\\fcvm-13-1868144-g001.jpg",
+    "sha256": "6025b16caf4080e911469f87c1b98a9a7def508ba86c4f463b61883e509be173",
+    "retrieved_at": "2026-07-26T01:11:45.214922+00:00"
+  },
+  {
+    "id": "PMC13385054-fcvm-13-1868144-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13385054 figure fcvm-13-1868144-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13385054.1/fcvm-13-1868144-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13385054_images\\fcvm-13-1868144-g002.jpg",
+    "sha256": "6d3ec18ac42ee6e58b9fc28cb75770613d0244a7733e94e4cd25d74bfd1b2a8e",
+    "retrieved_at": "2026-07-26T01:11:45.340068+00:00"
+  },
+  {
+    "id": "PMC13385054-fcvm-13-1868144-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13385054 figure fcvm-13-1868144-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13385054.1/fcvm-13-1868144-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13385054_images\\fcvm-13-1868144-g003.jpg",
+    "sha256": "d9bff76a215aa992d3456028257a3d54d1d4fbe15875fca835217112c48b2afd",
+    "retrieved_at": "2026-07-26T01:11:45.506326+00:00"
+  },
+  {
+    "id": "PMC13385054-fcvm-13-1868144-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13385054 figure fcvm-13-1868144-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13385054.1/fcvm-13-1868144-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13385054_images\\fcvm-13-1868144-g004.jpg",
+    "sha256": "63526df05ea20dc896516e469d7cd93fe8f2554cea1c1a7a9820165a4b2d7130",
+    "retrieved_at": "2026-07-26T01:11:45.639007+00:00"
+  },
+  {
+    "id": "PMC13385054-fcvm-13-1868144-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13385054 figure fcvm-13-1868144-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13385054.1/fcvm-13-1868144-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13385054_images\\fcvm-13-1868144-g005.jpg",
+    "sha256": "d78b1c710f64f861a9606c75ab2d40bbb37ad59bb7dfb153a9bc04581aab2590",
+    "retrieved_at": "2026-07-26T01:11:45.805469+00:00"
+  },
+  {
+    "id": "PMC13384923-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13384923",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13384923.1/PMC13384923.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13384923.pdf",
+    "sha256": "b64d67d1d3c1e5bfc3e7f4cca3f7505360db4a07794412ab72a1af1b5e5d046f",
+    "retrieved_at": "2026-07-26T01:11:46.712132+00:00"
+  },
+  {
+    "id": "PMC13384923-fcvm-13-1745544-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13384923 figure fcvm-13-1745544-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13384923.1/fcvm-13-1745544-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13384923_images\\fcvm-13-1745544-g001.jpg",
+    "sha256": "262c81fba2cf1d150f76b341fbb6be397ea54e30a3bf852d3fd3c3f2d520544e",
+    "retrieved_at": "2026-07-26T01:11:46.845494+00:00"
+  },
+  {
+    "id": "PMC13384923-fcvm-13-1745544-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13384923 figure fcvm-13-1745544-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13384923.1/fcvm-13-1745544-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13384923_images\\fcvm-13-1745544-g002.jpg",
+    "sha256": "9213b125a19964a12fbf5b250dedec1d3a26d6e77424d37086d81d6a6854565c",
+    "retrieved_at": "2026-07-26T01:11:46.970137+00:00"
+  },
+  {
+    "id": "PMC13384923-fcvm-13-1745544-g003.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13384923 figure fcvm-13-1745544-g003.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13384923.1/fcvm-13-1745544-g003.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13384923_images\\fcvm-13-1745544-g003.jpg",
+    "sha256": "2e347df16a0e1a4b1cf53f55bd9a388ff22c43553b50216aae6b70ad860d4df5",
+    "retrieved_at": "2026-07-26T01:11:47.120146+00:00"
+  },
+  {
+    "id": "PMC13384923-fcvm-13-1745544-g004.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13384923 figure fcvm-13-1745544-g004.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13384923.1/fcvm-13-1745544-g004.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13384923_images\\fcvm-13-1745544-g004.jpg",
+    "sha256": "a5807939cfd7e924d63033a22c6a356ba25102dea85084fafdb9cf03ad58f4c3",
+    "retrieved_at": "2026-07-26T01:11:47.302709+00:00"
+  },
+  {
+    "id": "PMC13384923-fcvm-13-1745544-g005.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13384923 figure fcvm-13-1745544-g005.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13384923.1/fcvm-13-1745544-g005.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13384923_images\\fcvm-13-1745544-g005.jpg",
+    "sha256": "c9fdc0bf447216021a276a2e73075edf45f8342370b6c7b7a6997f9b73ed0e50",
+    "retrieved_at": "2026-07-26T01:11:47.435989+00:00"
+  },
+  {
+    "id": "PMC13384923-fcvm-13-1745544-g006.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13384923 figure fcvm-13-1745544-g006.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13384923.1/fcvm-13-1745544-g006.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13384923_images\\fcvm-13-1745544-g006.jpg",
+    "sha256": "c7b024ec18b82db441cb055cc4fdaa76bd359b02ddad6067cd288e3ca21d9df3",
+    "retrieved_at": "2026-07-26T01:11:47.560741+00:00"
+  },
+  {
+    "id": "PMC13384923-fcvm-13-1745544-g007.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13384923 figure fcvm-13-1745544-g007.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13384923.1/fcvm-13-1745544-g007.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13384923_images\\fcvm-13-1745544-g007.jpg",
+    "sha256": "cfee26193bb220dc6669c046e120b426e9b76e114435b8dc7157fbd8e942ca00",
+    "retrieved_at": "2026-07-26T01:11:47.677239+00:00"
+  },
+  {
+    "id": "PMC13387070-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13387070",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13387070.1/PMC13387070.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13387070.pdf",
+    "sha256": "d5ed26ed509794e7fa3989a0262d2214b9d3f6b32397addb18945b2e06883f76",
+    "retrieved_at": "2026-07-26T01:11:48.733656+00:00"
+  },
+  {
+    "id": "PMC13386739-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13386739",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13386739.1/PMC13386739.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13386739.pdf",
+    "sha256": "70b06f781d7621de7726b3a2978ac3401aba6e8b7106a91e4051d2e576ade413",
+    "retrieved_at": "2026-07-26T01:11:49.659829+00:00"
+  },
+  {
+    "id": "PMC13386240-pdf",
+    "source_type": "pmc_pdf",
+    "title": "PMC13386240",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13386240.1/PMC13386240.1.pdf",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13386240.pdf",
+    "sha256": "5a27029c0a01df71398d14fca5438c636e5faa0cbae909ffa78b81c41777f431",
+    "retrieved_at": "2026-07-26T01:11:50.497258+00:00"
+  },
+  {
+    "id": "PMC13386240-CRIC-2026-5532920-g001.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13386240 figure CRIC-2026-5532920-g001.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13386240.1/CRIC-2026-5532920-g001.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13386240_images\\CRIC-2026-5532920-g001.jpg",
+    "sha256": "5b6f4c1f716c991ea4d620a9caaff9640e29533832b1a003023bd7157a12e39b",
+    "retrieved_at": "2026-07-26T01:11:50.647260+00:00"
+  },
+  {
+    "id": "PMC13386240-CRIC-2026-5532920-g002.jpg",
+    "source_type": "pmc_image",
+    "title": "PMC13386240 figure CRIC-2026-5532920-g002.jpg",
+    "resolved_url": "https://pmc-oa-opendata.s3.amazonaws.com/PMC13386240.1/CRIC-2026-5532920-g002.jpg",
+    "license": "CC BY (PMC Open Access, commercial-use-allowed subset)",
+    "local_path": "data\\raw\\pmc\\PMC13386240_images\\CRIC-2026-5532920-g002.jpg",
+    "sha256": "e0fd08f4d5b35f381aa56dbc4941778998155901ad2d084a0f78e77c3e1795f6",
+    "retrieved_at": "2026-07-26T01:11:50.771975+00:00"
+  }
+]

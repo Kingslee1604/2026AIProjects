@@ -1,0 +1,42 @@
+# Local, CPU-only stack that runs the live app. Docling (parsing) is
+# deliberately NOT here -- it runs once as a batch job in
+# notebooks/01_docling_parse_corpus.ipynb on Colab GPU; see requirements-colab.txt.
+
+# --- Corpus acquisition ---
+requests>=2.31.0
+
+# --- Chunking / indexing / hybrid retrieval (dense + BM25 sparse via FastEmbed/ONNX, CPU) ---
+# Capped below 1.19: qdrant-client 1.19.0 removed the FastEmbed convenience API
+# (client.set_model / add / query) that src/index/hybrid_index.py uses. Remove the cap
+# after migrating to upsert/query_points with explicit FastEmbed models.
+qdrant-client[fastembed]>=1.15.0,<1.19
+
+# --- Reranking ---
+sentence-transformers>=3.0.0
+# (cross-encoder/ms-marco-MiniLM-L-6-v2 loaded via sentence_transformers.CrossEncoder)
+
+# --- Generation (local LLM via Ollama) ---
+ollama>=0.3.0
+
+# --- Evaluation ---
+# NOTE: ragas was evaluated and dropped -- the currently published release has
+# a broken import (ragas.llms.base imports
+# langchain_community.chat_models.vertexai, which no longer exists in current
+# langchain_community releases), confirmed by installing both and hitting a
+# ModuleNotFoundError that isn't fixable from the client side. See README
+# "Engineering notes" for details. src/eval/generation_metrics.py implements
+# the same metrics (faithfulness, citation precision/recall, answer
+# relevance, refusal accuracy) directly against src/generate's already-tested
+# Ollama-judge calls instead.
+
+# --- Demo app ---
+streamlit>=1.36.0
+pandas>=2.2.0
+plotly>=5.22.0
+
+# --- Testing ---
+pytest>=8.2.0
+
+# --- Utilities ---
+pydantic>=2.7.0
+tabulate>=0.9.0
