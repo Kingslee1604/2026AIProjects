@@ -9,6 +9,8 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from agentforge import audit
+from agentforge.audit import AuditEvent
 from agentforge.auth.passwords import hash_password, needs_rehash, verify_password
 from agentforge.auth.rbac import Principal, Role
 from agentforge.core.settings import Settings
@@ -73,8 +75,22 @@ class AuthService:
         self, email: str, password: str, *, ip: str | None, user_agent: str | None
     ) -> NewSession:
         email = normalize_email(email)
+        try:
+            async with self._sessions() as db, db.begin():
+                await self._check_throttle(db, email, ip)
+        except LoginThrottledError:
+            await audit.record(
+                self._sessions,
+                AuditEvent(
+                    "auth.login",
+                    "denied",
+                    actor_email=email,
+                    ip=ip,
+                    details={"reason": "throttled"},
+                ),
+            )
+            raise
         async with self._sessions() as db, db.begin():
-            await self._check_throttle(db, email, ip)
             user = (
                 await db.execute(
                     text("SELECT id, password_hash, disabled_at FROM auth.users WHERE email = :e"),
@@ -91,6 +107,7 @@ class AuthService:
                 {"e": email, "ip": ip, "ok": ok},
             )
         if not ok or user is None:
+            await self._audit_login_failure(email, ip, "invalid_credentials")
             raise InvalidCredentialsError
 
         user_id: UUID = user.id
@@ -114,6 +131,7 @@ class AuthService:
                 )
             ).one_or_none()
         if membership is None:
+            await self._audit_login_failure(email, ip, "no_membership")
             raise InvalidCredentialsError
 
         token = secrets.token_urlsafe(32)
@@ -145,7 +163,27 @@ class AuthService:
             can_review=membership.can_review,
             session_token_hash=hash_token(token),
         )
+        await audit.record(
+            self._sessions,
+            AuditEvent(
+                "auth.login",
+                "success",
+                org_id=principal.org_id,
+                actor_user_id=user_id,
+                actor_email=email,
+                ip=ip,
+            ),
+        )
         return NewSession(token=token, csrf_token=csrf_token, principal=principal)
+
+    async def _audit_login_failure(self, email: str, ip: str | None, reason: str) -> None:
+        # No organization yet: stored with org_id NULL (visible to the schema owner only).
+        await audit.record(
+            self._sessions,
+            AuditEvent(
+                "auth.login", "failure", actor_email=email, ip=ip, details={"reason": reason}
+            ),
+        )
 
     async def resolve(self, token: str) -> tuple[Principal, str] | None:
         """Principal and CSRF token for a live session.
@@ -202,7 +240,8 @@ class AuthService:
         )
         return principal, row.csrf_token
 
-    async def logout(self, token_hash: bytes) -> None:
+    async def revoke(self, token_hash: bytes) -> None:
+        """Revoke one session without auditing (used when a login replaces an old session)."""
         async with self._sessions() as db, db.begin():
             await db.execute(
                 text(
@@ -212,13 +251,34 @@ class AuthService:
                 {"h": token_hash},
             )
 
-    async def logout_everywhere(self, user_id: UUID) -> int:
+    async def logout(self, principal: Principal, *, ip: str | None) -> None:
+        await self.revoke(principal.session_token_hash)
+        await audit.record(self._sessions, _principal_event("auth.logout", principal, ip))
+
+    async def logout_everywhere(self, principal: Principal, *, ip: str | None) -> int:
         async with self._sessions() as db, db.begin():
             result = await db.execute(
                 text(
                     "UPDATE auth.sessions SET revoked_at = now() "
                     "WHERE user_id = :u AND revoked_at IS NULL RETURNING 1"
                 ),
-                {"u": user_id},
+                {"u": principal.user_id},
             )
-            return len(result.all())
+            revoked = len(result.all())
+        event = _principal_event("auth.logout_all", principal, ip, sessions_revoked=revoked)
+        await audit.record(self._sessions, event)
+        return revoked
+
+
+def _principal_event(
+    action: str, principal: Principal, ip: str | None, **details: str | int | bool | None
+) -> AuditEvent:
+    return AuditEvent(
+        action,
+        "success",
+        org_id=principal.org_id,
+        actor_user_id=principal.user_id,
+        actor_email=principal.email,
+        ip=ip,
+        details=dict(details),
+    )

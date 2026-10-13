@@ -23,27 +23,6 @@ from agentforge.db.engine import create_app_engine, create_sessionmaker
 from agentforge.db.migrate import DEFAULT_ORG_ID
 
 
-def add_user_commands(user: argparse.ArgumentParser) -> None:
-    """Fill in the `user` sub-command parser created by agentforge.cli."""
-    actions = user.add_subparsers(dest="user_command", required=True)
-
-    create = actions.add_parser("create", help="Create a user in the default organization")
-    create.add_argument("--email", required=True)
-    create.add_argument("--role", choices=[r.value for r in Role], default=Role.MEMBER.value)
-    create.add_argument("--can-review", action="store_true", help="Allow deciding reviews")
-    create.add_argument("--password-stdin", action="store_true", help="Read password from stdin")
-
-    for name, text in (("disable", "Disable a user"), ("enable", "Re-enable a user")):
-        action = actions.add_parser(name, help=f"{text} (disabling signs them out everywhere)")
-        action.add_argument("--email", required=True)
-
-    reset = actions.add_parser("reset-password", help="Set a new password; signs out everywhere")
-    reset.add_argument("--email", required=True)
-    reset.add_argument("--password-stdin", action="store_true")
-
-    actions.add_parser("list", help="List users in the default organization")
-
-
 def _read_password(from_stdin: bool) -> str:
     if from_stdin:
         return sys.stdin.readline().rstrip("\n")

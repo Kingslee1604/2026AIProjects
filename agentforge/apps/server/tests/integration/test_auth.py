@@ -4,74 +4,23 @@ import asyncio
 import io
 import re
 import uuid
-from collections.abc import Callable, Iterator
 
 import pytest
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
-from pydantic import SecretStr
 from sqlalchemy import text
 
 from agentforge.api.app import PUBLIC_ROUTES, create_app
 from agentforge.auth.rbac import Role
 from agentforge.auth.service import AuthService, InvalidCredentialsError, LoginThrottledError
-from agentforge.auth.users import create_user, set_disabled
+from agentforge.auth.users import set_disabled
 from agentforge.cli import main
 from agentforge.core.settings import Settings, get_settings
 from agentforge.db.engine import create_app_engine, create_sessionmaker, create_sync_engine
 from agentforge.db.migrate import DEFAULT_ORG_ID
 
-from .conftest import Database
-
-PASSWORD = "correct horse battery staple"
-UserFactory = Callable[..., str]
-
-
-def settings_for(database: Database, **overrides: object) -> Settings:
-    return Settings(
-        env="test",
-        database_url=SecretStr(database.url("agentforge_app")),
-        **overrides,  # type: ignore[arg-type]
-    )
-
-
-@pytest.fixture
-def make_user(database: Database) -> UserFactory:
-    def factory(role: Role = Role.MEMBER, can_review: bool = False) -> str:
-        email = f"user-{uuid.uuid4().hex[:10]}@example.test"
-
-        async def run() -> None:
-            engine = create_app_engine(database.url("agentforge_app"), pool_size=1)
-            try:
-                await create_user(
-                    create_sessionmaker(engine),
-                    org_id=DEFAULT_ORG_ID,
-                    email=email,
-                    password=PASSWORD,
-                    role=role,
-                    can_review=can_review,
-                )
-            finally:
-                await engine.dispose()
-
-        asyncio.run(run())
-        return email
-
-    return factory
-
-
-@pytest.fixture
-def client(database: Database) -> Iterator[TestClient]:
-    with TestClient(create_app(settings_for(database))) as test_client:
-        yield test_client
-
-
-def login(client: TestClient, email: str, password: str = PASSWORD) -> str:
-    """Log in and return the CSRF token."""
-    response = client.post("/v1/auth/login", json={"email": email, "password": password})
-    assert response.status_code == 200, response.text
-    return str(response.json()["csrf_token"])
+from .conftest import PASSWORD, Database, UserFactory, login, settings_for
 
 
 def owner_sql(database: Database, sql: str, **params: object) -> None:

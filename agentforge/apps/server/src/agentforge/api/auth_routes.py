@@ -97,7 +97,7 @@ async def login(
     # Session fixation defense: a login always replaces any session the browser already had.
     previous = request.cookies.get(session_cookie_name(settings))
     if previous:
-        await auth.logout(hash_token(previous))
+        await auth.revoke(hash_token(previous))
 
     response.set_cookie(
         session_cookie_name(settings),
@@ -118,15 +118,23 @@ async def get_session(request: Request, principal: PrincipalDep) -> SessionInfo:
 
 @router.post("/logout", status_code=204)
 async def logout(
-    response: Response, principal: PrincipalDep, auth: AuthDep, settings: SettingsDep
+    request: Request,
+    response: Response,
+    principal: PrincipalDep,
+    auth: AuthDep,
+    settings: SettingsDep,
 ) -> None:
-    await auth.logout(principal.session_token_hash)
+    await auth.logout(principal, ip=_client_ip(request))
     _clear_cookie(response, settings)
 
 
 @router.post("/logout-all", status_code=204)
 async def logout_all(
-    response: Response, principal: PrincipalDep, auth: AuthDep, settings: SettingsDep
+    request: Request,
+    response: Response,
+    principal: PrincipalDep,
+    auth: AuthDep,
+    settings: SettingsDep,
 ) -> None:
-    await auth.logout_everywhere(principal.user_id)
+    await auth.logout_everywhere(principal, ip=_client_ip(request))
     _clear_cookie(response, settings)

@@ -18,7 +18,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "migrate", help="Upgrade the database schema and seed defaults (runs as schema owner)"
     )
     migrate.add_argument("--revision", default="head", help="Target revision (default: head)")
-    from agentforge.auth.cli import add_user_commands
+    from agentforge.auth.cli_args import add_user_commands
 
     add_user_commands(commands.add_parser("user", help="Manage user accounts (no public sign-up)"))
     commands.add_parser("version", help="Print the version")

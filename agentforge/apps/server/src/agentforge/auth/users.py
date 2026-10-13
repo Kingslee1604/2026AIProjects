@@ -12,6 +12,8 @@ from agentforge.auth.rbac import Role
 from agentforge.auth.service import normalize_email
 from agentforge.db.tenancy import TenantContext, tenant_session
 
+CLI_ACTOR = "cli"  # audit actor for operator commands run on the server
+
 
 class UserExistsError(Exception):
     pass
@@ -58,6 +60,14 @@ async def create_user(
                 ),
                 {"o": org_id, "u": user_id, "r": role.value, "c": can_review},
             )
+            await db.execute(
+                text(
+                    "INSERT INTO app.audit_log (org_id, actor_email, action, target, outcome, "
+                    "details) VALUES (:o, :actor, 'user.create', :t, 'success', "
+                    "jsonb_build_object('role', CAST(:r AS text), 'can_review', :c))"
+                ),
+                {"o": org_id, "actor": CLI_ACTOR, "t": email, "r": role.value, "c": can_review},
+            )
     except IntegrityError as error:
         raise UserExistsError(email) from error
     return user_id
@@ -97,6 +107,9 @@ async def set_disabled(
         )
         if disabled:
             await _revoke_sessions(db, user_id)
+        await _audit_in_users_orgs(
+            db, user_id, "user.disable" if disabled else "user.enable", normalize_email(email)
+        )
 
 
 async def reset_password(
@@ -110,6 +123,30 @@ async def reset_password(
             {"h": password_hash, "u": user_id},
         )
         await _revoke_sessions(db, user_id)
+        await _audit_in_users_orgs(db, user_id, "user.reset_password", normalize_email(email))
+
+
+async def _audit_in_users_orgs(db: AsyncSession, user_id: UUID, action: str, target: str) -> None:
+    """Record a CLI change in the audit log of every organization the user belongs to."""
+    await db.execute(text("SELECT set_config('app.user_id', :u, true)"), {"u": str(user_id)})
+    org_ids = (
+        (
+            await db.execute(
+                text("SELECT org_id FROM app.memberships WHERE user_id = :u"), {"u": user_id}
+            )
+        )
+        .scalars()
+        .all()
+    )
+    for org_id in org_ids:
+        await db.execute(text("SELECT set_config('app.org_id', :o, true)"), {"o": str(org_id)})
+        await db.execute(
+            text(
+                "INSERT INTO app.audit_log (org_id, actor_email, action, target, outcome) "
+                "VALUES (:o, :actor, :a, :t, 'success')"
+            ),
+            {"o": org_id, "actor": CLI_ACTOR, "a": action, "t": target},
+        )
 
 
 async def list_users(sessions: async_sessionmaker[AsyncSession], org_id: UUID) -> list[UserSummary]:

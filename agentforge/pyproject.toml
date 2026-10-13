@@ -58,15 +58,15 @@ source_modules = ["agentforge.core"]
 forbidden_modules = ["agentforge.db", "agentforge.api", "agentforge.worker"]
 
 [[tool.importlinter.contracts]]
-name = "db is infrastructure: it never imports auth, api, or worker"
+name = "db is infrastructure: it never imports domain modules, api, or worker"
 type = "forbidden"
 source_modules = ["agentforge.db"]
-forbidden_modules = ["agentforge.auth", "agentforge.api", "agentforge.worker"]
+forbidden_modules = ["agentforge.auth", "agentforge.audit", "agentforge.api", "agentforge.worker"]
 
 [[tool.importlinter.contracts]]
-name = "auth is a domain module: it never imports api or worker (HTTP stays in api)"
+name = "domain modules never import api or worker (HTTP stays in api)"
 type = "forbidden"
-source_modules = ["agentforge.auth"]
+source_modules = ["agentforge.auth", "agentforge.audit"]
 forbidden_modules = ["agentforge.api", "agentforge.worker", "fastapi", "starlette"]
 
 [[tool.importlinter.contracts]]

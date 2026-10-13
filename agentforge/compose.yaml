@@ -78,8 +78,8 @@ services:
       - "127.0.0.1:${API_PORT:-8000}:8000"
     healthcheck:
       test: ["CMD", "agentforge", "healthcheck", "api"]
-      interval: 10s
-      timeout: 5s
+      interval: 15s
+      timeout: 10s
       start_period: 15s
       retries: 3
 
@@ -88,8 +88,8 @@ services:
     command: ["worker"]
     healthcheck:
       test: ["CMD", "agentforge", "healthcheck", "worker"]
-      interval: 10s
-      timeout: 5s
+      interval: 15s
+      timeout: 10s
       start_period: 15s
       retries: 3
 

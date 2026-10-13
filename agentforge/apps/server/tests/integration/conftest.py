@@ -1,17 +1,25 @@
 """Real Postgres for integration tests: the same image and role setup as the Compose stack."""
 
+import asyncio
 import os
 import secrets
 import time
-from collections.abc import Iterator
+import uuid
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
+from pydantic import SecretStr
 from sqlalchemy import text
 
-from agentforge.db.engine import create_sync_engine
-from agentforge.db.migrate import seed_defaults, upgrade
+from agentforge.api.app import create_app
+from agentforge.auth.rbac import Role
+from agentforge.auth.users import create_user
+from agentforge.core.settings import Settings
+from agentforge.db.engine import create_app_engine, create_sessionmaker, create_sync_engine
+from agentforge.db.migrate import DEFAULT_ORG_ID, seed_defaults, upgrade
 
 # Ryuk (testcontainers' reaper container) intermittently fails its port-mapping check on Docker
 # Desktop. The `database` fixture stops its own container in a context manager, so the reaper
@@ -96,3 +104,57 @@ def database() -> Iterator[Database]:
         upgrade(db.url("agentforge_owner"))
         seed_defaults(db.url("agentforge_owner"))
         yield db
+
+
+# --- Shared helpers for tests that sign in --------------------------------------------------
+
+PASSWORD = "correct horse battery staple"
+UserFactory = Callable[..., str]
+
+
+def settings_for(database: Database, **overrides: object) -> Settings:
+    return Settings(
+        env="test",
+        database_url=SecretStr(database.url("agentforge_app")),
+        **overrides,  # type: ignore[arg-type]
+    )
+
+
+@pytest.fixture
+def make_user(database: Database) -> UserFactory:
+    """Create a user in the default organization and return their email."""
+
+    def factory(role: Role = Role.MEMBER, can_review: bool = False) -> str:
+        email = f"user-{uuid.uuid4().hex[:10]}@example.test"
+
+        async def run() -> None:
+            engine = create_app_engine(database.url("agentforge_app"), pool_size=1)
+            try:
+                await create_user(
+                    create_sessionmaker(engine),
+                    org_id=DEFAULT_ORG_ID,
+                    email=email,
+                    password=PASSWORD,
+                    role=role,
+                    can_review=can_review,
+                )
+            finally:
+                await engine.dispose()
+
+        asyncio.run(run())
+        return email
+
+    return factory
+
+
+@pytest.fixture
+def client(database: Database) -> Iterator[TestClient]:
+    with TestClient(create_app(settings_for(database))) as test_client:
+        yield test_client
+
+
+def login(client: TestClient, email: str, password: str = PASSWORD) -> str:
+    """Sign in and return the CSRF token."""
+    response = client.post("/v1/auth/login", json={"email": email, "password": password})
+    assert response.status_code == 200, response.text
+    return str(response.json()["csrf_token"])

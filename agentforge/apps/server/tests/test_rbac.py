@@ -1,9 +1,29 @@
+import subprocess
+import sys
 import uuid
 
 import pytest
 
+from agentforge.auth.cli_args import ROLES
 from agentforge.auth.passwords import WeakPasswordError, hash_password, verify_password
 from agentforge.auth.rbac import ROLE_PERMISSIONS, Permission, Principal, Role, authorize
+
+
+def test_cli_role_choices_match_the_role_enum() -> None:
+    assert set(ROLES) == {role.value for role in Role}
+
+
+def test_healthcheck_command_stays_lightweight() -> None:
+    """Container health checks run this every few seconds; heavy imports made them time out."""
+    probe = (
+        "import sys; from agentforge.cli import main; main(['healthcheck', 'worker']); "
+        "print(','.join(m for m in ('sqlalchemy', 'argon2', 'fastapi', 'psycopg') "
+        "if m in sys.modules))"
+    )
+    result = subprocess.run(  # noqa: S603 - fixed interpreter and code
+        [sys.executable, "-c", probe], capture_output=True, text=True, check=False, timeout=30
+    )
+    assert result.stdout.strip() == "", f"heavy modules imported: {result.stdout}"
 
 
 def principal(role: Role, can_review: bool = False) -> Principal:
