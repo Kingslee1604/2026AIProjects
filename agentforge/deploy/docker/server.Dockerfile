@@ -23,12 +23,14 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM python:3.12.15-slim-trixie@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1 AS runtime
 RUN groupadd --system --gid 10001 agentforge \
- && useradd --system --uid 10001 --gid agentforge --no-create-home --shell /usr/sbin/nologin agentforge
+ && useradd --system --uid 10001 --gid agentforge --no-create-home --shell /usr/sbin/nologin agentforge \
+ && mkdir -p /data/blobs && chown agentforge:agentforge /data/blobs
 COPY --from=build /opt/venv /opt/venv
 ENV PATH=/opt/venv/bin:$PATH \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    AGENTFORGE_API_HOST=0.0.0.0
+    AGENTFORGE_API_HOST=0.0.0.0 \
+    AGENTFORGE_BLOB_ROOT=/data/blobs
 USER agentforge
 EXPOSE 8000
 ENTRYPOINT ["agentforge"]

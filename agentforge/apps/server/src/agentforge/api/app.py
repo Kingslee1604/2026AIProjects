@@ -12,12 +12,13 @@ from opentelemetry.propagate import extract
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from agentforge import __version__
-from agentforge.api import admin_routes, auth_routes
+from agentforge.api import admin_routes, auth_routes, knowledge_routes
+from agentforge.api.limits import BodySizeLimitMiddleware
 from agentforge.auth.service import AuthService
 from agentforge.core.logging import configure_logging, get_logger
 from agentforge.core.settings import Settings, get_settings
 from agentforge.core.telemetry import configure_tracing, current_trace_id
-from agentforge.db.engine import create_app_engine, create_sessionmaker
+from agentforge.services import build_services
 
 log = get_logger("agentforge.api")
 tracer = trace.get_tracer("agentforge.api")
@@ -108,14 +109,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if settings.database_url is None:  # API without a database: /healthz and /v1/meta only
             yield
             return
-        engine = create_app_engine(settings.database_url)
-        sessions = create_sessionmaker(engine)
-        app.state.sessions = sessions
-        app.state.auth = AuthService(sessions, settings)
+        services = build_services(settings)
+        app.state.services = services
+        app.state.sessions = services.sessions
+        app.state.auth = AuthService(services.sessions, settings)
         try:
             yield
         finally:
-            await engine.dispose()
+            await services.close()
 
     app = FastAPI(
         title="AgentForge API",
@@ -127,7 +128,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.auth = None
     app.state.sessions = None
+    app.state.services = None
     app.middleware("http")(_trace_and_log)
+    app.add_middleware(
+        BodySizeLimitMiddleware,
+        default_limit=settings.max_request_kb * 1024,
+        upload_limit=settings.max_upload_mb * 1024 * 1024,
+    )
     app.add_exception_handler(StarletteHTTPException, _http_error)
     app.add_exception_handler(RequestValidationError, _validation_error)
 
@@ -144,4 +151,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(v1)
     app.include_router(auth_routes.router)
     app.include_router(admin_routes.router)
+    app.include_router(knowledge_routes.router)
     return app

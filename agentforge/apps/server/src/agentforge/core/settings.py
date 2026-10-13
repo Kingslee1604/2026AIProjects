@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     openai_base_url: str | None = None
     openai_api_key: SecretStr | None = None
 
+    # Knowledge: where uploaded files are stored, and request size limits (baseline S5).
+    blob_root: Path = Path("data/blobs")
+    max_upload_mb: int = Field(default=25, ge=1, le=500)
+    max_request_kb: int = Field(default=1024, ge=16)  # every non-upload request
+
     # Postgres URLs (postgresql://user:password@host:port/db). Secret: never logged.
     # database_url uses the agentforge_app role (RLS applies); migration_database_url uses the
     # schema owner and is only needed by `agentforge migrate`.

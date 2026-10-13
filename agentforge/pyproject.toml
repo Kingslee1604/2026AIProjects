@@ -65,15 +65,41 @@ forbidden_modules = [
   "agentforge.auth",
   "agentforge.audit",
   "agentforge.models",
+  "agentforge.knowledge",
+  "agentforge.services",
   "agentforge.api",
   "agentforge.worker",
 ]
 
 [[tool.importlinter.contracts]]
-name = "domain modules never import api or worker (HTTP stays in api)"
+name = "domain modules never import api, worker, or the service wiring (HTTP stays in api)"
 type = "forbidden"
-source_modules = ["agentforge.auth", "agentforge.audit", "agentforge.models"]
-forbidden_modules = ["agentforge.api", "agentforge.worker", "fastapi", "starlette"]
+source_modules = [
+  "agentforge.auth",
+  "agentforge.audit",
+  "agentforge.models",
+  "agentforge.knowledge",
+]
+forbidden_modules = [
+  "agentforge.api",
+  "agentforge.worker",
+  "agentforge.services",
+  "fastapi",
+  "starlette",
+]
+
+[[tool.importlinter.contracts]]
+name = "the sandboxed parser imports nothing from AgentForge"
+type = "forbidden"
+source_modules = ["agentforge.knowledge.parse_worker"]
+forbidden_modules = [
+  "agentforge.core",
+  "agentforge.db",
+  "agentforge.auth",
+  "agentforge.models",
+  "agentforge.api",
+  "agentforge.services",
+]
 
 [[tool.importlinter.contracts]]
 name = "api and worker are independent process types"

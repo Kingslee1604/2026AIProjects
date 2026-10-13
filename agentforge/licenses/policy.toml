@@ -65,6 +65,13 @@ scope = "any"
 reason = "ADR-0013"
 
 [[exception]]
+ecosystem = "pypi"
+name = "pypdfium2"
+license = "Apache-2.0 OR BSD-3-Clause"
+scope = "any"
+reason = "Free-text License field ('BSD-3-Clause, Apache-2.0, dependency licenses') is not SPDX. Verified 2026-10-13 against the repository: dual Apache-2.0 / BSD-3-Clause; the bundled PDFium binary and its libraries are permissive, and their notices ship in THIRD_PARTY_LICENSES (verification finding F4)."
+
+[[exception]]
 ecosystem = "npm"
 name = "khroma"
 license = "MIT"

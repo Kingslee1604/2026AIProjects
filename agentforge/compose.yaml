@@ -28,6 +28,8 @@ x-server: &server
     AGENTFORGE_DATABASE_URL: postgresql://agentforge_app:${AGENTFORGE_APP_DB_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
   extra_hosts:
     - "host.docker.internal:host-gateway"
+  volumes:
+    - blobs:/data/blobs # uploaded documents: written by api, read by worker
   depends_on:
     postgres:
       condition: service_healthy
@@ -136,4 +138,5 @@ services:
 
 volumes:
   pgdata:
+  blobs:
   ollama:
