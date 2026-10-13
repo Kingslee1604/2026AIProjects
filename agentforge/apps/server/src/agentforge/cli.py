@@ -22,11 +22,21 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     add_user_commands(commands.add_parser("user", help="Manage user accounts (no public sign-up)"))
     commands.add_parser("openapi", help="Print the API's OpenAPI schema (JSON)")
+    models = commands.add_parser("models", help="Model gateway utilities")
+    models.add_argument("action", choices=["smoke"], help="smoke: one chat + one embedding call")
     commands.add_parser("version", help="Print the version")
     args = parser.parse_args(argv)
 
     if args.command == "version":
         print(__version__)
+    elif args.command == "models":
+        from agentforge.core.logging import configure_logging
+        from agentforge.core.settings import get_settings
+        from agentforge.models.smoke import run_smoke
+
+        settings = get_settings()
+        configure_logging("WARNING", settings.log_format)
+        return run_smoke(settings)
     elif args.command == "openapi":
         import json
 

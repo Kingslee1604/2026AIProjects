@@ -28,6 +28,17 @@ class Settings(BaseSettings):
 
     ollama_base_url: str = "http://127.0.0.1:11434"
 
+    # Model gateway (architecture §8). References look like `provider:model`.
+    # model_provider=fake routes every call to the deterministic fake provider (tests, CI, UI).
+    model_provider: Literal["auto", "fake"] = "auto"
+    chat_model: str = "ollama:qwen3:4b"
+    chat_fallback_models: list[str] = Field(default_factory=lambda: [])
+    embedding_model: str = "ollama:nomic-embed-text:v1.5"
+    model_timeout_seconds: float = Field(default=180.0, gt=0)
+    fake_latency_ms: float = Field(default=0.0, ge=0)
+    openai_base_url: str | None = None
+    openai_api_key: SecretStr | None = None
+
     # Postgres URLs (postgresql://user:password@host:port/db). Secret: never logged.
     # database_url uses the agentforge_app role (RLS applies); migration_database_url uses the
     # schema owner and is only needed by `agentforge migrate`.

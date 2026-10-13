@@ -3,7 +3,7 @@ SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
 .PHONY: help tools setup lint format typecheck test docs-check secrets-scan licenses check \
-	up down logs ps doctor user-create user-list api-client api-client-check web-build e2e ci-tools security
+	up down logs ps doctor user-create user-list api-client api-client-check web-build e2e ci-tools security models-smoke
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -39,6 +39,9 @@ user-create: ## Create a user: make user-create EMAIL=you@example.com [ROLE=admi
 
 user-list: ## List users in the default organization
 	docker compose run --rm --no-deps api user list
+
+models-smoke: ## One real chat + embedding call through the gateway (needs Ollama and the models)
+	docker compose run --rm --no-deps api models smoke
 
 lint: ## Lint Python (ruff), module boundaries (import-linter), web (eslint), formatting
 	uv run --frozen ruff check .
