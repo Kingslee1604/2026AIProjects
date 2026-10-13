@@ -6,7 +6,10 @@
 requests>=2.31.0
 
 # --- Chunking / indexing / hybrid retrieval (dense + BM25 sparse via FastEmbed/ONNX, CPU) ---
-qdrant-client[fastembed]>=1.15.0
+# Capped below 1.19: qdrant-client 1.19.0 removed the FastEmbed convenience API
+# (client.set_model / add / query) that src/index/hybrid_index.py uses. Remove the cap
+# after migrating to upsert/query_points with explicit FastEmbed models.
+qdrant-client[fastembed]>=1.15.0,<1.19
 
 # --- Reranking ---
 sentence-transformers>=3.0.0
