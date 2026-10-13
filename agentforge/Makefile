@@ -15,8 +15,9 @@ setup: ## Install project dependencies from lockfiles and enable git hooks
 	pnpm install --frozen-lockfile
 	pre-commit install
 
-lint: ## Lint Python (ruff) and check formatting (ruff, prettier)
+lint: ## Lint Python (ruff), module boundaries (import-linter), formatting (ruff, prettier)
 	uv run --frozen ruff check .
+	uv run --frozen lint-imports
 	uv run --frozen ruff format --check .
 	pnpm exec prettier --check .
 

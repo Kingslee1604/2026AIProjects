@@ -6,7 +6,12 @@ requires-python = ">=3.12,<3.14"
 dependencies = ["agentforge"]
 
 [dependency-groups]
-dev = ["pytest", "ruff"]
+dev = [
+    "httpx2>=2.13.1",
+    "import-linter>=2.15",
+    "pytest",
+    "ruff",
+]
 
 [tool.uv]
 package = false
@@ -38,3 +43,18 @@ select = ["E", "W", "F", "I", "B", "UP", "S", "C4", "SIM", "RUF", "PT"]
 testpaths = ["apps/server/tests", "tools/tests"]
 pythonpath = ["."]
 addopts = "-ra --strict-markers --strict-config"
+
+# Module boundaries (architecture §5.4), checked by `make lint` via import-linter.
+[tool.importlinter]
+root_package = "agentforge"
+
+[[tool.importlinter.contracts]]
+name = "core is infrastructure: it never imports api or worker"
+type = "forbidden"
+source_modules = ["agentforge.core"]
+forbidden_modules = ["agentforge.api", "agentforge.worker"]
+
+[[tool.importlinter.contracts]]
+name = "api and worker are independent process types"
+type = "independence"
+modules = ["agentforge.api", "agentforge.worker"]

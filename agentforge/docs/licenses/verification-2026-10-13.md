@@ -51,7 +51,7 @@ first adds the package.
 | pgvector (Python client) | 0.5.0 | MIT | S | R1-13 | ✅ |
 | argon2-cffi | 25.1.0 | MIT | S | R1-06 | ✅ |
 | cryptography | 50.0.1 | Apache-2.0 OR BSD-3-Clause | S | R1-06 | ✅ |
-| httpx | 0.28.1 | BSD-3-Clause | S | R1-10 | ✅ (1.0 is still a dev pre-release; do not use) |
+| httpx2 (successor of httpx, by the Pydantic team) | 2.13.1 | BSD-3-Clause | S | R1-04 (tests), R1-10 | ✅ Starlette's test client deprecates `httpx` in favor of `httpx2`, and the MCP SDK 2.3 requires it. Replaces `httpx` 0.28.1 (verified 2026-10-13) |
 | tenacity | 9.1.4 | Apache-2.0 | S | R1-10 | ✅ |
 | python-multipart | 0.0.32 | Apache-2.0 | S | R1-11 | ✅ |
 | pypdfium2 | 5.13.0 | Apache-2.0 OR BSD-3-Clause (+ bundled library notices) | S | R1-12 | ⚠️ F4 |
