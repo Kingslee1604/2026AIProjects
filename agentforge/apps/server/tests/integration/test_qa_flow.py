@@ -231,3 +231,41 @@ def test_agent_versions_are_immutable_and_appended_on_change(
     first, same, second = asyncio.run(scenario())
     assert same == first
     assert second == first + 1
+
+
+def test_answer_calls_show_what_the_model_was_sent(asker: tuple[TestClient, str, str]) -> None:
+    client, csrf, kb = asker
+    answer_id = ask(client, csrf, kb, "How long are access logs retained?")
+    answer_queue(client)
+    calls = client.get(f"/v1/answers/{answer_id}/calls").json()
+    assert [c["purpose"] for c in calls] == ["retrieve", "draft"]
+    draft = calls[1]
+    assert draft["status"] == "ok"
+    assert draft["model"].startswith("fake:")
+    assert "<evidence" in draft["request"][-1]["content"]
+    assert "claims" in draft["response"]
+    assert client.get(f"/v1/answers/{uuid.uuid4()}/calls").status_code == 404
+
+
+def test_answers_stored_before_newer_claim_fields_still_load(
+    database: Database, asker: tuple[TestClient, str, str]
+) -> None:
+    """Regression: answers saved on 2026-10-13 lack quote_supports_claim and drafted_text."""
+    client, csrf, kb = asker
+    answer_id = ask(client, csrf, kb, "How long are access logs retained?")
+    answer_queue(client)
+    owner = create_sync_engine(database.url("agentforge_owner"))
+    with owner.begin() as connection:
+        connection.execute(
+            text(
+                "UPDATE app.qa_answers SET claims = (SELECT jsonb_agg("
+                "c - 'drafted_text' - 'quote_supports_claim') "
+                "FROM jsonb_array_elements(claims) c) WHERE id = :i"
+            ),
+            {"i": answer_id},
+        )
+    owner.dispose()
+    [claim] = client.get(f"/v1/answers/{answer_id}").json()["claims"]
+    assert claim["drafted_text"] == claim["text"]
+    assert claim["quote_supports_claim"] is False
+    assert client.get("/v1/answers").status_code == 200

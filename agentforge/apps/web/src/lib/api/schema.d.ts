@@ -76,6 +76,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/answers/{answer_id}/calls": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Answer Calls
+         * @description The model calls behind an answer: prompts, responses, tokens, latency, outcome.
+         */
+        get: operations["answer_calls_v1_answers__answer_id__calls_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/login": {
         parameters: {
             query?: never;
@@ -371,7 +391,10 @@ export interface components {
             citations: string[];
             /** Citations Valid */
             citations_valid: boolean;
-            /** Drafted Text */
+            /**
+             * Drafted Text
+             * @default
+             */
             drafted_text: string;
             /** Kept */
             kept: boolean;
@@ -379,10 +402,13 @@ export interface components {
             quote: string;
             /** Quote Found */
             quote_found: boolean;
-            /** Quote Supports Claim */
+            /**
+             * Quote Supports Claim
+             * @default false
+             */
             quote_supports_claim: boolean;
             /** Reason */
-            reason: string | null;
+            reason?: string | null;
             /**
              * Status
              * @enum {string}
@@ -391,7 +417,7 @@ export interface components {
             /** Text */
             text: string;
             /** Verdict */
-            verdict: string | null;
+            verdict?: string | null;
         };
         /** DocumentOut */
         DocumentOut: {
@@ -526,6 +552,41 @@ export interface components {
             id: string;
             /** Role */
             role: string;
+        };
+        /** ModelCallOut */
+        ModelCallOut: {
+            /** Attempt */
+            attempt: number;
+            /** Completion Tokens */
+            completion_tokens: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Error Class */
+            error_class: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Latency Ms */
+            latency_ms: number;
+            /** Model */
+            model: string;
+            /** Prompt Tokens */
+            prompt_tokens: number | null;
+            /** Purpose */
+            purpose: string;
+            /** Request */
+            request: {
+                [key: string]: unknown;
+            }[];
+            /** Response */
+            response: string | null;
+            /** Status */
+            status: string;
         };
         /** SearchHitOut */
         SearchHitOut: {
@@ -754,6 +815,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AnswerOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    answer_calls_v1_answers__answer_id__calls_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                answer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelCallOut"][];
                 };
             };
             /** @description Validation Error */

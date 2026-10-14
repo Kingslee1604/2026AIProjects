@@ -2,11 +2,11 @@
 
 from dataclasses import asdict
 from datetime import datetime
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, cast
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from agentforge.api.deps import require
 from agentforge.api.knowledge_routes import ServicesDep
@@ -35,12 +35,23 @@ class ClaimOut(BaseModel):
     quote: str
     citations_valid: bool
     quote_found: bool
-    quote_supports_claim: bool
-    drafted_text: str
-    verdict: str | None
-    reason: str | None
+    # Defaults keep answers stored before these checks existed (2026-10-13) readable.
+    quote_supports_claim: bool = False
+    drafted_text: str = ""
+    verdict: str | None = None
+    reason: str | None = None
     status: Literal["verified", "rescued", "partial", "dropped"]
     kept: bool
+
+    @model_validator(mode="before")
+    @classmethod
+    def _drafted_defaults_to_text(cls, data: object) -> object:
+        if not isinstance(data, dict):
+            return data
+        fields = cast(dict[str, object], data)
+        if "drafted_text" in fields:
+            return fields
+        return {**fields, "drafted_text": fields.get("text", "")}
 
 
 class EvidenceOut(BaseModel):
@@ -76,6 +87,21 @@ class AnswerOut(BaseModel):
     completed_at: datetime | None
 
 
+class ModelCallOut(BaseModel):
+    id: UUID
+    purpose: str
+    model: str
+    status: str
+    attempt: int
+    latency_ms: float
+    prompt_tokens: int | None
+    completion_tokens: int | None
+    error_class: str | None
+    request: list[dict[str, Any]]
+    response: str | None
+    created_at: datetime
+
+
 @router.post("/v1/answers", response_model=AskOut, status_code=202)
 async def ask(body: AskIn, principal: Asker, svc: ServicesDep) -> AskOut:
     """Queue a question. Poll GET /v1/answers/{id} until the status is final."""
@@ -102,3 +128,13 @@ async def get_answer(answer_id: UUID, principal: Reader, svc: ServicesDep) -> An
     except NotFoundError:
         raise HTTPException(404, "Answer not found") from None
     return AnswerOut(**asdict(record))
+
+
+@router.get("/v1/answers/{answer_id}/calls", response_model=list[ModelCallOut])
+async def answer_calls(answer_id: UUID, principal: Reader, svc: ServicesDep) -> list[ModelCallOut]:
+    """The model calls behind an answer: prompts, responses, tokens, latency, outcome."""
+    try:
+        calls = await svc.qa.calls(principal.org_id, answer_id)
+    except NotFoundError:
+        raise HTTPException(404, "Answer not found") from None
+    return [ModelCallOut(**asdict(c)) for c in calls]

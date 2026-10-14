@@ -285,6 +285,7 @@
             "type": "boolean"
           },
           "drafted_text": {
+            "default": "",
             "title": "Drafted Text",
             "type": "string"
           },
@@ -301,6 +302,7 @@
             "type": "boolean"
           },
           "quote_supports_claim": {
+            "default": false,
             "title": "Quote Supports Claim",
             "type": "boolean"
           },
@@ -347,10 +349,6 @@
           "quote",
           "citations_valid",
           "quote_found",
-          "quote_supports_claim",
-          "drafted_text",
-          "verdict",
-          "reason",
           "status",
           "kept"
         ],
@@ -658,6 +656,108 @@
           "disabled"
         ],
         "title": "MemberOut",
+        "type": "object"
+      },
+      "ModelCallOut": {
+        "properties": {
+          "attempt": {
+            "title": "Attempt",
+            "type": "integer"
+          },
+          "completion_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completion Tokens"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Class"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "latency_ms": {
+            "title": "Latency Ms",
+            "type": "number"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Tokens"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          },
+          "request": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Request",
+            "type": "array"
+          },
+          "response": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "purpose",
+          "model",
+          "status",
+          "attempt",
+          "latency_ms",
+          "prompt_tokens",
+          "completion_tokens",
+          "error_class",
+          "request",
+          "response",
+          "created_at"
+        ],
+        "title": "ModelCallOut",
         "type": "object"
       },
       "SearchHitOut": {
@@ -1101,6 +1201,54 @@
           }
         },
         "summary": "Get Answer",
+        "tags": [
+          "answers"
+        ]
+      }
+    },
+    "/v1/answers/{answer_id}/calls": {
+      "get": {
+        "description": "The model calls behind an answer: prompts, responses, tokens, latency, outcome.",
+        "operationId": "answer_calls_v1_answers__answer_id__calls_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "answer_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Answer Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelCallOut"
+                  },
+                  "title": "Response Answer Calls V1 Answers  Answer Id  Calls Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Answer Calls",
         "tags": [
           "answers"
         ]

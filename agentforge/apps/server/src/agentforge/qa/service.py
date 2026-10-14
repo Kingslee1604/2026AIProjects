@@ -46,6 +46,22 @@ class AnswerRecord:
     completed_at: datetime | None
 
 
+@dataclass(frozen=True, slots=True)
+class ModelCall:
+    id: UUID
+    purpose: str
+    model: str
+    status: str
+    attempt: int
+    latency_ms: float
+    prompt_tokens: int | None
+    completion_tokens: int | None
+    error_class: str | None
+    request: list[dict[str, Any]]
+    response: str | None
+    created_at: datetime
+
+
 _COLUMNS = (
     "id, question, knowledge_base_ids, status, answer, confidence, reason, claims, evidence, "
     "agent_versions, error, timings, created_at, completed_at"
@@ -115,6 +131,36 @@ class QAService:
         if row is None:
             raise NotFoundError("answer not found")
         return _record(row)
+
+    async def calls(self, org_id: UUID, answer_id: UUID) -> list[ModelCall]:
+        """Every model call made for an answer (linked by run_id), oldest first."""
+        await self.get(org_id, answer_id)  # 404 for unknown or other-tenant answers
+        async with tenant_session(self._sessions, TenantContext(org_id)) as db:
+            rows = await db.execute(
+                text(
+                    "SELECT id, purpose, model, status, attempt, latency_ms, prompt_tokens, "
+                    "completion_tokens, error_class, request, response, created_at "
+                    "FROM app.llm_calls WHERE run_id = :r ORDER BY created_at, attempt"
+                ),
+                {"r": answer_id},
+            )
+            return [
+                ModelCall(
+                    id=r.id,
+                    purpose=r.purpose,
+                    model=r.model,
+                    status=r.status,
+                    attempt=r.attempt,
+                    latency_ms=r.latency_ms,
+                    prompt_tokens=r.prompt_tokens,
+                    completion_tokens=r.completion_tokens,
+                    error_class=r.error_class,
+                    request=list(r.request),
+                    response=r.response,
+                    created_at=r.created_at,
+                )
+                for r in rows
+            ]
 
     async def recent(self, org_id: UUID, limit: int = 20) -> list[AnswerRecord]:
         async with tenant_session(self._sessions, TenantContext(org_id)) as db:
