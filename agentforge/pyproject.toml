@@ -13,6 +13,11 @@ dev = [
     "ruff",
     "testcontainers>=4.15.0",
 ]
+engine-spikes = [
+    "dbos>=3.1.0",
+    "langgraph>=1.2.12",
+    "langgraph-checkpoint-postgres>=3.1.2",
+]
 
 [tool.uv]
 package = false
@@ -38,6 +43,8 @@ select = ["E", "W", "F", "I", "B", "UP", "S", "C4", "SIM", "RUF", "PT"]
 # Tests use asserts and throwaway test passwords.
 "apps/server/tests/**" = ["S101", "S105", "S106"]
 "tools/tests/**" = ["S101"]
+# Engine prototypes (M3): spike code with test-style asserts, kept for the ADR-2 record.
+"spikes/**" = ["S101", "E501"]
 # Repository tooling runs fixed commands (uv, pnpm) found on PATH; no user input reaches them.
 "tools/license_check.py" = ["S603", "S607"]
 
