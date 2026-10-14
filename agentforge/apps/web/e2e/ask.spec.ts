@@ -96,7 +96,9 @@ test("an unanswerable question says so instead of guessing", async ({ page }) =>
   await signIn(page);
   await page.goto("/app/ask");
   await onlyOurKb(page);
-  await page.getByLabel("Question").fill("What is the company's policy on employee pet insurance?");
+  // No word in common with the policy: CI's fake model matches by shared words, so this is the
+  // case it can recognize as unanswerable; the real model must recognize it too.
+  await page.getByLabel("Question").fill("Which pets may employees bring to work?");
   await page.getByRole("button", { name: "Ask", exact: true }).click();
   await expect(page.getByTestId("insufficient")).toBeVisible({ timeout: 180_000 });
   await expect(page.getByTestId("claim")).toHaveCount(0);
