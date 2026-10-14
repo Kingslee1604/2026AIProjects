@@ -464,6 +464,11 @@
             "title": "Content",
             "type": "string"
           },
+          "deleted": {
+            "default": false,
+            "title": "Deleted",
+            "type": "boolean"
+          },
           "document_id": {
             "format": "uuid",
             "title": "Document Id",
@@ -1191,6 +1196,43 @@
         ]
       }
     },
+    "/v1/documents/{document_id}": {
+      "delete": {
+        "description": "Permanently delete a document: its chunks, vectors, file, and copies in answers.",
+        "operationId": "delete_document_v1_documents__document_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Document",
+        "tags": [
+          "knowledge"
+        ]
+      }
+    },
     "/v1/documents/{document_id}/reindex": {
       "post": {
         "operationId": "reindex_document_v1_documents__document_id__reindex_post",
@@ -1291,6 +1333,43 @@
           }
         },
         "summary": "Create Knowledge Base",
+        "tags": [
+          "knowledge"
+        ]
+      }
+    },
+    "/v1/knowledge-bases/{kb_id}": {
+      "delete": {
+        "description": "Permanently delete a knowledge base and every document in it.",
+        "operationId": "delete_knowledge_base_v1_knowledge_bases__kb_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kb_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Kb Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Knowledge Base",
         "tags": [
           "knowledge"
         ]

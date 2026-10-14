@@ -56,6 +56,7 @@ class EvidenceOut(BaseModel):
     content: str
     score: float
     vector_distance: float | None
+    deleted: bool = False  # the source document was deleted; content removed
 
 
 class AnswerOut(BaseModel):

@@ -17,12 +17,17 @@ interface NavItem {
 
 const NAV: NavItem[] = [
   { href: "/app", label: "Overview" },
-  { href: "/app/knowledge", label: "Knowledge", comingIn: "M2" },
+  { href: "/app/knowledge", label: "Knowledge" },
   { href: "/app/ask", label: "Ask", comingIn: "M2" },
   { href: "/app/runs", label: "Questionnaires", comingIn: "M4" },
   { href: "/app/reviews", label: "Reviews", comingIn: "M4" },
   { href: "/app/admin", label: "Admin", adminOnly: true },
 ];
+
+/** "/app" matches only itself; sections also match their sub-pages. */
+function isActive(pathname: string, href: string): boolean {
+  return href === "/app" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -83,10 +88,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 ) : (
                   <Link
                     href={item.href}
-                    aria-current={pathname === item.href ? "page" : undefined}
+                    aria-current={isActive(pathname, item.href) ? "page" : undefined}
                     className={cn(
                       "block rounded-md px-3 py-2 hover:bg-surface",
-                      pathname === item.href && "bg-surface font-medium",
+                      isActive(pathname, item.href) && "bg-surface font-medium",
                     )}
                   >
                     {item.label}

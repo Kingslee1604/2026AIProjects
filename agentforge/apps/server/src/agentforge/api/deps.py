@@ -4,6 +4,7 @@ Every route that is not explicitly public depends on `current_principal` (direct
 `require`). tests/integration/test_auth.py checks this for every registered route.
 """
 
+import ipaddress
 import secrets
 from collections.abc import Awaitable, Callable
 
@@ -20,6 +21,15 @@ CSRF_HEADER = "X-CSRF-Token"
 def session_cookie_name(settings: Settings) -> str:
     # The __Host- prefix (Secure, Path=/, no Domain) is only valid over TLS.
     return "__Host-af_session" if settings.cookie_secure else "af_session"
+
+
+def client_ip(request: Request) -> str | None:
+    """The peer address, if it is a real IP (test clients and some proxies send names)."""
+    host = request.client.host if request.client else None
+    try:
+        return str(ipaddress.ip_address(host)) if host else None
+    except ValueError:
+        return None
 
 
 def get_settings_from_app(request: Request) -> Settings:

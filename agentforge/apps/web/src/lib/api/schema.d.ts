@@ -144,6 +144,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/documents/{document_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Document
+         * @description Permanently delete a document: its chunks, vectors, file, and copies in answers.
+         */
+        delete: operations["delete_document_v1_documents__document_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/documents/{document_id}/reindex": {
         parameters: {
             query?: never;
@@ -174,6 +194,26 @@ export interface paths {
         /** Create Knowledge Base */
         post: operations["create_knowledge_base_v1_knowledge_bases_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/knowledge-bases/{kb_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Knowledge Base
+         * @description Permanently delete a knowledge base and every document in it.
+         */
+        delete: operations["delete_knowledge_base_v1_knowledge_bases__kb_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -403,6 +443,11 @@ export interface components {
             chunk_id: string;
             /** Content */
             content: string;
+            /**
+             * Deleted
+             * @default false
+             */
+            deleted: boolean;
             /**
              * Document Id
              * Format: uuid
@@ -811,6 +856,35 @@ export interface operations {
             };
         };
     };
+    delete_document_v1_documents__document_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     reindex_document_v1_documents__document_id__reindex_post: {
         parameters: {
             query?: never;
@@ -883,6 +957,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["KnowledgeBaseOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_knowledge_base_v1_knowledge_bases__kb_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kb_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

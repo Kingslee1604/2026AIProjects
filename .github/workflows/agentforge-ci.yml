@@ -106,7 +106,9 @@ jobs:
           name: sbom
           path: agentforge/build/sbom/
           if-no-files-found: error
-      - name: Start the stack
+      - name: Start the stack (fake models: CI has no Ollama)
+        env:
+          AGENTFORGE_MODEL_PROVIDER: fake
         run: make up
       - name: Browser tests (Playwright)
         run: pnpm install --frozen-lockfile && make e2e

@@ -9,8 +9,10 @@
   --color-border: oklch(0.91 0.01 260);
   --color-accent: oklch(0.52 0.17 262);
   --color-accent-fg: oklch(0.99 0 0);
-  --color-danger: oklch(0.55 0.2 27);
-  --color-ok: oklch(0.58 0.14 150);
+  /* Status colours stay at 4.5:1 or more against the surface (small badge text, WCAG AA). */
+  --color-danger: oklch(0.5 0.19 27);
+  --color-ok: oklch(0.48 0.12 150);
+  --color-warn: oklch(0.5 0.12 70);
   --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -23,6 +25,9 @@
     --color-border: oklch(0.32 0.015 260);
     --color-accent: oklch(0.68 0.15 262);
     --color-accent-fg: oklch(0.16 0.01 260);
+    --color-danger: oklch(0.72 0.16 27);
+    --color-ok: oklch(0.76 0.13 150);
+    --color-warn: oklch(0.8 0.12 80);
   }
 }
 

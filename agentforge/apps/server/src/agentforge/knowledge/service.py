@@ -3,6 +3,7 @@
 import asyncio
 import hashlib
 import json
+from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -12,6 +13,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from agentforge import audit
 from agentforge.core.logging import get_logger
 from agentforge.db.tenancy import TenantContext, tenant_session
 from agentforge.knowledge import queue
@@ -76,6 +78,20 @@ _INSERT_DOCUMENT = (
 )
 
 
+@dataclass(frozen=True, slots=True)
+class Actor:
+    """Who performed an action, for the audit log."""
+
+    user_id: UUID | None
+    email: str | None
+    ip: str | None = None
+
+
+# Runs inside the deletion transaction with the ids of the documents being deleted. Modules
+# that keep copies of document text (answer evidence, model-call prompts) redact them here.
+PurgeHook = Callable[[AsyncSession, list[UUID]], Awaitable[None]]
+
+
 class KnowledgeService:
     def __init__(
         self,
@@ -85,12 +101,14 @@ class KnowledgeService:
         *,
         embedding_model: str,
         embedding_table: EmbeddingTable,
+        purge_hooks: Sequence[PurgeHook] = (),
     ) -> None:
         self._sessions = sessions
         self._blobs = blobs
         self._gateway = gateway
         self._embedding_model = embedding_model
         self._table = embedding_table
+        self._purge_hooks = list(purge_hooks)
 
     # --- Knowledge bases ---------------------------------------------------------------------
 
@@ -233,6 +251,102 @@ class KnowledgeService:
                 raise NotFoundError("Document not found")
             await queue.enqueue(db, org_id, document_id)
 
+    # --- Deletion (NFR-13: rows, vectors, and blobs, synchronously) --------------------------
+
+    async def delete_document(self, org_id: UUID, document_id: UUID, actor: Actor) -> None:
+        await self._delete(org_id, actor, "document.delete", document_id=document_id)
+
+    async def delete_kb(self, org_id: UUID, kb_id: UUID, actor: Actor) -> None:
+        await self._delete(org_id, actor, "knowledge_base.delete", kb_id=kb_id)
+
+    async def _delete(
+        self,
+        org_id: UUID,
+        actor: Actor,
+        action: str,
+        *,
+        document_id: UUID | None = None,
+        kb_id: UUID | None = None,
+    ) -> None:
+        """Delete in one transaction (chunks and embeddings cascade; purge hooks redact copies
+        of the text kept elsewhere, such as answer evidence), then remove the blobs."""
+        async with tenant_session(self._sessions, TenantContext(org_id)) as db:
+            if document_id is not None:
+                rows = (
+                    await db.execute(
+                        text("SELECT id, blob_key FROM app.documents WHERE id = :d FOR UPDATE"),
+                        {"d": document_id},
+                    )
+                ).all()
+                if not rows:
+                    raise NotFoundError("Document not found")
+            else:
+                assert kb_id is not None  # noqa: S101 - one of the two is always given
+                await self._require_kb(db, kb_id)
+                rows = (
+                    await db.execute(
+                        text(
+                            "SELECT id, blob_key FROM app.documents "
+                            "WHERE knowledge_base_id = :k FOR UPDATE"
+                        ),
+                        {"k": kb_id},
+                    )
+                ).all()
+            document_ids: list[UUID] = [r.id for r in rows]
+            for hook in self._purge_hooks:
+                await hook(db, document_ids)
+            await db.execute(
+                text("DELETE FROM queue.ingestion_jobs WHERE document_id = ANY(:ids)"),
+                {"ids": document_ids},
+            )
+            if document_id is not None:
+                await db.execute(
+                    text("DELETE FROM app.documents WHERE id = :d"), {"d": document_id}
+                )
+            else:
+                await db.execute(
+                    text("DELETE FROM app.knowledge_bases WHERE id = :k"), {"k": kb_id}
+                )
+        for r in rows:
+            await asyncio.to_thread(self._blobs.delete, r.blob_key)
+        target = f"document:{document_id}" if document_id else f"knowledge_base:{kb_id}"
+        await audit.record(
+            self._sessions,
+            audit.AuditEvent(
+                action,
+                "success",
+                org_id=org_id,
+                actor_user_id=actor.user_id,
+                actor_email=actor.email,
+                target=target,
+                ip=actor.ip,
+                details={"documents": len(rows)},
+            ),
+        )
+        log.info("deleted", target=target, documents=len(rows))
+
+    async def residuals(self, org_id: UUID, document_ids: list[UUID]) -> dict[str, int]:
+        """Verification query: everything that would still hold these documents' content."""
+        async with tenant_session(self._sessions, TenantContext(org_id)) as db:
+            counts = (
+                await db.execute(
+                    text(
+                        f"""
+                        SELECT
+                          (SELECT count(*) FROM app.documents WHERE id = ANY(:ids)) AS documents,
+                          (SELECT count(*) FROM app.chunks WHERE document_id = ANY(:ids)) AS chunks,
+                          (SELECT count(*) FROM app.{self._table.name} e
+                             WHERE NOT EXISTS (SELECT 1 FROM app.chunks c WHERE c.id = e.chunk_id)
+                          ) AS orphan_embeddings,
+                          (SELECT count(*) FROM queue.ingestion_jobs
+                             WHERE document_id = ANY(:ids)) AS jobs
+                        """  # noqa: S608 - fixed table name
+                    ),
+                    {"ids": document_ids},
+                )
+            ).one()
+        return dict(counts._mapping)  # pyright: ignore[reportPrivateUsage]
+
     # --- Ingestion (runs in the worker) ------------------------------------------------------
 
     async def _set_status(
@@ -309,6 +423,16 @@ class KnowledgeService:
         # Replace this document's chunks atomically: a crash or a rerun never leaves
         # duplicates or a half-indexed document.
         async with tenant_session(self._sessions, context) as db:
+            # Lock the document: a concurrent delete either finishes first (we stop here) or
+            # waits for this transaction and then removes the new chunks with the document.
+            still_there = (
+                await db.execute(
+                    text("SELECT 1 FROM app.documents WHERE id = :d FOR UPDATE"),
+                    {"d": job.subject_id},
+                )
+            ).scalar_one_or_none()
+            if still_there is None:
+                raise _DocumentGoneError
             await db.execute(
                 text("DELETE FROM app.chunks WHERE document_id = :d"), {"d": job.subject_id}
             )

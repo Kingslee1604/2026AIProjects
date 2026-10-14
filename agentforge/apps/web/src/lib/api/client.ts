@@ -31,6 +31,11 @@ export interface Problem {
   trace_id?: string;
 }
 
+/** Headers for requests made with plain fetch (file uploads send the raw file as the body). */
+export function csrfHeaders(): Record<string, string> {
+  return csrfToken ? { "X-CSRF-Token": csrfToken } : {};
+}
+
 export function problemTitle(error: unknown, fallback = "Something went wrong"): string {
   if (error && typeof error === "object" && "title" in error && typeof error.title === "string") {
     return error.title;

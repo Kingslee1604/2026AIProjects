@@ -11,10 +11,15 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
-from agentforge.api.deps import require
+from agentforge.api.deps import client_ip, require
 from agentforge.auth.rbac import Permission, Principal
 from agentforge.knowledge.retrieval import SearchHit
-from agentforge.knowledge.service import DuplicateDocumentError, DuplicateNameError, NotFoundError
+from agentforge.knowledge.service import (
+    Actor,
+    DuplicateDocumentError,
+    DuplicateNameError,
+    NotFoundError,
+)
 from agentforge.knowledge.validation import UploadRejectedError
 from agentforge.services import Services
 
@@ -162,6 +167,36 @@ async def reindex_document(document_id: UUID, principal: Writer, svc: ServicesDe
     except NotFoundError:
         raise HTTPException(404, "Document not found") from None
     return Response(status_code=202)
+
+
+def _actor(principal: Principal, request: Request) -> Actor:
+    return Actor(principal.user_id, principal.email, client_ip(request))
+
+
+@router.delete("/v1/documents/{document_id}", status_code=204)
+async def delete_document(
+    document_id: UUID, request: Request, principal: Writer, svc: ServicesDep
+) -> Response:
+    """Permanently delete a document: its chunks, vectors, file, and copies in answers."""
+    try:
+        await svc.knowledge.delete_document(
+            principal.org_id, document_id, _actor(principal, request)
+        )
+    except NotFoundError:
+        raise HTTPException(404, "Document not found") from None
+    return Response(status_code=204)
+
+
+@router.delete("/v1/knowledge-bases/{kb_id}", status_code=204)
+async def delete_knowledge_base(
+    kb_id: UUID, request: Request, principal: Writer, svc: ServicesDep
+) -> Response:
+    """Permanently delete a knowledge base and every document in it."""
+    try:
+        await svc.knowledge.delete_kb(principal.org_id, kb_id, _actor(principal, request))
+    except NotFoundError:
+        raise HTTPException(404, "Knowledge base not found") from None
+    return Response(status_code=204)
 
 
 @router.post("/v1/knowledge/search", response_model=list[SearchHitOut])

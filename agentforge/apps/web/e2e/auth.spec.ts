@@ -1,11 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-const email = process.env.E2E_EMAIL ?? "";
-const password = process.env.E2E_PASSWORD ?? "";
+import { email, password, requireCredentials } from "./helpers";
 
-test.beforeAll(() => {
-  if (!email || !password) throw new Error("Set E2E_EMAIL and E2E_PASSWORD (make e2e does this)");
-});
+test.beforeAll(requireCredentials);
 
 test("signed-out visitors are sent to the sign-in page", async ({ page }) => {
   await page.goto("/app");

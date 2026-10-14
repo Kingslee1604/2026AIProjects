@@ -1,12 +1,12 @@
 """/v1/auth: login, session info, logout, logout everywhere."""
 
-import ipaddress
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
+from agentforge.api.deps import client_ip as _client_ip
 from agentforge.api.deps import (
     current_principal,
     get_auth,
@@ -52,15 +52,6 @@ def _session_info(principal: Principal, csrf_token: str) -> SessionInfo:
         can_review=principal.can_review,
         csrf_token=csrf_token,
     )
-
-
-def _client_ip(request: Request) -> str | None:
-    """The peer address, if it is a real IP (test clients and some proxies send names)."""
-    host = request.client.host if request.client else None
-    try:
-        return str(ipaddress.ip_address(host)) if host else None
-    except ValueError:
-        return None
 
 
 def _clear_cookie(response: Response, settings: Settings) -> None:
