@@ -20,7 +20,7 @@ const NAV: NavItem[] = [
   { href: "/app/knowledge", label: "Knowledge" },
   { href: "/app/ask", label: "Ask" },
   { href: "/app/runs", label: "Questionnaires" },
-  { href: "/app/reviews", label: "Reviews", comingIn: "M4" },
+  { href: "/app/reviews", label: "Reviews" },
   { href: "/app/admin", label: "Admin", adminOnly: true },
 ];
 

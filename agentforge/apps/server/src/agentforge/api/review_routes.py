@@ -51,6 +51,16 @@ class BulkOut(BaseModel):
     approved: int
 
 
+class QueueEntryOut(BaseModel):
+    run_id: UUID
+    title: str
+    epoch: int
+    total: int
+    undecided: int
+    candidates: int
+    created_at: datetime
+
+
 def _out(batch: ReviewBatch) -> ReviewOut:
     data = asdict(batch)
     return ReviewOut(**data, undecided=batch.undecided)
@@ -58,6 +68,12 @@ def _out(batch: ReviewBatch) -> ReviewOut:
 
 def _reviewer(principal: Principal, request: Request) -> Reviewer:
     return Reviewer(principal.user_id, principal.email, client_ip(request))
+
+
+@router.get("/v1/reviews", response_model=list[QueueEntryOut])
+async def review_queue(principal: ReaderDep, svc: ServicesDep) -> list[QueueEntryOut]:
+    """Runs waiting for a review, oldest first, with how many answers still need a decision."""
+    return [QueueEntryOut(**asdict(e)) for e in await svc.reviews.queue(principal.org_id)]
 
 
 @router.get("/v1/runs/{run_id}/review", response_model=ReviewOut)

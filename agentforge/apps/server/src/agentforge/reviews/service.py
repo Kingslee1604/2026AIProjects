@@ -63,6 +63,19 @@ class ReviewBatch:
         return sum(1 for i in self.items if i.decision is None)
 
 
+@dataclass(frozen=True, slots=True)
+class QueueEntry:
+    """An open review: how many answers it has, and how many still need a decision."""
+
+    run_id: UUID
+    title: str
+    epoch: int
+    total: int
+    undecided: int
+    candidates: int  # undecided bulk-approval candidates (verified, high confidence)
+    created_at: datetime
+
+
 class ReviewService:
     def __init__(self, sessions: async_sessionmaker[AsyncSession], runs: RunService) -> None:
         self._sessions = sessions
@@ -82,6 +95,23 @@ class ReviewService:
         if row is None:
             raise NotFoundError("this run has no review")
         return row
+
+    async def queue(self, org_id: UUID) -> list[QueueEntry]:
+        """Open reviews of runs waiting for one, oldest first."""
+        async with self._tx(org_id) as db:
+            rows = await db.execute(
+                text(
+                    "SELECT b.run_id, r.title, b.epoch, count(i.item_index) AS total, "
+                    "count(i.item_index) FILTER (WHERE i.decision IS NULL) AS undecided, "
+                    "count(i.item_index) FILTER (WHERE i.decision IS NULL "
+                    "AND i.auto_accept_candidate) AS candidates, b.created_at "
+                    "FROM app.review_batches b JOIN app.runs r ON r.id = b.run_id "
+                    "LEFT JOIN app.review_items i ON i.batch_id = b.id "
+                    "WHERE b.status = 'open' AND r.status = 'waiting_review' "
+                    "GROUP BY b.id, r.title ORDER BY b.created_at"
+                )
+            )
+            return [QueueEntry(**r._mapping) for r in rows]  # pyright: ignore[reportPrivateUsage]
 
     async def get(self, org_id: UUID, run_id: UUID) -> ReviewBatch:
         async with self._tx(org_id) as db:

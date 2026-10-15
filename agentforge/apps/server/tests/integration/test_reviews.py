@@ -129,6 +129,28 @@ def test_route_opens_a_batch_with_bulk_approval_candidates(review: Review) -> No
     assert review.member.get(f"/v1/runs/{review.run_id}").json()["status"] == "waiting_review"
 
 
+def test_the_queue_counts_what_is_left_to_decide(review: Review) -> None:
+    def entry() -> Any:
+        queue = review.member.get("/v1/reviews").json()
+        return next((e for e in queue if e["run_id"] == str(review.run_id)), None)
+
+    assert entry() == {
+        "run_id": str(review.run_id),
+        "title": "Review test",
+        "epoch": 1,
+        "total": 4,
+        "undecided": 4,
+        "candidates": 2,
+        "created_at": entry()["created_at"],
+    }
+    review.as_reviewer(f"/v1/runs/{review.run_id}/review/approve-supported")
+    review.decide(2, decision="approved")
+    assert (entry()["undecided"], entry()["candidates"]) == (1, 0)
+    review.decide(3, decision="rejected", reason="Not applicable.")
+    review.as_reviewer(f"/v1/runs/{review.run_id}/review/complete")
+    assert entry() is None  # completed reviews leave the queue
+
+
 def test_decisions_are_validated_and_permission_checked(review: Review) -> None:
     run = review.run_id
     member_decide = review.member.post(
@@ -186,6 +208,7 @@ def test_other_organizations_cannot_see_or_decide(
     review: Review, app: FastAPI, database: Database
 ) -> None:
     with outsider(app, database) as (other, csrf):  # an admin, so permission is not the reason
+        assert all(e["run_id"] != str(review.run_id) for e in other.get("/v1/reviews").json())
         assert other.get(f"/v1/runs/{review.run_id}/review").status_code == 404
         decided = other.post(
             f"/v1/runs/{review.run_id}/review/items/0",

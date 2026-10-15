@@ -1054,6 +1054,51 @@
         "title": "QuestionnaireOut",
         "type": "object"
       },
+      "QueueEntryOut": {
+        "properties": {
+          "candidates": {
+            "title": "Candidates",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "epoch": {
+            "title": "Epoch",
+            "type": "integer"
+          },
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "undecided": {
+            "title": "Undecided",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "run_id",
+          "title",
+          "epoch",
+          "total",
+          "undecided",
+          "candidates",
+          "created_at"
+        ],
+        "title": "QueueEntryOut",
+        "type": "object"
+      },
       "ReviewItemOut": {
         "properties": {
           "auto_accept_candidate": {
@@ -2807,6 +2852,32 @@
         "summary": "Set Columns",
         "tags": [
           "questionnaires"
+        ]
+      }
+    },
+    "/v1/reviews": {
+      "get": {
+        "description": "Runs waiting for a review, oldest first, with how many answers still need a decision.",
+        "operationId": "review_queue_v1_reviews_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QueueEntryOut"
+                  },
+                  "title": "Response Review Queue V1 Reviews Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Review Queue",
+        "tags": [
+          "reviews"
         ]
       }
     },

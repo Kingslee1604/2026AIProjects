@@ -5,12 +5,17 @@ export const email = process.env.E2E_EMAIL ?? "";
 export const password = process.env.E2E_PASSWORD ?? "";
 
 export function requireCredentials(): void {
-  if (!email || !password) throw new Error("Set E2E_EMAIL and E2E_PASSWORD (make e2e does this)");
+  if (!email || !password || !reviewerEmail) {
+    throw new Error("Set E2E_EMAIL, E2E_REVIEWER_EMAIL, and E2E_PASSWORD (make e2e does this)");
+  }
 }
 
-export async function signIn(page: Page): Promise<void> {
+/** A second user who may decide reviews (same password; make e2e creates both). */
+export const reviewerEmail = process.env.E2E_REVIEWER_EMAIL ?? "";
+
+export async function signIn(page: Page, as: string = email): Promise<void> {
   await page.goto("/login");
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email").fill(as);
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/app$/);

@@ -9,7 +9,7 @@ import { EventList } from "./event-list";
 import { Phases, type Selection } from "./phases";
 import { SidePanel } from "./side-panel";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 import { formatAge, formatBytes, formatDuration } from "@/lib/format";
@@ -84,6 +84,11 @@ export default function RunPage() {
             of {r.item_count} questions answered
           </p>
           <div className="flex flex-wrap gap-2">
+            {r.status === "waiting_review" && (
+              <Link href={`/app/reviews/${r.id}`} className={buttonVariants({ size: "sm" })}>
+                Review answers
+              </Link>
+            )}
             {r.status === "succeeded" && (
               <Button
                 variant="secondary"
