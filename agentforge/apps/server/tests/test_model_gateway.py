@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from agentforge.models import (
     CallContext,
     Message,
+    ModelError,
     ModelGateway,
     ModelTimeoutError,
     StructuredOutputError,
@@ -44,6 +45,27 @@ def gateway(*providers: FakeProvider) -> tuple[ModelGateway, list[CallRecord]]:
 
 
 VALID = json.dumps({"answer": "Paris", "confidence": 0.9})
+
+
+async def test_fault_injection_is_seeded_and_off_by_default() -> None:
+    async def outcomes(provider: FakeProvider) -> list[str]:
+        seen: list[str] = []
+        for _ in range(200):
+            try:
+                response = await provider.chat(
+                    "m", ASK, json_schema=None, temperature=0, max_tokens=None, timeout=1
+                )
+            except ModelError as error:
+                seen.append(error.__class__.__name__)
+            else:
+                seen.append("invalid_json" if response.text.startswith('{"this') else "ok")
+        return seen
+
+    first = await outcomes(FakeProvider(fault_rate=0.3, fault_seed=7))
+    assert first == await outcomes(FakeProvider(fault_rate=0.3, fault_seed=7))  # replayable
+    assert {"ModelTimeoutError", "ModelUnavailableError", "invalid_json", "ok"} == set(first)
+    assert 0.2 < sum(o != "ok" for o in first) / len(first) < 0.4
+    assert set(await outcomes(FakeProvider())) == {"ok"}
 
 
 def test_model_ref_parsing_keeps_colons_in_the_model_name() -> None:

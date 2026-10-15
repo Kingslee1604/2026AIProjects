@@ -95,6 +95,7 @@ class Worker:
                 self.settings,
                 self.services.questionnaire_steps,
                 item_parallelism=self.settings.run_item_parallelism,
+                worker_concurrency=self.settings.run_worker_concurrency,
             )
             self._engine_running = True
             log.info("run_engine_started", executor_id=self.settings.engine_executor_id)
@@ -123,7 +124,9 @@ def run_worker(settings: Settings | None = None) -> None:
     configure_tracing(settings)
 
     async def main() -> None:
-        services = build_services(settings, pool_size=3) if settings.database_url else None
+        # One connection per item in flight, plus a few for jobs, the reconciler, and events.
+        pool_size = settings.run_worker_concurrency + 2
+        services = build_services(settings, pool_size=pool_size) if settings.database_url else None
         worker = Worker(settings, services)
         loop = asyncio.get_running_loop()
         for sig in (signal.SIGTERM, signal.SIGINT):

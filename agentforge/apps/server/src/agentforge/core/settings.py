@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     embedding_model: str = "ollama:nomic-embed-text:v1.5"
     model_timeout_seconds: float = Field(default=180.0, gt=0)
     fake_latency_ms: float = Field(default=0.0, ge=0)
+    # Fault injection for durability tests: this share of fake chat calls times out, is
+    # unavailable, or returns invalid JSON (seeded, so a failing run can be replayed).
+    fake_fault_rate: float = Field(default=0.0, ge=0, le=0.5)
+    fake_fault_seed: int = 0
     openai_base_url: str | None = None
     openai_api_key: SecretStr | None = None
 
@@ -65,6 +69,9 @@ class Settings(BaseSettings):
     # Questionnaire runs: items answered at once per run (gate H3), and default run budgets
     # (a run that exceeds them fails as budget_exceeded; architecture §7.6).
     run_item_parallelism: int = Field(default=4, ge=1, le=16)
+    # Items one worker answers at once across all runs: what the model server can serve, and
+    # the most work a worker crash can lose (in-flight answers are redone after recovery).
+    run_worker_concurrency: int = Field(default=8, ge=1, le=64)
     run_max_llm_calls: int = Field(default=3000, ge=10)
     run_max_seconds: float = Field(default=6 * 3600, gt=0)
 

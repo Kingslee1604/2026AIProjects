@@ -10,7 +10,7 @@ import time
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, BinaryIO
 from urllib.parse import quote
 from uuid import UUID
 
@@ -60,6 +60,7 @@ class Stack:
     blobs: Path
     kb_id: str
     worker: subprocess.Popen[bytes]
+    worker_log: BinaryIO
 
     def post(self, path: str, body: object | None = None, *, as_reviewer: bool = False) -> Any:
         client, csrf = (
@@ -119,8 +120,30 @@ def northwind_xlsx(tmp_path_factory: pytest.TempPathFactory) -> bytes:
     return path.read_bytes()
 
 
+def spawn_worker(
+    database: Database, blobs: Path, log: BinaryIO, *, latency_ms: float, **env: str
+) -> subprocess.Popen[bytes]:
+    """The worker process as in production; `env` adds settings (e.g. fault injection)."""
+    return subprocess.Popen(
+        [
+            sys.executable,
+            "-c",
+            "from agentforge.cli import main; raise SystemExit(main())",
+            "worker",
+        ],
+        env={**worker_env(database, blobs, latency_ms=latency_ms), **env},
+        stdout=log,
+        stderr=subprocess.STDOUT,
+    )
+
+
 def start_stack(
-    database: Database, make_user: UserFactory, root: Path, *, latency_ms: float = 0.0
+    database: Database,
+    make_user: UserFactory,
+    root: Path,
+    *,
+    latency_ms: float = 0.0,
+    **worker_settings: str,
 ) -> Iterator[Stack]:
     blobs = root / "blobs"
     blobs.mkdir(parents=True, exist_ok=True)
@@ -130,19 +153,10 @@ def start_stack(
         blob_root=blobs,
         engine_database_url=SecretStr(database.url("agentforge_engine")),
     )
-    log = (root / "worker.log").open("wb")
-    worker = subprocess.Popen(
-        [
-            sys.executable,
-            "-c",
-            "from agentforge.cli import main; raise SystemExit(main())",
-            "worker",
-        ],
-        env=worker_env(database, blobs, latency_ms=latency_ms),
-        stdout=log,
-        stderr=subprocess.STDOUT,
-    )
+    log = (root / "worker.log").open("ab")
+    worker = spawn_worker(database, blobs, log, latency_ms=latency_ms, **worker_settings)
     owner = create_sync_engine(database.url("agentforge_owner"))
+    stack: Stack | None = None
     try:
         with (
             TestClient(create_app(settings)) as client,
@@ -166,7 +180,7 @@ def start_stack(
                     },
                 )
                 assert response.status_code == 201, response.text
-            stack = Stack(client, csrf, reviewer, reviewer_csrf, owner, blobs, kb, worker)
+            stack = Stack(client, csrf, reviewer, reviewer_csrf, owner, blobs, kb, worker, log)
             deadline = time.monotonic() + 120
             while (
                 client.get("/v1/knowledge-bases").json()[-1]["ready_count"]
@@ -176,11 +190,12 @@ def start_stack(
                 time.sleep(0.5)
             yield stack
     finally:
-        worker.terminate()
+        current = stack.worker if stack is not None else worker  # a test may restart it
+        current.terminate()
         try:
-            worker.wait(timeout=20)
+            current.wait(timeout=20)
         except subprocess.TimeoutExpired:
-            worker.kill()
+            current.kill()
         log.close()
         owner.dispose()
 

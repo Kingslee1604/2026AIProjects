@@ -24,6 +24,7 @@ from agentforge.agents.budget import BudgetExceededError
 from agentforge.core.logging import get_logger
 from agentforge.db.tenancy import TenantContext, tenant_session
 from agentforge.knowledge.blobs import BlobStore
+from agentforge.models import ModelError
 from agentforge.qa.pipeline import INSUFFICIENT, GroundedAnswerer
 from agentforge.qa.planner import BATCH_SIZE, ItemPlan, ItemToPlan, Planner
 from agentforge.questionnaires.exporter import ExportRow, export_csv, export_xlsx
@@ -53,6 +54,14 @@ class Usage:
     llm_calls: int
     tokens: int
     seconds: float
+
+
+# Step records left "running" by a worker crash (the retry or the run's end closes them).
+_INTERRUPTED = (
+    "UPDATE app.step_records SET status = 'failed', error_class = 'WorkerInterrupted', "
+    "error = 'the worker stopped during this attempt', finished_at = now() "
+    "WHERE run_id = :r AND status = 'running'"
+)
 
 
 def export_key(run_id: UUID, epoch: int) -> str:
@@ -87,6 +96,14 @@ class QuestionnaireSteps:
         """Record a step attempt: running, then succeeded or failed with the error class."""
         step_id = uuid4()
         async with self._tx(org_id) as db:
+            # An earlier attempt still "running" was cut off by a worker crash.
+            await db.execute(
+                text(
+                    f"{_INTERRUPTED} AND node_id = :n "
+                    "AND item_index IS NOT DISTINCT FROM :i AND epoch = :e"
+                ),
+                {"r": run_id, "n": node, "i": item_index, "e": epoch},
+            )
             await db.execute(
                 text(
                     "INSERT INTO app.step_records (id, org_id, run_id, node_id, item_index, epoch, "
@@ -167,14 +184,20 @@ class QuestionnaireSteps:
         pending = [r for r in rows if not r.plan]
         for start in range(0, len(pending), BATCH_SIZE):
             batch = pending[start : start + BATCH_SIZE]
-            async with self._step(org_id, run_id, "plan", batch[0].item_index) as step_id:
-                plans, version = await self._planner.plan_batch(
-                    org_id,
-                    [ItemToPlan(r.item_index, r.question, r.section) for r in batch],
-                    run_id=run_id,
-                    step_id=step_id,
-                )
-                await self._store_plans(org_id, run_id, plans, version)
+            try:
+                async with self._step(org_id, run_id, "plan", batch[0].item_index) as step_id:
+                    plans, version = await self._planner.plan_batch(
+                        org_id,
+                        [ItemToPlan(r.item_index, r.question, r.section) for r in batch],
+                        run_id=run_id,
+                        step_id=step_id,
+                    )
+            except ModelError as error:
+                # Planning only improves answers: if the model keeps failing (the gateway has
+                # already retried), answer these items as written rather than stall the run.
+                log.warning("plan_fallback", run_id=str(run_id), error=error.__class__.__name__)
+                plans, version = {r.item_index: ItemPlan() for r in batch}, "fallback"
+            await self._store_plans(org_id, run_id, plans, version)
         async with self._tx(org_id) as db:
             planned = (
                 await db.execute(
@@ -382,6 +405,7 @@ class QuestionnaireSteps:
                 )
             ).one_or_none()
             if moved is not None:
+                await db.execute(text(_INTERRUPTED), {"r": run_id})
                 await emit(db, org_id, run_id, "run_failed", data={"error_class": error_class})
 
     async def route(self, org_id: UUID, run_id: UUID) -> dict[str, int]:
@@ -592,6 +616,7 @@ class QuestionnaireSteps:
                 )
             ).one_or_none()
             if moved is not None:
+                await db.execute(text(_INTERRUPTED), {"r": run_id})
                 await emit(db, org_id, run_id, "run_succeeded", epoch=epoch)
 
     async def reopen_item(self, org_id: UUID, run_id: UUID, index: int) -> None:

@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import json
 import math
+import random
 import re
 from collections.abc import Callable, Sequence
 from typing import Any, Protocol
@@ -247,8 +248,10 @@ class FakeProvider:
 
     `script` is consumed one entry per chat call: literal text, or a fault name
     ("timeout", "unavailable", "invalid_json"). When the script is empty, `responder` answers
-    (default: schema-valid JSON derived from a hash of the prompt). Embeddings are hashed
-    bag-of-words vectors, so texts that share words are close: good enough to test retrieval.
+    (default: schema-valid JSON derived from a hash of the prompt). With `fault_rate`, that
+    share of unscripted calls gets a random fault instead (seeded; durability tests).
+    Embeddings are hashed bag-of-words vectors, so texts that share words are close: good
+    enough to test retrieval.
     """
 
     name = "fake"
@@ -259,10 +262,14 @@ class FakeProvider:
         script: Sequence[FakeOutcome] = (),
         responder: Responder | None = None,
         latency_ms: float = 0.0,
+        fault_rate: float = 0.0,
+        fault_seed: int = 0,
     ) -> None:
         self.script = list(script)
         self.responder = responder or _default_responder
         self.latency_ms = latency_ms
+        self.fault_rate = fault_rate
+        self._faults = random.Random(fault_seed)  # noqa: S311 - test fault injection, not crypto
         self.calls: list[tuple[str, list[Message]]] = []
 
     async def chat(
@@ -278,9 +285,12 @@ class FakeProvider:
         self.calls.append((model, list(messages)))
         if self.latency_ms:
             await asyncio.sleep(self.latency_ms / 1000)
-        outcome = (
-            self.script.pop(0) if self.script else self.responder(model, messages, json_schema)
-        )
+        if self.script:
+            outcome = self.script.pop(0)
+        elif self.fault_rate and self._faults.random() < self.fault_rate:
+            outcome = self._faults.choice(FAULTS)
+        else:
+            outcome = self.responder(model, messages, json_schema)
         if outcome == "timeout":
             raise ModelTimeoutError("fake: injected timeout")
         if outcome == "unavailable":

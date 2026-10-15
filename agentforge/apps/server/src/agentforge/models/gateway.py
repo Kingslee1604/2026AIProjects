@@ -282,7 +282,11 @@ def build_gateway(settings: Settings, recorder: Recorder = _discard) -> ModelGat
     api_key = settings.openai_api_key.get_secret_value() if settings.openai_api_key else None
     providers: dict[str, Provider] = {
         "ollama": OllamaProvider(settings.ollama_base_url),
-        "fake": FakeProvider(latency_ms=settings.fake_latency_ms),
+        "fake": FakeProvider(
+            latency_ms=settings.fake_latency_ms,
+            fault_rate=settings.fake_fault_rate,
+            fault_seed=settings.fake_fault_seed,
+        ),
     }
     if settings.openai_base_url:
         providers["openai"] = OpenAICompatibleProvider(settings.openai_base_url, api_key)

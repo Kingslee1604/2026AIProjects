@@ -113,6 +113,17 @@ async def item_workflow(org: str, run: str, index: int, epoch: int) -> str:
 async def run_workflow(org: str, run: str) -> None:
     if not await s_begin(org, run):
         return
+    try:
+        await _run_body(org, run)
+    except RunStoppedError:
+        return  # cancelled or deleted
+    except Exception as error:
+        # A step gave up after its retries: say so on the run instead of leaving it "running".
+        await s_fail(org, run, error.__class__.__name__, str(error) or "a run step failed")
+        raise
+
+
+async def _run_body(org: str, run: str) -> None:
     indexes = await s_plan(org, run)
     queue = await DBOS.retrieve_queue_async(ITEM_QUEUE)
     assert queue is not None  # noqa: S101 - registered at launch
@@ -149,5 +160,11 @@ async def retry_item_workflow(org: str, run: str, index: int, epoch: int) -> str
 @DBOS.workflow(name="questionnaire.export")
 async def export_workflow(org: str, run: str, epoch: int) -> None:
     """User-initiated re-export (new epoch, so a new artifact)."""
-    await s_export(org, run, epoch)
-    await s_finish(org, run, epoch)
+    try:
+        await s_export(org, run, epoch)
+        await s_finish(org, run, epoch)
+    except RunStoppedError:
+        return
+    except Exception as error:
+        await s_fail(org, run, error.__class__.__name__, str(error) or "the export failed")
+        raise

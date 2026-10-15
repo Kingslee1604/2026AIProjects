@@ -106,7 +106,11 @@ class DbosEngine:
 
 
 async def launch_worker(
-    settings: Settings, steps: "QuestionnaireSteps", *, item_parallelism: int = 4
+    settings: Settings,
+    steps: "QuestionnaireSteps",
+    *,
+    item_parallelism: int = 4,
+    worker_concurrency: int = 8,
 ) -> None:
     """Start DBOS in the worker process (creates or migrates its tables in `engine`)."""
     from agentforge.runs import workflows  # registers the workflows before launch
@@ -124,8 +128,13 @@ async def launch_worker(
     )
     DBOS.launch()
     await DBOS.register_queue_async(RUN_QUEUE)
+    # Per run: at most `item_parallelism` items at once (gate H3). Per worker, across runs: at
+    # most `worker_concurrency`, so 50 runs never mean 200 model calls in flight.
     await DBOS.register_queue_async(
-        ITEM_QUEUE, partition_concurrency=item_parallelism, polling_interval_sec=0.5
+        ITEM_QUEUE,
+        partition_concurrency=item_parallelism,
+        worker_concurrency=worker_concurrency,
+        polling_interval_sec=0.5,
     )
 
 

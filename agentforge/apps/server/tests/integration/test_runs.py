@@ -24,6 +24,7 @@ from agentforge.api.app import create_app
 from agentforge.auth.rbac import Role
 from agentforge.auth.users import create_user
 from agentforge.db.engine import create_app_engine, create_sessionmaker, create_sync_engine
+from agentforge.models.providers import FakeProvider
 from agentforge.runs.service import NewItem, RunService
 
 from .conftest import PASSWORD, Database, UserFactory, login, settings_for
@@ -331,3 +332,47 @@ def test_other_organizations_cannot_see_runs(ctx: Ctx, database: Database, app: 
             outsider.post(f"/v1/runs/{run_id}/cancel", headers={"X-CSRF-Token": csrf}).status_code
             == 404
         )
+
+
+def test_planning_falls_back_and_crashed_attempts_are_closed(ctx: Ctx) -> None:
+    """R1-36: a model that keeps failing does not stall planning (items are answered as
+    written), and step records left "running" by a worker crash are closed as interrupted."""
+    run_id = ctx.create(items=3)
+    ctx.owner_sql("UPDATE app.runs SET status = 'running' WHERE id = :r", r=run_id)
+    crashed = (
+        "INSERT INTO app.step_records (org_id, run_id, node_id, item_index) "
+        "VALUES (:o, :r, :n, :i) RETURNING id"
+    )
+    [old_plan] = ctx.owner_sql(crashed, o=ctx.org_id, r=run_id, n="plan", i=0)
+    svc = services_of(ctx.client)
+    fake = svc.gateway.provider("fake")
+    assert isinstance(fake, FakeProvider)
+    fake.script = ["timeout"]  # the planner's call times out (the gateway does not retry those)
+
+    indexes = ctx.client.portal.call(  # type: ignore[union-attr]
+        svc.questionnaire_steps.plan, ctx.org_id, run_id
+    )
+    assert indexes == [0, 1, 2]
+    plans = ctx.owner_sql(
+        "SELECT plan FROM app.run_items WHERE run_id = :r ORDER BY item_index", r=run_id
+    )
+    assert {(p.plan["planner_version"], p.plan["source"]) for p in plans} == {
+        ("fallback", "fallback")
+    }
+    steps = {
+        s.id: (s.status, s.error_class)
+        for s in ctx.owner_sql(
+            "SELECT id, status, error_class FROM app.step_records WHERE run_id = :r", r=run_id
+        )
+    }
+    assert steps.pop(old_plan.id) == ("failed", "WorkerInterrupted")  # closed by the retry
+    assert list(steps.values()) == [("failed", "StructuredOutputError")]
+
+    [old_answer] = ctx.owner_sql(crashed, o=ctx.org_id, r=run_id, n="answer", i=2)
+    ctx.client.portal.call(  # type: ignore[union-attr]
+        svc.questionnaire_steps.finish, ctx.org_id, run_id, 1
+    )
+    [closed] = ctx.owner_sql(
+        "SELECT status, error_class FROM app.step_records WHERE id = :s", s=old_answer.id
+    )
+    assert (closed.status, closed.error_class) == ("failed", "WorkerInterrupted")
