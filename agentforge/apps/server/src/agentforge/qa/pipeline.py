@@ -7,6 +7,7 @@ database except through the retriever and the agent registry.
 
 import time
 from collections.abc import Sequence
+from contextvars import ContextVar
 from dataclasses import asdict, dataclass, field
 from typing import Literal
 from uuid import UUID
@@ -28,6 +29,11 @@ from agentforge.qa.matching import (
 from agentforge.qa.schemas import DraftAnswer, DraftClaim, VerifierOutput
 
 log = get_logger("agentforge.qa")
+
+# The run step whose model calls these are (trace view). A context variable, not an
+# attribute: one answerer serves many items concurrently, each in its own asyncio task.
+_STEP: ContextVar[UUID | None] = ContextVar("agentforge_qa_step", default=None)
+SEARCH_RRF_K = 60
 
 INSUFFICIENT = "Insufficient evidence in the knowledge base."
 RESTATEMENT_OVERLAP = 0.75  # share of the quote's words in the claim: a restatement
@@ -130,6 +136,16 @@ def _evidence(hits: Sequence[SearchHit]) -> list[Evidence]:
     ]
 
 
+def _task(question: str, parts: Sequence[str]) -> str:
+    if not parts:
+        return f"Question: {question}"
+    listed = "\n".join(f"- {part}" for part in parts)
+    return (
+        f"Question: {question}\n\nThis question has several parts. Answer each part with its own "
+        f"claims, and leave out any part the evidence does not answer:\n{listed}"
+    )
+
+
 def _passage(e: Evidence) -> EvidencePassage:
     pages = str(e.page_start) if e.page_start == e.page_end else f"{e.page_start}-{e.page_end}"
     return EvidencePassage(e.id, e.filename, pages, " / ".join(e.section_path), e.content)
@@ -190,6 +206,36 @@ class GroundedAnswerer:
         max_models = max(definition.limits.max_llm_calls // 2, 1)
         return model, fallbacks[: max_models - 1]
 
+    async def _search(
+        self,
+        org_id: UUID,
+        knowledge_base_ids: Sequence[UUID],
+        queries: Sequence[str],
+        run_id: UUID | None,
+    ) -> list[SearchHit]:
+        """Search each distinct query and fuse the rankings (RRF), keeping each passage once
+        with its closest vector distance. One query: the retriever's own ranking."""
+        distinct = list(dict.fromkeys(q.strip() for q in queries if q.strip()))
+        k = self._config.top_k
+        if len(distinct) <= 1:
+            query = distinct[0] if distinct else ""
+            return await self._retriever.search(
+                org_id, knowledge_base_ids, query, k=k, run_id=run_id
+            )
+        scores: dict[UUID, float] = {}
+        best: dict[UUID, SearchHit] = {}
+        for query in distinct:
+            hits = await self._retriever.search(
+                org_id, knowledge_base_ids, query, k=k, run_id=run_id
+            )
+            for rank, hit in enumerate(hits, start=1):
+                scores[hit.chunk_id] = scores.get(hit.chunk_id, 0.0) + 1.0 / (SEARCH_RRF_K + rank)
+                kept = best.get(hit.chunk_id)
+                if kept is None or (hit.vector_distance or 9.0) < (kept.vector_distance or 9.0):
+                    best[hit.chunk_id] = hit
+        ranked = sorted(scores, key=lambda c: (-scores[c], str(c)))[:k]
+        return [best[c] for c in ranked]
+
     async def answer(
         self,
         org_id: UUID,
@@ -197,7 +243,12 @@ class GroundedAnswerer:
         knowledge_base_ids: Sequence[UUID],
         *,
         run_id: UUID | None = None,
+        step_id: UUID | None = None,
+        search_queries: Sequence[str] = (),
+        parts: Sequence[str] = (),
     ) -> GroundedAnswer:
+        """Answer one question. `search_queries` (from the planner) are searched in addition to
+        the question; `parts` tell the drafter to answer each part of a compound question."""
         config = self._config
         budget = Budget(
             max_llm_calls=config.max_llm_calls,
@@ -206,11 +257,10 @@ class GroundedAnswerer:
         )
         timings: dict[str, float] = {}
         started = time.perf_counter()
+        _STEP.set(step_id)
 
         budget.step()
-        hits = await self._retriever.search(
-            org_id, knowledge_base_ids, question, k=config.top_k, run_id=run_id
-        )
+        hits = await self._search(org_id, knowledge_base_ids, [question, *search_queries], run_id)
         timings["retrieve_ms"] = round((time.perf_counter() - started) * 1000, 1)
         evidence = _evidence(hits)
 
@@ -252,10 +302,10 @@ class GroundedAnswerer:
         budget.check()
         t0 = time.perf_counter()
         draft, result = await self._gateway.generate_structured(
-            CallContext(org_id, "draft", run_id),
+            CallContext(org_id, "draft", run_id, _STEP.get()),
             build_messages(
                 drafter.definition.system_prompt,
-                f"Question: {question}",
+                _task(question, parts),
                 [_passage(e) for e in evidence],
             ),
             DraftAnswer,
@@ -389,7 +439,7 @@ class GroundedAnswerer:
         budget.step()
         task = f"Question: {question}\nClaim: {claim.text}"
         output, result = await self._gateway.generate_structured(
-            CallContext(org_id, "verify", run_id),
+            CallContext(org_id, "verify", run_id, _STEP.get()),
             build_messages(
                 verifier.definition.system_prompt,
                 task,

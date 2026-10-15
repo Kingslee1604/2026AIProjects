@@ -36,9 +36,26 @@ def with_grounded_answers(fallback: Responder) -> Responder:
         properties = _properties(schema)
         if "verdict" in properties or "claims" in properties:
             return grounded_responder(model, messages, schema)
+        if "items" in properties and "PlannedItem" in (schema or {}).get("$defs", {}):
+            return passthrough_planner(messages)
         return fallback(model, messages, schema)
 
     return responder
+
+
+_PLAN_LINE = re.compile(r"^\[(\d+)\]", re.MULTILINE)
+
+
+def passthrough_planner(messages: Sequence[Message]) -> str:
+    """Planner: every item is a question, answered as written."""
+    indexes = [int(i) for i in _PLAN_LINE.findall(messages[-1].content)]
+    return json.dumps(
+        {
+            "items": [
+                {"index": i, "kind": "question", "search_queries": [], "parts": []} for i in indexes
+            ]
+        }
+    )
 
 
 def grounded_responder(

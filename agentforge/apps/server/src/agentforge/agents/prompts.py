@@ -28,6 +28,12 @@ def _neutralize(content: str) -> str:
     return _FENCE.sub(r"&lt;\1evidence", content)
 
 
+def neutralize_untrusted(text: str) -> str:
+    """Untrusted text placed in a prompt outside an evidence block (e.g. questionnaire items):
+    it must not be able to open or close evidence fences either."""
+    return _neutralize(text)
+
+
 def _attribute(value: str) -> str:
     """File names and headings come from documents too: keep them inside their quotes."""
     return (
