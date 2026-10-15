@@ -11,18 +11,31 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from agentforge.api.deps import require
 from agentforge.api.knowledge_routes import ServicesDep
 from agentforge.auth.rbac import Permission, Principal
+from agentforge.questionnaires.service import NotFoundError as QuestionnaireNotFoundError
 from agentforge.runs.events import EventHub, RunEvent
-from agentforge.runs.service import FINAL_STATUSES, InvalidStateError, NotFoundError
+from agentforge.runs.service import FINAL_STATUSES, InvalidStateError, NewItem, NotFoundError
 
 router = APIRouter(tags=["runs"])
 
 Reader = Annotated[Principal, Depends(require(Permission.RUNS_READ))]
 Writer = Annotated[Principal, Depends(require(Permission.RUNS_WRITE))]
+Reviewer = Annotated[Principal, Depends(require(Permission.REVIEWS_DECIDE))]
+
+
+class StartRunIn(BaseModel):
+    questionnaire_id: UUID
+    knowledge_base_ids: list[UUID] = Field(min_length=1, max_length=20)
+    title: str | None = Field(default=None, max_length=300)
+
+
+class EpochOut(BaseModel):
+    epoch: int
+
 
 RunStatus = Literal[
     "queued", "running", "waiting_review", "succeeded", "failed", "cancelled", "timed_out"
@@ -120,6 +133,67 @@ async def run_events(
     except NotFoundError:
         raise HTTPException(404, "Run not found") from None
     return [_event_out(e) for e in events]
+
+
+@router.post("/v1/runs", response_model=RunOut, status_code=201)
+async def start_run(body: StartRunIn, principal: Writer, svc: ServicesDep) -> RunOut:
+    """Start answering an uploaded questionnaire from the chosen knowledge bases."""
+    try:
+        questionnaire = await svc.questionnaires.get(principal.org_id, body.questionnaire_id)
+    except QuestionnaireNotFoundError:
+        raise HTTPException(404, "Questionnaire not found") from None
+    items = [
+        NewItem(question=i.question, section=i.section, source_ref=str(i.row))
+        for i in questionnaire.parsed_items()
+    ]
+    try:
+        run_id = await svc.runs.start_questionnaire(
+            principal.org_id,
+            principal.user_id,
+            questionnaire_id=questionnaire.id,
+            items=items,
+            knowledge_base_ids=body.knowledge_base_ids,
+            title=body.title or questionnaire.filename,
+        )
+    except NotFoundError:
+        raise HTTPException(404, "Knowledge base not found") from None
+    return RunOut(**asdict(await svc.runs.get(principal.org_id, run_id)))
+
+
+@router.post("/v1/runs/{run_id}/items/{item_index}/retry", response_model=EpochOut, status_code=202)
+async def retry_item(
+    run_id: UUID, item_index: int, principal: Writer, svc: ServicesDep
+) -> EpochOut:
+    """Answer one item again (only while the run waits for review)."""
+    try:
+        return EpochOut(epoch=await svc.runs.retry_item(principal.org_id, run_id, item_index))
+    except NotFoundError as error:
+        raise HTTPException(404, str(error).capitalize()) from None
+    except InvalidStateError as error:
+        raise HTTPException(409, str(error)) from None
+
+
+@router.post("/v1/runs/{run_id}/export/retry", response_model=EpochOut, status_code=202)
+async def retry_export(run_id: UUID, principal: Writer, svc: ServicesDep) -> EpochOut:
+    """Export again: a new version of the answered file (the earlier one is kept)."""
+    try:
+        return EpochOut(epoch=await svc.runs.retry_export(principal.org_id, run_id))
+    except NotFoundError:
+        raise HTTPException(404, "Run not found") from None
+    except InvalidStateError as error:
+        raise HTTPException(409, str(error)) from None
+
+
+@router.post("/v1/runs/{run_id}/review/complete", status_code=202)
+async def complete_review(run_id: UUID, principal: Reviewer, svc: ServicesDep) -> dict[str, str]:
+    """Finish the review and export. (R1-34 replaces this with per-item decisions.)"""
+    try:
+        await svc.runs.signal_review(principal.org_id, run_id)
+    except NotFoundError:
+        raise HTTPException(404, "Run not found") from None
+    except InvalidStateError as error:
+        raise HTTPException(409, str(error)) from None
+    return {"status": "accepted"}
 
 
 @router.post("/v1/runs/{run_id}/cancel", response_model=RunOut)

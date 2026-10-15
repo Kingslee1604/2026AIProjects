@@ -16,11 +16,13 @@ from agentforge.models.providers import FakeProvider
 from agentforge.models.recorder import DbRecorder
 from agentforge.qa.fake import with_grounded_answers
 from agentforge.qa.pipeline import GroundedAnswerer, QAConfig
+from agentforge.qa.planner import Planner
 from agentforge.qa.purge import purge_documents
 from agentforge.qa.service import QAService
 from agentforge.questionnaires.service import QuestionnaireService
 from agentforge.runs.dbos_engine import DbosEngine
 from agentforge.runs.port import NoEngine, RunEngine
+from agentforge.runs.questionnaire import QuestionnaireSteps, RunBudget
 from agentforge.runs.service import RunService
 
 
@@ -38,6 +40,7 @@ class Services:
     runs: RunService
     blobs: LocalBlobStore
     questionnaires: QuestionnaireService
+    questionnaire_steps: QuestionnaireSteps
 
     async def close(self) -> None:
         if isinstance(self.run_engine, DbosEngine):
@@ -80,6 +83,7 @@ def build_services(settings: Settings, *, pool_size: int = 5) -> Services:
         DbosEngine(settings) if settings.engine_database_url is not None else NoEngine()
     )
     blobs = LocalBlobStore(settings.blob_root)
+    answerer = GroundedAnswerer(gateway, retriever, agents, qa_config(settings))
     return Services(
         engine=engine,
         sessions=sessions,
@@ -101,5 +105,14 @@ def build_services(settings: Settings, *, pool_size: int = 5) -> Services:
         ),
         retriever=retriever,
         agents=agents,
-        qa=QAService(sessions, GroundedAnswerer(gateway, retriever, agents, qa_config(settings))),
+        qa=QAService(sessions, answerer),
+        questionnaire_steps=QuestionnaireSteps(
+            sessions,
+            blobs,
+            answerer,
+            Planner(gateway, agents, settings.chat_model),
+            default_budget=RunBudget(
+                max_llm_calls=settings.run_max_llm_calls, max_seconds=settings.run_max_seconds
+            ),
+        ),
     )

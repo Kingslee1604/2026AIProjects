@@ -8,12 +8,16 @@ ADR-0002 conditions applied here: system tables in the `engine` schema with the 
 a capped thread pool; a stable executor id per worker.
 """
 
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from dbos import DBOS, DBOSClient
 from pydantic import SecretStr
 
 from agentforge.core.settings import Settings
+
+if TYPE_CHECKING:
+    from agentforge.runs.questionnaire import QuestionnaireSteps
 
 RUN_QUEUE = "runs"
 ITEM_QUEUE = "run_items"  # partitioned by run id: per-run parallelism (gate H3)
@@ -73,7 +77,7 @@ class DbosEngine:
     async def retry_export(self, org_id: UUID, run_id: UUID, epoch: int) -> None:
         await self.client.enqueue_async(
             {
-                "workflow_name": "run.export",
+                "workflow_name": "questionnaire.export",
                 "queue_name": RUN_QUEUE,
                 "workflow_id": f"{run_workflow_id(run_id)}-export-{epoch}",
             },
@@ -82,15 +86,32 @@ class DbosEngine:
             epoch,
         )
 
+    async def retry_item(self, org_id: UUID, run_id: UUID, item_index: int, epoch: int) -> None:
+        await self.client.enqueue_async(
+            {
+                "workflow_name": "questionnaire.retry_item",
+                "queue_name": ITEM_QUEUE,
+                "workflow_id": f"{run_workflow_id(run_id)}-retry-{item_index}-e{epoch}",
+                "queue_partition_key": str(run_id),
+            },
+            str(org_id),
+            str(run_id),
+            item_index,
+            epoch,
+        )
+
     def close(self) -> None:
         if self._client is not None:
             self._client.destroy()
 
 
-async def launch_worker(settings: Settings, *, item_parallelism: int = 4) -> None:
+async def launch_worker(
+    settings: Settings, steps: "QuestionnaireSteps", *, item_parallelism: int = 4
+) -> None:
     """Start DBOS in the worker process (creates or migrates its tables in `engine`)."""
-    import agentforge.runs.workflows  # noqa: F401  # pyright: ignore[reportUnusedImport] - registers workflows
+    from agentforge.runs import workflows  # registers the workflows before launch
 
+    workflows.configure(steps)
     DBOS(
         config={
             "name": APP_NAME,

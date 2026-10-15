@@ -362,7 +362,11 @@ export interface paths {
         /** List Runs */
         get: operations["list_runs_v1_runs_get"];
         put?: never;
-        post?: never;
+        /**
+         * Start Run
+         * @description Start answering an uploaded questionnaire from the chosen knowledge bases.
+         */
+        post: operations["start_run_v1_runs_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -420,6 +424,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/runs/{run_id}/export/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry Export
+         * @description Export again: a new version of the answered file (the earlier one is kept).
+         */
+        post: operations["retry_export_v1_runs__run_id__export_retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/runs/{run_id}/items": {
         parameters: {
             query?: never;
@@ -431,6 +455,46 @@ export interface paths {
         get: operations["run_items_v1_runs__run_id__items_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runs/{run_id}/items/{item_index}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry Item
+         * @description Answer one item again (only while the run waits for review).
+         */
+        post: operations["retry_item_v1_runs__run_id__items__item_index__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runs/{run_id}/review/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete Review
+         * @description Finish the review and export. (R1-34 replaces this with per-item decisions.)
+         */
+        post: operations["complete_review_v1_runs__run_id__review_complete_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -634,6 +698,11 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** EpochOut */
+        EpochOut: {
+            /** Epoch */
+            epoch: number;
         };
         /** EvidenceOut */
         EvidenceOut: {
@@ -993,6 +1062,18 @@ export interface components {
              * Format: uuid
              */
             user_id: string;
+        };
+        /** StartRunIn */
+        StartRunIn: {
+            /** Knowledge Base Ids */
+            knowledge_base_ids: string[];
+            /**
+             * Questionnaire Id
+             * Format: uuid
+             */
+            questionnaire_id: string;
+            /** Title */
+            title?: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -1682,6 +1763,39 @@ export interface operations {
             };
         };
     };
+    start_run_v1_runs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartRunIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_run_v1_runs__run_id__get: {
         parameters: {
             query?: never;
@@ -1777,6 +1891,37 @@ export interface operations {
             };
         };
     };
+    retry_export_v1_runs__run_id__export_retry_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpochOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     run_items_v1_runs__run_id__items_get: {
         parameters: {
             query?: never;
@@ -1795,6 +1940,71 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RunItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retry_item_v1_runs__run_id__items__item_index__retry_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+                item_index: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpochOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    complete_review_v1_runs__run_id__review_complete_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
                 };
             };
             /** @description Validation Error */

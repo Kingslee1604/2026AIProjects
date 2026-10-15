@@ -494,6 +494,19 @@
         "title": "DocumentOut",
         "type": "object"
       },
+      "EpochOut": {
+        "properties": {
+          "epoch": {
+            "title": "Epoch",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "epoch"
+        ],
+        "title": "EpochOut",
+        "type": "object"
+      },
       "EvidenceOut": {
         "properties": {
           "char_end": {
@@ -1457,6 +1470,43 @@
           "csrf_token"
         ],
         "title": "SessionInfo",
+        "type": "object"
+      },
+      "StartRunIn": {
+        "properties": {
+          "knowledge_base_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Knowledge Base Ids",
+            "type": "array"
+          },
+          "questionnaire_id": {
+            "format": "uuid",
+            "title": "Questionnaire Id",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "questionnaire_id",
+          "knowledge_base_ids"
+        ],
+        "title": "StartRunIn",
         "type": "object"
       },
       "ValidationError": {
@@ -2433,6 +2483,46 @@
         "tags": [
           "runs"
         ]
+      },
+      "post": {
+        "description": "Start answering an uploaded questionnaire from the chosen knowledge bases.",
+        "operationId": "start_run_v1_runs_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRunIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start Run",
+        "tags": [
+          "runs"
+        ]
       }
     },
     "/v1/runs/{run_id}": {
@@ -2579,6 +2669,50 @@
         ]
       }
     },
+    "/v1/runs/{run_id}/export/retry": {
+      "post": {
+        "description": "Export again: a new version of the answered file (the earlier one is kept).",
+        "operationId": "retry_export_v1_runs__run_id__export_retry_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EpochOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Retry Export",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
     "/v1/runs/{run_id}/items": {
       "get": {
         "operationId": "run_items_v1_runs__run_id__items_get",
@@ -2621,6 +2755,107 @@
           }
         },
         "summary": "Run Items",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/runs/{run_id}/items/{item_index}/retry": {
+      "post": {
+        "description": "Answer one item again (only while the run waits for review).",
+        "operationId": "retry_item_v1_runs__run_id__items__item_index__retry_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "item_index",
+            "required": true,
+            "schema": {
+              "title": "Item Index",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EpochOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Retry Item",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/runs/{run_id}/review/complete": {
+      "post": {
+        "description": "Finish the review and export. (R1-34 replaces this with per-item decisions.)",
+        "operationId": "complete_review_v1_runs__run_id__review_complete_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Complete Review V1 Runs  Run Id  Review Complete Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Complete Review",
         "tags": [
           "runs"
         ]

@@ -49,6 +49,9 @@ class RecordingEngine:
     async def retry_export(self, org_id: UUID, run_id: UUID, epoch: int) -> None:
         self.calls.append(("retry_export", run_id))
 
+    async def retry_item(self, org_id: UUID, run_id: UUID, item_index: int, epoch: int) -> None:
+        self.calls.append(("retry_item", run_id))
+
 
 @dataclasses.dataclass
 class Ctx:

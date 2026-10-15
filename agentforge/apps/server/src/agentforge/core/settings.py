@@ -62,6 +62,12 @@ class Settings(BaseSettings):
     engine_executor_id: str = "worker-1"
     engine_max_threads: int = Field(default=32, ge=4, le=256)
 
+    # Questionnaire runs: items answered at once per run (gate H3), and default run budgets
+    # (a run that exceeds them fails as budget_exceeded; architecture §7.6).
+    run_item_parallelism: int = Field(default=4, ge=1, le=16)
+    run_max_llm_calls: int = Field(default=3000, ge=10)
+    run_max_seconds: float = Field(default=6 * 3600, gt=0)
+
     # Sessions (security baseline S3). Cookies are Secure whenever served over TLS; production
     # refuses to start without it.
     cookie_secure: bool = False

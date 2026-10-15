@@ -23,6 +23,10 @@ class RunEngine(Protocol):
         """User-initiated retry of the export with a new epoch (gate H4)."""
         ...
 
+    async def retry_item(self, org_id: UUID, run_id: UUID, item_index: int, epoch: int) -> None:
+        """User-initiated retry of one item: only that item is answered again."""
+        ...
+
 
 class NoEngine:
     """Used when no engine database is configured (tests, API-only setups): runs can be read
@@ -38,4 +42,7 @@ class NoEngine:
         raise RuntimeError("no run engine configured")
 
     async def retry_export(self, org_id: UUID, run_id: UUID, epoch: int) -> None:
+        raise RuntimeError("no run engine configured")
+
+    async def retry_item(self, org_id: UUID, run_id: UUID, item_index: int, epoch: int) -> None:
         raise RuntimeError("no run engine configured")

@@ -250,3 +250,105 @@ class RunService:
                 await emit(db, org_id, run_id, "run_cancelled", data={"by": str(user_id)})
         log.info("run_cancelled", run_id=str(run_id))
         return await self.get(org_id, run_id)
+
+    # --- questionnaire runs (R1-33) ------------------------------------------------------------
+
+    async def start_questionnaire(
+        self,
+        org_id: UUID,
+        user_id: UUID | None,
+        *,
+        questionnaire_id: UUID,
+        items: Sequence[NewItem],
+        knowledge_base_ids: Sequence[UUID],
+        title: str,
+        budgets: dict[str, Any] | None = None,
+    ) -> UUID:
+        async with tenant_session(self._sessions, TenantContext(org_id)) as db:
+            found = (
+                await db.execute(
+                    text("SELECT count(*) FROM app.knowledge_bases WHERE id = ANY(:ids)"),
+                    {"ids": list(knowledge_base_ids)},
+                )
+            ).scalar_one()
+        if found != len(set(knowledge_base_ids)):
+            raise NotFoundError("knowledge base not found")
+        return await self.create(
+            org_id,
+            user_id,
+            template_key="questionnaire",
+            title=title,
+            input={
+                "questionnaire_id": str(questionnaire_id),
+                "knowledge_base_ids": [str(k) for k in dict.fromkeys(knowledge_base_ids)],
+            },
+            items=items,
+            budgets=budgets,
+        )
+
+    async def _bump_epoch(
+        self,
+        org_id: UUID,
+        run_id: UUID,
+        allowed: set[str],
+        *,
+        reopen: bool,
+        event: str,
+        data: dict[str, Any],
+    ) -> int:
+        async with tenant_session(self._sessions, TenantContext(org_id)) as db:
+            row = (
+                await db.execute(
+                    text("SELECT status, epoch FROM app.runs WHERE id = :r FOR UPDATE"),
+                    {"r": run_id},
+                )
+            ).one_or_none()
+            if row is None:
+                raise NotFoundError("run not found")
+            if row.status not in allowed:
+                raise InvalidStateError(f"run is {row.status}")
+            epoch = int(row.epoch) + 1
+            await db.execute(
+                text(
+                    "UPDATE app.runs SET epoch = :e, updated_at = now(), finished_at = CASE WHEN "
+                    ":reopen THEN NULL ELSE finished_at END, status = CASE WHEN :reopen THEN "
+                    "'running' ELSE status END WHERE id = :r"
+                ),
+                {"e": epoch, "reopen": reopen, "r": run_id},
+            )
+            await emit(db, org_id, run_id, event, epoch=epoch, data=data)
+        return epoch
+
+    async def retry_item(self, org_id: UUID, run_id: UUID, item_index: int) -> int:
+        """Answer one item again while the run waits for review (a new epoch)."""
+        items = {i.item_index: i for i in await self.items(org_id, run_id)}
+        item = items.get(item_index)
+        if item is None:
+            raise NotFoundError("item not found")
+        if item.status in {"skipped", "pending", "answering"}:
+            raise InvalidStateError(f"item is {item.status}")
+        epoch = await self._bump_epoch(
+            org_id,
+            run_id,
+            {"waiting_review"},
+            reopen=False,
+            event="item_retry_requested",
+            data={"item_index": item_index},
+        )
+        await self._engine.retry_item(org_id, run_id, item_index, epoch)
+        return epoch
+
+    async def retry_export(self, org_id: UUID, run_id: UUID) -> int:
+        """Export again (a new epoch, so a new artifact; the earlier one is kept)."""
+        epoch = await self._bump_epoch(
+            org_id, run_id, {"succeeded"}, reopen=True, event="export_retry_requested", data={}
+        )
+        await self._engine.retry_export(org_id, run_id, epoch)
+        return epoch
+
+    async def signal_review(self, org_id: UUID, run_id: UUID) -> None:
+        """Tell a run waiting for review to continue to the export."""
+        run = await self.get(org_id, run_id)
+        if run.status != "waiting_review":
+            raise InvalidStateError(f"run is {run.status}")
+        await self._engine.signal_review(org_id, run_id)

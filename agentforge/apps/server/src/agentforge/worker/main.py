@@ -90,7 +90,12 @@ class Worker:
         self._heartbeat()
         heartbeat = asyncio.create_task(self._heartbeats())
         if self.services is not None and self.settings.engine_database_url is not None:
-            await launch_worker(self.settings)  # DBOS resumes this worker's unfinished runs
+            # DBOS resumes this worker's unfinished runs on launch.
+            await launch_worker(
+                self.settings,
+                self.services.questionnaire_steps,
+                item_parallelism=self.settings.run_item_parallelism,
+            )
             self._engine_running = True
             log.info("run_engine_started", executor_id=self.settings.engine_executor_id)
         try:
