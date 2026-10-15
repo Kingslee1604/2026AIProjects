@@ -31,6 +31,47 @@ export async function expectAccessible(page: Page): Promise<void> {
   ).toEqual([]);
 }
 
+/** A new knowledge base holding the test policy, once its document is indexed. */
+export async function createIndexedKb(page: Page, name: string): Promise<void> {
+  await page.goto("/app/knowledge");
+  await page.getByLabel("Name").fill(name);
+  await page.getByRole("button", { name: "Create" }).click();
+  await expect(page.getByRole("heading", { name })).toBeVisible();
+  await page.getByTestId("file-input").setInputFiles({
+    name: "security-policy.md",
+    mimeType: "text/markdown",
+    buffer: Buffer.from(POLICY),
+  });
+  await expect(page.getByTestId("document-row").getByText("Ready")).toBeVisible({
+    timeout: 90_000,
+  });
+}
+
+/** Use only the test's knowledge base, whatever else the stack contains. */
+export async function onlyOurKb(page: Page, kbName: string, legend: string): Promise<void> {
+  const group = page.getByRole("group", { name: legend });
+  await expect(group.getByRole("checkbox", { name: kbName })).toBeChecked();
+  for (const box of await group.getByRole("checkbox").all()) {
+    const label = (await box.locator("xpath=..").innerText()).trim();
+    if (label.startsWith(kbName)) {
+      // Toggle off and on: an explicit choice, so knowledge bases that other tests create
+      // (or delete) meanwhile are not added to the selection automatically.
+      await box.uncheck();
+      await box.check();
+    } else {
+      await box.uncheck();
+    }
+  }
+}
+
+export async function deleteKb(page: Page, name: string): Promise<void> {
+  await page.goto("/app/knowledge");
+  await page.getByRole("link", { name }).click();
+  await page.getByRole("button", { name: "Delete knowledge base" }).click();
+  await page.getByRole("button", { name: "Delete permanently" }).click();
+  await expect(page).toHaveURL(/\/app\/knowledge$/);
+}
+
 export const POLICY = `# Information Security Policy
 
 ## Logging

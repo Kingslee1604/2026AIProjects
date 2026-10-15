@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -23,17 +24,24 @@ export default function Overview() {
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
-          <CardTitle>Ask your documents</CardTitle>
+          <CardTitle>
+            <Link href="/app/ask" className="text-accent hover:underline">
+              Ask your documents
+            </Link>
+          </CardTitle>
           <p className="mt-2 text-sm text-muted">
             Upload documents, ask questions, and get answers where every claim links to its source.
-            Arrives in milestone M2.
           </p>
         </Card>
         <Card>
-          <CardTitle>Fill a questionnaire</CardTitle>
+          <CardTitle>
+            <Link href="/app/runs" className="text-accent hover:underline">
+              Fill a questionnaire
+            </Link>
+          </CardTitle>
           <p className="mt-2 text-sm text-muted">
             Upload an Excel questionnaire; AgentForge drafts every answer from your documents and a
-            reviewer approves them. Arrives in milestone M4.
+            reviewer approves them.
           </p>
         </Card>
       </div>

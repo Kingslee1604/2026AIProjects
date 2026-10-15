@@ -1,50 +1,28 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { expectAccessible, POLICY, requireCredentials, signIn } from "./helpers";
+import {
+  createIndexedKb,
+  deleteKb,
+  expectAccessible,
+  onlyOurKb as onlyKb,
+  requireCredentials,
+  signIn,
+} from "./helpers";
 
 // Locally these run against the real model on a CPU (15-60 s per answer); CI uses the fake one.
 test.describe.configure({ mode: "serial", timeout: 240_000 });
 test.beforeAll(requireCredentials);
 
-let kbName = "";
-
-async function createIndexedKb(page: Page): Promise<void> {
-  kbName = `E2E ask ${Date.now()}`;
-  await page.goto("/app/knowledge");
-  await page.getByLabel("Name").fill(kbName);
-  await page.getByRole("button", { name: "Create" }).click();
-  await expect(page.getByRole("heading", { name: kbName })).toBeVisible();
-  await page.getByTestId("file-input").setInputFiles({
-    name: "security-policy.md",
-    mimeType: "text/markdown",
-    buffer: Buffer.from(POLICY),
-  });
-  await expect(page.getByTestId("document-row").getByText("Ready")).toBeVisible({
-    timeout: 90_000,
-  });
-}
+const kbName = `E2E ask ${Date.now()}`;
 
 /** Search only the test's knowledge base, whatever else the stack contains. */
 async function onlyOurKb(page: Page): Promise<void> {
-  const group = page.getByRole("group", { name: "Search in" });
-  await expect(group.getByRole("checkbox", { name: kbName })).toBeChecked();
-  const boxes = group.getByRole("checkbox");
-  for (const box of await boxes.all()) {
-    const label = (await box.locator("xpath=..").innerText()).trim();
-    if (label.startsWith(kbName)) {
-      // Toggle off and on: an explicit choice, so knowledge bases that other tests create
-      // (or delete) meanwhile are not added to the selection automatically.
-      await box.uncheck();
-      await box.check();
-    } else {
-      await box.uncheck();
-    }
-  }
+  await onlyKb(page, kbName, "Search in");
 }
 
 test("ask, see verified sentences, open the cited passage", async ({ page }) => {
   await signIn(page);
-  await createIndexedKb(page);
+  await createIndexedKb(page, kbName);
 
   await page.getByRole("link", { name: "Ask" }).click();
   await expect(page.getByRole("heading", { name: "Ask", exact: true })).toBeVisible();
@@ -105,9 +83,5 @@ test("an unanswerable question says so instead of guessing", async ({ page }) =>
   await expectAccessible(page);
 
   // Clean up the test knowledge base.
-  await page.goto("/app/knowledge");
-  await page.getByRole("link", { name: kbName }).click();
-  await page.getByRole("button", { name: "Delete knowledge base" }).click();
-  await page.getByRole("button", { name: "Delete permanently" }).click();
-  await expect(page).toHaveURL(/\/app\/knowledge$/);
+  await deleteKb(page, kbName);
 });

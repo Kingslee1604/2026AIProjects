@@ -5,40 +5,22 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, useState } from "react";
 
 import { AnswerView } from "./answer-view";
+import { KnowledgePicker, useKnowledgeSelection } from "@/components/knowledge-picker";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/input";
 import { useAsk, useRecentAnswers } from "@/lib/answers";
 import { formatAge } from "@/lib/format";
-import { useKnowledgeBases } from "@/lib/knowledge";
 
 export function AskView() {
   const router = useRouter();
   const pathname = usePathname();
   const answerId = useSearchParams().get("answer");
-  const kbs = useKnowledgeBases();
   const ask = useAsk();
   const recent = useRecentAnswers();
   const [question, setQuestion] = useState("");
-  const [picked, setPicked] = useState<Set<string> | null>(null);
-
-  const usable = (kbs.data ?? []).filter((kb) => kb.ready_count > 0);
-  // Start with every knowledge base that has ready documents, chosen once when the list first
-  // loads: knowledge bases created later are not added to the selection behind the user's back.
-  // (Setting state during render is React's pattern for deriving initial state from data.)
-  // Wait for the fresh list (not a cached one from before the latest uploads finished).
-  if (picked === null && kbs.isSuccess && !kbs.isFetching) {
-    setPicked(new Set(usable.map((kb) => kb.id)));
-  }
-  // Only send knowledge bases that still exist and are ready.
-  const selected = new Set(usable.map((kb) => kb.id).filter((id) => picked?.has(id)));
-
-  function toggle(id: string) {
-    const next = new Set(selected);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setPicked(next);
-  }
+  const knowledge = useKnowledgeSelection();
+  const { selected } = knowledge;
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -60,35 +42,7 @@ export function AskView() {
 
       <Card>
         <form className="space-y-4" onSubmit={onSubmit}>
-          <fieldset>
-            <legend className="text-sm font-medium">Search in</legend>
-            {kbs.isPending ? (
-              <p className="mt-2 text-sm text-muted">Loading knowledge bases…</p>
-            ) : usable.length === 0 ? (
-              <p className="mt-2 text-sm text-muted">
-                No knowledge base has ready documents yet.{" "}
-                <Link href="/app/knowledge" className="text-accent hover:underline">
-                  Upload documents first
-                </Link>
-                .
-              </p>
-            ) : (
-              <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
-                {usable.map((kb) => (
-                  <label key={kb.id} className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      className="size-4 accent-accent"
-                      checked={selected.has(kb.id)}
-                      onChange={() => toggle(kb.id)}
-                    />
-                    {kb.name}
-                    <span className="text-muted">({kb.ready_count})</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </fieldset>
+          <KnowledgePicker legend="Search in" selection={knowledge} />
           <div className="grid gap-1">
             <Label htmlFor="question">Question</Label>
             <textarea

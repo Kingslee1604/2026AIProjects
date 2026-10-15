@@ -14,6 +14,15 @@ export function formatPages(start: number, end: number): string {
   return start === end ? `p. ${start}` : `pp. ${start}–${end}`;
 }
 
+/** Spreadsheet column letter for a zero-based column index: 0 → A, 25 → Z, 26 → AA. */
+export function columnLetter(index: number): string {
+  let letters = "";
+  for (let n = index + 1; n > 0; n = Math.floor((n - 1) / 26)) {
+    letters = String.fromCharCode(65 + ((n - 1) % 26)) + letters;
+  }
+  return letters;
+}
+
 /** "3 min ago", "2 h ago", or a date for anything older than a day. */
 export function formatAge(iso: string, now: Date = new Date()): string {
   const seconds = Math.max(0, Math.round((now.getTime() - new Date(iso).getTime()) / 1000));

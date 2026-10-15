@@ -19,7 +19,7 @@ const NAV: NavItem[] = [
   { href: "/app", label: "Overview" },
   { href: "/app/knowledge", label: "Knowledge" },
   { href: "/app/ask", label: "Ask" },
-  { href: "/app/runs", label: "Questionnaires", comingIn: "M4" },
+  { href: "/app/runs", label: "Questionnaires" },
   { href: "/app/reviews", label: "Reviews", comingIn: "M4" },
   { href: "/app/admin", label: "Admin", adminOnly: true },
 ];
