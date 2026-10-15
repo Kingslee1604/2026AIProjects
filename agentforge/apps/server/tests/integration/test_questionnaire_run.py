@@ -284,6 +284,23 @@ def test_a_40_item_questionnaire_runs_to_an_exported_file(
     )[0][0]
     assert unlinked == 0
 
+    # The trace (R1-38): every step attempt, budget used against the limits, and each step's
+    # own model calls.
+    trace = stack.client.get(f"/v1/runs/{run_id}/trace").json()
+    nodes = [s["node_id"] for s in trace["steps"]]
+    assert nodes.count("answer") == 40
+    assert "plan" in nodes
+    assert trace["llm_calls"] >= 40
+    assert trace["max_llm_calls"] == 3000  # the default limit (run_max_llm_calls)
+    assert trace["seconds"] > 0
+    step = next(s for s in trace["steps"] if s["node_id"] == "answer" and s["item_index"] == 0)
+    calls = stack.client.get(f"/v1/runs/{run_id}/steps/{step['id']}/calls").json()
+    draft = next(c for c in calls if c["purpose"] == "draft")
+    assert draft["request"]
+    assert draft["response"]
+    items_out = stack.client.get(f"/v1/runs/{run_id}/items").json()
+    assert items_out[0]["plan"]["planner_version"]  # the plan behind each item
+
     # Review: a Member without can_review cannot decide; the reviewer bulk-approves verified
     # answers, edits item 0, rejects item 1, approves the rest, and completes the review.
     review = f"/v1/runs/{run_id}/review"

@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 import {
   createIndexedKb,
@@ -16,6 +16,7 @@ test.beforeAll(requireCredentials);
 const stamp = Date.now();
 const kbName = `E2E runs ${stamp}`;
 const runName = `E2E questionnaire ${stamp}`;
+let runPath = "";
 
 // The customer's file: an ID, a section, the question, an empty answer column, and their notes.
 const QUESTIONNAIRE = [
@@ -23,6 +24,24 @@ const QUESTIONNAIRE = [
   "Q1,Logging,How long are access logs retained?,,keep",
   "Q2,Encryption,How often are encryption keys rotated?,,keep",
 ].join("\n");
+
+const ANSWER_TIMEOUT = 400_000;
+
+async function eventSeqs(page: Page): Promise<number[]> {
+  const seqs = await page
+    .getByTestId("run-events")
+    .getByTestId("event")
+    .evaluateAll((nodes) => nodes.map((n) => Number(n.getAttribute("data-seq"))));
+  return seqs;
+}
+
+/** Ask the API directly (not through the page), e.g. while the page is offline. */
+async function apiPost(page: Page, path: string): Promise<number> {
+  const session = await page.request.get("/api/v1/auth/session");
+  const { csrf_token: csrf } = (await session.json()) as { csrf_token: string };
+  const response = await page.request.post(`/api${path}`, { headers: { "X-CSRF-Token": csrf } });
+  return response.status();
+}
 
 test("start a questionnaire run and follow its status in the list", async ({ page }) => {
   await signIn(page);
@@ -68,7 +87,7 @@ test("start a questionnaire run and follow its status in the list", async ({ pag
     /queued|running|waiting_review/,
   );
   await expect(row.getByTestId("run-status")).toHaveAttribute("data-status", "waiting_review", {
-    timeout: 400_000,
+    timeout: ANSWER_TIMEOUT,
   });
   await expect(row).toContainText("2 of 2");
   await expectAccessible(page);
@@ -80,10 +99,90 @@ test("start a questionnaire run and follow its status in the list", async ({ pag
   await expect(row).toBeHidden();
   await page.getByRole("button", { name: /^All/ }).click();
 
-  // The run's own page.
   await row.getByRole("link", { name: runName }).click();
   await expect(page.getByRole("heading", { name: runName })).toBeVisible();
-  await expect(page.getByText("2 of 2 questions answered")).toBeVisible();
+  runPath = new URL(page.url()).pathname;
+});
+
+test("the run page: steps, model calls, retrievals, and a live retry", async ({ page }) => {
+  await signIn(page);
+  await page.goto(runPath);
+  await expect(page.getByTestId("live-state")).toHaveAttribute("data-state", "live");
+  await expect(page.getByText("Model calls", { exact: true }).first()).toBeVisible(); // budget
+  const lanes = page.getByTestId("item-lane");
+  await expect(lanes).toHaveCount(2);
+  await expect(page.getByTestId("run-events")).toContainText("Waiting for review");
+  // Nothing below may reload the page: this marker would be lost.
+  await page.evaluate(() => {
+    (window as unknown as { stayed: boolean }).stayed = true;
+  });
+
+  // Open a question: its model calls (with the prompt) and the passages retrieved.
+  const first = lanes.filter({ hasText: "access logs" });
+  await first.getByRole("button", { name: /access logs/ }).click();
+  const panel = page.getByTestId("step-panel");
+  await expect(panel.getByRole("heading", { name: "Question 1" })).toBeVisible();
+  await expect(panel).toContainText("How long are access logs retained?"); // Input tab
+  await panel.getByRole("tab", { name: "Model calls" }).click();
+  const draft = panel.getByTestId("model-call").filter({ hasText: "Draft the answer" });
+  await expect(draft.first()).toBeVisible();
+  await draft.first().getByText("Prompt and reply").click();
+  await expect(draft.first()).toContainText("reply");
+  await panel.getByRole("tab", { name: "Retrievals" }).click();
+  await expect(panel.getByTestId("retrieval").first()).toContainText("security-policy.md");
+  await expectAccessible(page);
+
+  // Retry from the UI: the question is answered again, live.
+  await panel.getByRole("button", { name: "Answer again" }).click();
+  const events = page.getByTestId("run-events");
+  await expect(events).toContainText("Asked to answer again");
+  await expect(events.getByTestId("event").filter({ hasText: /Answered.*retry 1/ })).toBeVisible({
+    timeout: ANSWER_TIMEOUT,
+  });
+  await expect(first).toHaveAttribute("data-status", /answered|insufficient_evidence/);
+  expect(await page.evaluate(() => (window as unknown as { stayed?: boolean }).stayed)).toBe(true);
+});
+
+test("a dropped connection resumes with no gaps or duplicates", async ({ page, context }) => {
+  await signIn(page);
+  await page.goto(runPath);
+  const live = page.getByTestId("live-state");
+  await expect(live).toHaveAttribute("data-state", "live");
+  await expect(page.getByTestId("run-events")).toContainText("retry 1");
+
+  // Drop the connection, and make progress while the page is offline.
+  await context.setOffline(true);
+  await expect(live).toHaveAttribute("data-state", "reconnecting");
+  const runId = runPath.split("/").at(-1);
+  expect(await apiPost(page, `/v1/runs/${runId}/items/1/retry`)).toBe(202);
+  await context.setOffline(false);
+
+  // Back online: the stream resumes after the last event it had, and catches up.
+  await expect(live).toHaveAttribute("data-state", "live", { timeout: 30_000 });
+  await expect(
+    page
+      .getByTestId("run-events")
+      .getByTestId("event")
+      .filter({ hasText: /Answered.*retry 2/ }),
+  ).toBeVisible({ timeout: ANSWER_TIMEOUT });
+  const shown = await eventSeqs(page);
+  const stored = (await (await page.request.get(`/api/v1/runs/${runId}/events`)).json()) as {
+    seq: number;
+  }[];
+  expect(shown).toEqual(stored.map((e) => e.seq)); // every event, once, in order
+});
+
+test("cancel from the run page", async ({ page }) => {
+  await signIn(page);
+  await page.goto(runPath);
+  await page.getByRole("button", { name: "Cancel run" }).click();
+  await page
+    .getByRole("group", { name: "Stop answering this questionnaire?" })
+    .getByRole("button", { name: "Cancel run" })
+    .click();
+  await expect(page.getByTestId("run-status").first()).toHaveAttribute("data-status", "cancelled");
+  await expect(page.getByTestId("live-state")).toHaveAttribute("data-state", "ended");
+  await expect(page.getByTestId("run-events")).toContainText("Cancelled");
   await expectAccessible(page);
 
   await deleteKb(page, kbName);

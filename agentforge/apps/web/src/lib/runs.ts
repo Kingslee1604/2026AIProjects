@@ -9,6 +9,9 @@ export type Run = components["schemas"]["RunOut"];
 export type RunStatus = Run["status"];
 export type RunItem = components["schemas"]["RunItemOut"];
 export type Artifact = components["schemas"]["ArtifactOut"];
+export type RunEvent = components["schemas"]["RunEventOut"];
+export type Trace = components["schemas"]["TraceOut"];
+export type Step = components["schemas"]["StepOut"];
 export type Questionnaire = components["schemas"]["QuestionnaireOut"];
 export type QuestionnaireItem = components["schemas"]["QuestionnaireItemOut"];
 
@@ -29,6 +32,18 @@ export const RUN_STATUS: Record<
   failed: { label: "Failed", tone: "danger" },
   cancelled: { label: "Cancelled", tone: "neutral" },
   timed_out: { label: "Timed out", tone: "danger" },
+};
+
+export const ITEM_STATUS: Record<
+  string,
+  { label: string; tone: "neutral" | "progress" | "ok" | "warn" | "danger" }
+> = {
+  pending: { label: "Waiting", tone: "neutral" },
+  answering: { label: "Answering…", tone: "progress" },
+  answered: { label: "Answered", tone: "ok" },
+  insufficient_evidence: { label: "Not in documents", tone: "warn" },
+  failed: { label: "Failed", tone: "danger" },
+  skipped: { label: "Skipped", tone: "neutral" },
 };
 
 /** List filters: each is a set of statuses (the API filters by one, so the list filters here). */
@@ -71,6 +86,85 @@ export function useRun(runId: string) {
       const status = query.state.data?.status;
       return status && !FINAL_RUN.has(status) ? 2000 : false;
     },
+  });
+}
+
+// The run page refreshes these when the live stream reports progress (no polling).
+
+export function useRunItems(runId: string) {
+  return useQuery({
+    queryKey: ["runs", runId, "items"],
+    queryFn: async (): Promise<RunItem[]> => {
+      const { data, error } = await api.GET("/v1/runs/{run_id}/items", {
+        params: { path: { run_id: runId } },
+      });
+      if (error) throw new Error(problemTitle(error));
+      return data;
+    },
+  });
+}
+
+export function useTrace(runId: string) {
+  return useQuery({
+    queryKey: ["runs", runId, "trace"],
+    queryFn: async (): Promise<Trace> => {
+      const { data, error } = await api.GET("/v1/runs/{run_id}/trace", {
+        params: { path: { run_id: runId } },
+      });
+      if (error) throw new Error(problemTitle(error));
+      return data;
+    },
+  });
+}
+
+export function useStepCalls(runId: string, stepId: string | null) {
+  return useQuery({
+    queryKey: ["runs", runId, "steps", stepId, "calls"],
+    enabled: stepId !== null,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/v1/runs/{run_id}/steps/{step_id}/calls", {
+        params: { path: { run_id: runId, step_id: stepId ?? "" } },
+      });
+      if (error) throw new Error(problemTitle(error));
+      return data;
+    },
+  });
+}
+
+function useRunAction<T>(action: (arg: T) => Promise<unknown>) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: action,
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["runs"] });
+    },
+  });
+}
+
+export function useCancelRun(runId: string) {
+  return useRunAction(async () => {
+    const { error } = await api.POST("/v1/runs/{run_id}/cancel", {
+      params: { path: { run_id: runId } },
+    });
+    if (error) throw new Error(problemTitle(error));
+  });
+}
+
+export function useRetryItem(runId: string) {
+  return useRunAction(async (itemIndex: number) => {
+    const { error } = await api.POST("/v1/runs/{run_id}/items/{item_index}/retry", {
+      params: { path: { run_id: runId, item_index: itemIndex } },
+    });
+    if (error) throw new Error(problemTitle(error));
+  });
+}
+
+export function useRetryExport(runId: string) {
+  return useRunAction(async () => {
+    const { error } = await api.POST("/v1/runs/{run_id}/export/retry", {
+      params: { path: { run_id: runId } },
+    });
+    if (error) throw new Error(problemTitle(error));
   });
 }
 

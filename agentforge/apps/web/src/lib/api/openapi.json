@@ -1351,6 +1351,11 @@
             "title": "Item Index",
             "type": "integer"
           },
+          "plan": {
+            "additionalProperties": true,
+            "title": "Plan",
+            "type": "object"
+          },
           "question": {
             "title": "Question",
             "type": "string"
@@ -1405,7 +1410,8 @@
           "reason",
           "claims",
           "evidence",
-          "completed_at"
+          "completed_at",
+          "plan"
         ],
         "title": "RunItemOut",
         "type": "object"
@@ -1764,6 +1770,142 @@
           "knowledge_base_ids"
         ],
         "title": "StartRunIn",
+        "type": "object"
+      },
+      "StepOut": {
+        "properties": {
+          "attempt": {
+            "title": "Attempt",
+            "type": "integer"
+          },
+          "epoch": {
+            "title": "Epoch",
+            "type": "integer"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "error_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Class"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "item_index": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Index"
+          },
+          "node_id": {
+            "title": "Node Id",
+            "type": "string"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "running",
+              "succeeded",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "node_id",
+          "item_index",
+          "epoch",
+          "attempt",
+          "status",
+          "error_class",
+          "error",
+          "started_at",
+          "finished_at"
+        ],
+        "title": "StepOut",
+        "type": "object"
+      },
+      "TraceOut": {
+        "properties": {
+          "llm_calls": {
+            "title": "Llm Calls",
+            "type": "integer"
+          },
+          "max_llm_calls": {
+            "title": "Max Llm Calls",
+            "type": "integer"
+          },
+          "max_seconds": {
+            "title": "Max Seconds",
+            "type": "number"
+          },
+          "seconds": {
+            "title": "Seconds",
+            "type": "number"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/StepOut"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "tokens": {
+            "title": "Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "steps",
+          "llm_calls",
+          "tokens",
+          "seconds",
+          "max_llm_calls",
+          "max_seconds"
+        ],
+        "title": "TraceOut",
         "type": "object"
       },
       "ValidationError": {
@@ -3362,6 +3504,64 @@
         ]
       }
     },
+    "/v1/runs/{run_id}/steps/{step_id}/calls": {
+      "get": {
+        "description": "The model calls one step attempt made: prompts, responses, tokens, latency, outcome.",
+        "operationId": "step_calls_v1_runs__run_id__steps__step_id__calls_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "step_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Step Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelCallOut"
+                  },
+                  "title": "Response Step Calls V1 Runs  Run Id  Steps  Step Id  Calls Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Step Calls",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
     "/v1/runs/{run_id}/stream": {
       "get": {
         "description": "Server-sent events for one run. Reconnect with `Last-Event-ID` (the browser does this\nautomatically) to continue after the last event received: no gaps, no duplicates. The\nstream ends with an `end` event once the run is final and every event has been sent.",
@@ -3424,6 +3624,50 @@
           }
         },
         "summary": "Stream Run",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/runs/{run_id}/trace": {
+      "get": {
+        "description": "Every step attempt, oldest first, and the budget used so far against the run's limits.",
+        "operationId": "run_trace_v1_runs__run_id__trace_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TraceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Run Trace",
         "tags": [
           "runs"
         ]

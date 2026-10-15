@@ -14,6 +14,15 @@ export function formatPages(start: number, end: number): string {
   return start === end ? `p. ${start}` : `pp. ${start}–${end}`;
 }
 
+/** "45 s", "3 min 20 s", "2 h 5 min". */
+export function formatDuration(seconds: number): string {
+  const s = Math.max(0, Math.round(seconds));
+  if (s < 60) return `${s} s`;
+  if (s < 3600) return `${Math.floor(s / 60)} min${s % 60 ? ` ${s % 60} s` : ""}`;
+  const minutes = Math.floor((s % 3600) / 60);
+  return `${Math.floor(s / 3600)} h${minutes ? ` ${minutes} min` : ""}`;
+}
+
 /** Spreadsheet column letter for a zero-based column index: 0 → A, 25 → Z, 26 → AA. */
 export function columnLetter(index: number): string {
   let letters = "";

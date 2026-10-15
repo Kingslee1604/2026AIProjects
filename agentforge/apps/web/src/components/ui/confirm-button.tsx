@@ -12,6 +12,8 @@ export function ConfirmButton({
   question,
   onConfirm,
   pending = false,
+  pendingLabel = "Deleting…",
+  backLabel = "Cancel",
   size = "sm",
 }: {
   label: string;
@@ -19,6 +21,9 @@ export function ConfirmButton({
   question: string;
   onConfirm: () => void;
   pending?: boolean;
+  pendingLabel?: string;
+  /** The button that backs out (rename it when the action itself is a "cancel"). */
+  backLabel?: string;
   size?: ButtonProps["size"];
 }) {
   const [asking, setAsking] = useState(false);
@@ -31,7 +36,7 @@ export function ConfirmButton({
   if (!asking) {
     return (
       <Button variant="secondary" size={size} onClick={() => setAsking(true)} disabled={pending}>
-        {pending ? "Deleting…" : label}
+        {pending ? pendingLabel : label}
       </Button>
     );
   }
@@ -56,7 +61,7 @@ export function ConfirmButton({
         {confirmLabel}
       </Button>
       <Button ref={cancelRef} variant="secondary" size={size} onClick={() => setAsking(false)}>
-        Cancel
+        {backLabel}
       </Button>
     </span>
   );

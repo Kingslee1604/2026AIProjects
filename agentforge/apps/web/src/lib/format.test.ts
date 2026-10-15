@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { columnLetter, formatAge, formatBytes, formatPages } from "./format";
+import { columnLetter, formatAge, formatBytes, formatDuration, formatPages } from "./format";
 
 describe("format", () => {
   it("formats sizes", () => {
@@ -12,6 +12,18 @@ describe("format", () => {
   it("formats page ranges", () => {
     expect(formatPages(3, 3)).toBe("p. 3");
     expect(formatPages(3, 5)).toBe("pp. 3–5");
+  });
+
+  it("formats durations", () => {
+    expect([0, 45, 60, 200, 3600, 7500, 21600].map(formatDuration)).toEqual([
+      "0 s",
+      "45 s",
+      "1 min",
+      "3 min 20 s",
+      "1 h",
+      "2 h 5 min",
+      "6 h",
+    ]);
   });
 
   it("names spreadsheet columns", () => {

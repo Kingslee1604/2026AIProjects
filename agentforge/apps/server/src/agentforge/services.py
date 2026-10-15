@@ -24,7 +24,7 @@ from agentforge.reviews.service import ReviewService
 from agentforge.runs.dbos_engine import DbosEngine
 from agentforge.runs.port import NoEngine, RunEngine
 from agentforge.runs.questionnaire import QuestionnaireSteps, RunBudget
-from agentforge.runs.service import RunService
+from agentforge.runs.service import Limits, RunService
 
 
 @dataclass(frozen=True, slots=True)
@@ -86,7 +86,11 @@ def build_services(settings: Settings, *, pool_size: int = 5) -> Services:
     )
     blobs = LocalBlobStore(settings.blob_root)
     answerer = GroundedAnswerer(gateway, retriever, agents, qa_config(settings))
-    runs = RunService(sessions, run_engine)
+    runs = RunService(
+        sessions,
+        run_engine,
+        Limits(max_llm_calls=settings.run_max_llm_calls, max_seconds=settings.run_max_seconds),
+    )
     return Services(
         engine=engine,
         sessions=sessions,

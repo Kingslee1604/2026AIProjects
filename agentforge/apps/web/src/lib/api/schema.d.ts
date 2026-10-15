@@ -598,6 +598,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/runs/{run_id}/steps/{step_id}/calls": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Step Calls
+         * @description The model calls one step attempt made: prompts, responses, tokens, latency, outcome.
+         */
+        get: operations["step_calls_v1_runs__run_id__steps__step_id__calls_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/runs/{run_id}/stream": {
         parameters: {
             query?: never;
@@ -612,6 +632,26 @@ export interface paths {
          *     stream ends with an `end` event once the run is final and every event has been sent.
          */
         get: operations["stream_run_v1_runs__run_id__stream_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runs/{run_id}/trace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Run Trace
+         * @description Every step attempt, oldest first, and the budget used so far against the run's limits.
+         */
+        get: operations["run_trace_v1_runs__run_id__trace_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1122,6 +1162,10 @@ export interface components {
             id: string;
             /** Item Index */
             item_index: number;
+            /** Plan */
+            plan: {
+                [key: string]: unknown;
+            };
             /** Question */
             question: string;
             /** Reason */
@@ -1264,6 +1308,53 @@ export interface components {
             questionnaire_id: string;
             /** Title */
             title?: string | null;
+        };
+        /** StepOut */
+        StepOut: {
+            /** Attempt */
+            attempt: number;
+            /** Epoch */
+            epoch: number;
+            /** Error */
+            error: string | null;
+            /** Error Class */
+            error_class: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Item Index */
+            item_index: number | null;
+            /** Node Id */
+            node_id: string;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "succeeded" | "failed" | "cancelled";
+        };
+        /** TraceOut */
+        TraceOut: {
+            /** Llm Calls */
+            llm_calls: number;
+            /** Max Llm Calls */
+            max_llm_calls: number;
+            /** Max Seconds */
+            max_seconds: number;
+            /** Seconds */
+            seconds: number;
+            /** Steps */
+            steps: components["schemas"]["StepOut"][];
+            /** Tokens */
+            tokens: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -2367,6 +2458,38 @@ export interface operations {
             };
         };
     };
+    step_calls_v1_runs__run_id__steps__step_id__calls_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+                step_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelCallOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     stream_run_v1_runs__run_id__stream_get: {
         parameters: {
             query?: {
@@ -2389,6 +2512,37 @@ export interface operations {
                 };
                 content: {
                     "text/event-stream": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_trace_v1_runs__run_id__trace_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TraceOut"];
                 };
             };
             /** @description Validation Error */

@@ -326,7 +326,7 @@ def test_other_organizations_cannot_see_runs(ctx: Ctx, database: Database, app: 
     with TestClient(app) as outsider:
         csrf = login(outsider, email)
         assert outsider.get("/v1/runs").json() == []
-        for path in ("", "/items", "/events", "/stream"):
+        for path in ("", "/items", "/events", "/stream", "/trace", f"/steps/{uuid.uuid4()}/calls"):
             assert outsider.get(f"/v1/runs/{run_id}{path}").status_code == 404, path
         assert (
             outsider.post(f"/v1/runs/{run_id}/cancel", headers={"X-CSRF-Token": csrf}).status_code

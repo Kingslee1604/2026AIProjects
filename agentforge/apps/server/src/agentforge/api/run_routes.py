@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 from agentforge.api.deps import client_ip, require
 from agentforge.api.knowledge_routes import ServicesDep
+from agentforge.api.qa_routes import ModelCallOut
 from agentforge.auth.rbac import Permission, Principal
 from agentforge.knowledge.service import Actor
 from agentforge.questionnaires.service import NotFoundError as QuestionnaireNotFoundError
@@ -75,6 +76,7 @@ class RunItemOut(BaseModel):
     claims: list[dict[str, Any]]
     evidence: list[dict[str, Any]]
     completed_at: datetime | None
+    plan: dict[str, Any]
 
 
 class RunEventOut(BaseModel):
@@ -87,6 +89,28 @@ class RunEventOut(BaseModel):
     step_id: UUID | None
     data: dict[str, Any]
     created_at: datetime
+
+
+class StepOut(BaseModel):
+    id: UUID
+    node_id: str
+    item_index: int | None
+    epoch: int
+    attempt: int
+    status: Literal["running", "succeeded", "failed", "cancelled"]
+    error_class: str | None
+    error: str | None
+    started_at: datetime
+    finished_at: datetime | None
+
+
+class TraceOut(BaseModel):
+    steps: list[StepOut]
+    llm_calls: int
+    tokens: int
+    seconds: float
+    max_llm_calls: int
+    max_seconds: float
 
 
 class ArtifactOut(BaseModel):
@@ -144,6 +168,28 @@ async def run_events(
     except NotFoundError:
         raise HTTPException(404, "Run not found") from None
     return [_event_out(e) for e in events]
+
+
+@router.get("/v1/runs/{run_id}/trace", response_model=TraceOut)
+async def run_trace(run_id: UUID, principal: Reader, svc: ServicesDep) -> TraceOut:
+    """Every step attempt, oldest first, and the budget used so far against the run's limits."""
+    try:
+        trace = await svc.runs.trace(principal.org_id, run_id)
+    except NotFoundError:
+        raise HTTPException(404, "Run not found") from None
+    return TraceOut.model_validate(asdict(trace))
+
+
+@router.get("/v1/runs/{run_id}/steps/{step_id}/calls", response_model=list[ModelCallOut])
+async def step_calls(
+    run_id: UUID, step_id: UUID, principal: Reader, svc: ServicesDep
+) -> list[ModelCallOut]:
+    """The model calls one step attempt made: prompts, responses, tokens, latency, outcome."""
+    try:
+        calls = await svc.runs.step_calls(principal.org_id, run_id, step_id)
+    except NotFoundError:
+        raise HTTPException(404, "Run not found") from None
+    return [ModelCallOut(**asdict(c)) for c in calls]
 
 
 @router.get("/v1/runs/{run_id}/artifacts", response_model=list[ArtifactOut])
@@ -306,5 +352,7 @@ async def stream_run(
     return StreamingResponse(
         body(),
         media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        # no-transform: proxies (the web app's /api rewrite, nginx) must not compress, and so
+        # buffer, the stream.
+        headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"},
     )
