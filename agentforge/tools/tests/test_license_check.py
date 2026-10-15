@@ -107,3 +107,8 @@ def test_python_license_derivation(
     expression: str | None, field: str | None, classifiers: list[str], expected: str | None
 ) -> None:
     assert python_license(expression, field, classifiers) == expected
+
+
+def test_psfl_free_text_maps_to_psf_2_0() -> None:
+    # defusedxml declares "PSFL" in its License field; its LICENSE file is PSF License v2.
+    assert python_license(None, "PSFL", []) == "PSF-2.0"

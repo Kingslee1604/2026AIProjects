@@ -38,25 +38,35 @@ def safe_filename(name: str) -> str:
     return cleaned[:255]
 
 
-def _check_docx(path: Path) -> None:
+def check_zip_container(path: Path, *, required: set[str], kind: str) -> set[str]:
+    """Reject decompression bombs and files missing the parts their format requires, before
+    any parser opens them (Office files are zip archives). Returns the part names."""
+    invalid = f"The file is not a valid {kind}."
     try:
         with zipfile.ZipFile(path) as archive:
             entries = archive.infolist()
             if len(entries) > MAX_ZIP_ENTRIES:
-                raise UploadRejectedError("The Word file has too many internal parts.")
+                raise UploadRejectedError(f"The {kind} has too many internal parts.")
             total = 0
             for entry in entries:
                 total += entry.file_size
                 compressed = max(entry.compress_size, 1)
                 if entry.file_size / compressed > MAX_ZIP_RATIO and entry.file_size > 1_000_000:
-                    raise UploadRejectedError("The Word file looks like a decompression bomb.")
+                    raise UploadRejectedError(f"The {kind} looks like a decompression bomb.")
             if total > MAX_ZIP_UNCOMPRESSED:
-                raise UploadRejectedError("The Word file expands to more than 200 MB.")
+                raise UploadRejectedError(f"The {kind} expands to more than 200 MB.")
             names = {entry.filename for entry in entries}
-            if "word/document.xml" not in names or "[Content_Types].xml" not in names:
-                raise UploadRejectedError("The file is not a valid Word (.docx) document.")
+            if not required <= names:
+                raise UploadRejectedError(invalid)
+            return names
     except zipfile.BadZipFile as error:
-        raise UploadRejectedError("The file is not a valid Word (.docx) document.") from error
+        raise UploadRejectedError(invalid) from error
+
+
+def _check_docx(path: Path) -> None:
+    check_zip_container(
+        path, required={"word/document.xml", "[Content_Types].xml"}, kind="Word (.docx) document"
+    )
 
 
 def _check_text(path: Path) -> None:

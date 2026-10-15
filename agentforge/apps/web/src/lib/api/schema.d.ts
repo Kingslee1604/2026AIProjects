@@ -294,6 +294,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/questionnaires": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload Questionnaire
+         * @description Upload an Excel (.xlsx) or CSV questionnaire as the raw request body. The response shows
+         *     the detected header row and columns and every question found.
+         */
+        post: operations["upload_questionnaire_v1_questionnaires_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/questionnaires/{questionnaire_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Questionnaire */
+        get: operations["get_questionnaire_v1_questionnaires__questionnaire_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/questionnaires/{questionnaire_id}/columns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Columns
+         * @description Choose the columns yourself when the detected ones are wrong.
+         */
+        put: operations["set_columns_v1_questionnaires__questionnaire_id__columns_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/runs": {
         parameters: {
             query?: never;
@@ -526,6 +584,20 @@ export interface components {
             /** Verdict */
             verdict?: string | null;
         };
+        /**
+         * ColumnsIn
+         * @description Spreadsheet column letters (A, B, ... AA). Answer omitted: add a new column on export.
+         */
+        ColumnsIn: {
+            /** Answer */
+            answer?: string | null;
+            /** Id */
+            id?: string | null;
+            /** Question */
+            question: string;
+            /** Section */
+            section?: string | null;
+        };
         /** DocumentOut */
         DocumentOut: {
             /** Chunk Count */
@@ -694,6 +766,50 @@ export interface components {
             response: string | null;
             /** Status */
             status: string;
+        };
+        /** QuestionnaireItemOut */
+        QuestionnaireItemOut: {
+            /** External Id */
+            external_id: string | null;
+            /** Question */
+            question: string;
+            /** Row */
+            row: number;
+            /** Section */
+            section: string | null;
+        };
+        /** QuestionnaireOut */
+        QuestionnaireOut: {
+            /** Columns */
+            columns: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Filename */
+            filename: string;
+            /** Format */
+            format: string;
+            /** Header Row */
+            header_row: number;
+            /** Headers */
+            headers: string[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Item Count */
+            item_count: number;
+            /** Items */
+            items: components["schemas"]["QuestionnaireItemOut"][];
+            /** Sheet */
+            sheet: string | null;
+            /** Warnings */
+            warnings: string[];
         };
         /** RunEventOut */
         RunEventOut: {
@@ -1428,6 +1544,108 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    upload_questionnaire_v1_questionnaires_post: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description URL-encoded file name */
+                "x-filename": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/octet-stream": string;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionnaireOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_questionnaire_v1_questionnaires__questionnaire_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionnaire_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionnaireOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_columns_v1_questionnaires__questionnaire_id__columns_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                questionnaire_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ColumnsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionnaireOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

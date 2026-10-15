@@ -75,6 +75,7 @@ forbidden_modules = [
   "agentforge.agents",
   "agentforge.qa",
   "agentforge.runs",
+  "agentforge.questionnaires",
   "agentforge.services",
   "agentforge.api",
   "agentforge.worker",
@@ -91,6 +92,7 @@ source_modules = [
   "agentforge.agents",
   "agentforge.qa",
   "agentforge.runs",
+  "agentforge.questionnaires",
 ]
 forbidden_modules = [
   "agentforge.api",

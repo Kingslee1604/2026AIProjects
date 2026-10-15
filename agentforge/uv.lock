@@ -19,6 +19,7 @@ dependencies = [
     { name = "alembic" },
     { name = "argon2-cffi" },
     { name = "dbos" },
+    { name = "defusedxml" },
     { name = "fastapi" },
     { name = "httpx2" },
     { name = "openpyxl" },
@@ -38,6 +39,7 @@ requires-dist = [
     { name = "alembic", specifier = ">=1.20.0" },
     { name = "argon2-cffi", specifier = ">=25.1.0" },
     { name = "dbos", specifier = ">=3.1.0" },
+    { name = "defusedxml", specifier = ">=0.7.1" },
     { name = "fastapi", specifier = ">=0.141.1" },
     { name = "httpx2", specifier = ">=2.13.1" },
     { name = "openpyxl", specifier = ">=3.1.5" },
@@ -309,6 +311,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/d9/a3/c5245f9c94760ac6042efbd594e08d2fe1efee728e8f156d1ac64855c781/dbos-3.1.0.tar.gz", hash = "sha256:5195e65bfc9f689523bc68c8592a9d0aa925bec1e42059d1e4ea00a12159b63c", size = 559340, upload-time = "2026-09-24T18:02:53.546Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/96/fb/a06fb0cc97b3ac92ddbe2228048e9b6d07545e4196adbc7d6f8420b2fddc/dbos-3.1.0-py3-none-any.whl", hash = "sha256:de6b361352b72067e3528b9d80e96eef3521c5a4350651cf640278aec9765f10", size = 272613, upload-time = "2026-09-24T18:02:51.716Z" },
+]
+
+[[package]]
+name = "defusedxml"
+version = "0.7.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69", size = 75520, upload-time = "2021-03-08T10:59:26.269Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61", size = 25604, upload-time = "2021-03-08T10:59:24.45Z" },
 ]
 
 [[package]]

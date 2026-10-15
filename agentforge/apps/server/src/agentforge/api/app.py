@@ -12,7 +12,14 @@ from opentelemetry.propagate import extract
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from agentforge import __version__
-from agentforge.api import admin_routes, auth_routes, knowledge_routes, qa_routes, run_routes
+from agentforge.api import (
+    admin_routes,
+    auth_routes,
+    knowledge_routes,
+    qa_routes,
+    questionnaire_routes,
+    run_routes,
+)
 from agentforge.api.limits import BodySizeLimitMiddleware
 from agentforge.auth.service import AuthService
 from agentforge.core.logging import configure_logging, get_logger
@@ -160,4 +167,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(knowledge_routes.router)
     app.include_router(qa_routes.router)
     app.include_router(run_routes.router)
+    app.include_router(questionnaire_routes.router)
     return app

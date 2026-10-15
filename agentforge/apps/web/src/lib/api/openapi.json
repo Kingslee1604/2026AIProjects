@@ -355,6 +355,57 @@
         "title": "ClaimOut",
         "type": "object"
       },
+      "ColumnsIn": {
+        "description": "Spreadsheet column letters (A, B, ... AA). Answer omitted: add a new column on export.",
+        "properties": {
+          "answer": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z]{1,3}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z]{1,3}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "question": {
+            "pattern": "^[A-Za-z]{1,3}$",
+            "title": "Question",
+            "type": "string"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z]{1,3}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "ColumnsIn",
+        "type": "object"
+      },
       "DocumentOut": {
         "properties": {
           "chunk_count": {
@@ -758,6 +809,130 @@
           "created_at"
         ],
         "title": "ModelCallOut",
+        "type": "object"
+      },
+      "QuestionnaireItemOut": {
+        "properties": {
+          "external_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Id"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "row": {
+            "title": "Row",
+            "type": "integer"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section"
+          }
+        },
+        "required": [
+          "row",
+          "question",
+          "external_id",
+          "section"
+        ],
+        "title": "QuestionnaireItemOut",
+        "type": "object"
+      },
+      "QuestionnaireOut": {
+        "properties": {
+          "columns": {
+            "additionalProperties": true,
+            "title": "Columns",
+            "type": "object"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "format": {
+            "title": "Format",
+            "type": "string"
+          },
+          "header_row": {
+            "title": "Header Row",
+            "type": "integer"
+          },
+          "headers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Headers",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "item_count": {
+            "title": "Item Count",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionnaireItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "sheet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "filename",
+          "format",
+          "sheet",
+          "header_row",
+          "columns",
+          "headers",
+          "items",
+          "item_count",
+          "warnings",
+          "created_at"
+        ],
+        "title": "QuestionnaireOut",
         "type": "object"
       },
       "RunEventOut": {
@@ -2031,6 +2206,159 @@
           }
         },
         "summary": "Meta"
+      }
+    },
+    "/v1/questionnaires": {
+      "post": {
+        "description": "Upload an Excel (.xlsx) or CSV questionnaire as the raw request body. The response shows\nthe detected header row and columns and every question found.",
+        "operationId": "upload_questionnaire_v1_questionnaires_post",
+        "parameters": [
+          {
+            "description": "URL-encoded file name",
+            "in": "header",
+            "name": "x-filename",
+            "required": true,
+            "schema": {
+              "description": "URL-encoded file name",
+              "title": "X-Filename",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionnaireOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload Questionnaire",
+        "tags": [
+          "questionnaires"
+        ]
+      }
+    },
+    "/v1/questionnaires/{questionnaire_id}": {
+      "get": {
+        "operationId": "get_questionnaire_v1_questionnaires__questionnaire_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "questionnaire_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Questionnaire Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionnaireOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Questionnaire",
+        "tags": [
+          "questionnaires"
+        ]
+      }
+    },
+    "/v1/questionnaires/{questionnaire_id}/columns": {
+      "put": {
+        "description": "Choose the columns yourself when the detected ones are wrong.",
+        "operationId": "set_columns_v1_questionnaires__questionnaire_id__columns_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "questionnaire_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Questionnaire Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ColumnsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionnaireOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Columns",
+        "tags": [
+          "questionnaires"
+        ]
       }
     },
     "/v1/runs": {

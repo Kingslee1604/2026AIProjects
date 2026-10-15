@@ -18,6 +18,7 @@ from agentforge.qa.fake import with_grounded_answers
 from agentforge.qa.pipeline import GroundedAnswerer, QAConfig
 from agentforge.qa.purge import purge_documents
 from agentforge.qa.service import QAService
+from agentforge.questionnaires.service import QuestionnaireService
 from agentforge.runs.dbos_engine import DbosEngine
 from agentforge.runs.port import NoEngine, RunEngine
 from agentforge.runs.service import RunService
@@ -36,6 +37,7 @@ class Services:
     run_engine: RunEngine
     runs: RunService
     blobs: LocalBlobStore
+    questionnaires: QuestionnaireService
 
     async def close(self) -> None:
         if isinstance(self.run_engine, DbosEngine):
@@ -86,6 +88,9 @@ def build_services(settings: Settings, *, pool_size: int = 5) -> Services:
         run_engine=run_engine,
         runs=RunService(sessions, run_engine),
         blobs=blobs,
+        questionnaires=QuestionnaireService(
+            sessions, blobs, max_bytes=settings.max_upload_mb * 1024 * 1024
+        ),
         knowledge=KnowledgeService(
             sessions,
             blobs,

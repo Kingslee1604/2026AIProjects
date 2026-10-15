@@ -6,10 +6,12 @@ import secrets
 import time
 import uuid
 from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
 from sqlalchemy import text
@@ -158,3 +160,34 @@ def login(client: TestClient, email: str, password: str = PASSWORD) -> str:
     response = client.post("/v1/auth/login", json={"email": email, "password": password})
     assert response.status_code == 200, response.text
     return str(response.json()["csrf_token"])
+
+
+@contextmanager
+def outsider(app: FastAPI, database: Database) -> Iterator[tuple[TestClient, str]]:
+    """A signed-in admin of a brand-new, different organization: (client, csrf token)."""
+    org_id = uuid.uuid4()
+    owner = create_sync_engine(database.url("agentforge_owner"))
+    with owner.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.organizations (id, name, slug) VALUES (:o, 'Other', :s)"),
+            {"o": org_id, "s": f"other-{org_id.hex[:8]}"},
+        )
+    owner.dispose()
+    email = f"outsider-{uuid.uuid4().hex[:8]}@example.test"
+
+    async def make() -> None:
+        engine = create_app_engine(database.url("agentforge_app"), pool_size=1)
+        try:
+            await create_user(
+                create_sessionmaker(engine),
+                org_id=org_id,
+                email=email,
+                password=PASSWORD,
+                role=Role.ADMIN,
+            )
+        finally:
+            await engine.dispose()
+
+    asyncio.run(make())
+    with TestClient(app) as client:
+        yield client, login(client, email)

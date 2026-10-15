@@ -50,6 +50,7 @@ ALIASES = {
     "bsd license": "BSD-3-Clause",
     "bsd 2-clause license": "BSD-2-Clause",
     "bsd 3-clause license": "BSD-3-Clause",
+    "psfl": "PSF-2.0",  # e.g. defusedxml (its LICENSE file is the PSF License Version 2)
 }
 SPDX_ID = re.compile(r"^[A-Za-z0-9.+-]+$")
 

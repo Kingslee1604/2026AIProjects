@@ -6,7 +6,7 @@ an oversized request is rejected without buffering it.
 
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
-UPLOAD_PATH_SUFFIX = "/documents"
+UPLOAD_PATH_SUFFIXES = ("/documents", "/questionnaires")
 
 
 class BodyTooLargeError(Exception):
@@ -21,7 +21,7 @@ class BodySizeLimitMiddleware:
 
     def _limit_for(self, scope: Scope) -> int:
         path = str(scope.get("path", ""))
-        is_upload = scope.get("method") == "POST" and path.endswith(UPLOAD_PATH_SUFFIX)
+        is_upload = scope.get("method") == "POST" and path.endswith(UPLOAD_PATH_SUFFIXES)
         return self.upload_limit if is_upload else self.default_limit
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
