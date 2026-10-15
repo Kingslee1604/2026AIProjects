@@ -10,12 +10,13 @@ from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
-from agentforge.api.deps import require
+from agentforge.api.deps import client_ip, require
 from agentforge.api.knowledge_routes import ServicesDep
 from agentforge.auth.rbac import Permission, Principal
+from agentforge.knowledge.service import Actor
 from agentforge.questionnaires.service import NotFoundError as QuestionnaireNotFoundError
 from agentforge.runs.events import EventHub, RunEvent
 from agentforge.runs.service import FINAL_STATUSES, InvalidStateError, NewItem, NotFoundError
@@ -88,6 +89,17 @@ class RunEventOut(BaseModel):
     created_at: datetime
 
 
+class ArtifactOut(BaseModel):
+    id: UUID
+    run_id: UUID
+    node_id: str
+    epoch: int
+    filename: str
+    media_type: str
+    size_bytes: int
+    created_at: datetime
+
+
 def _event_out(event: RunEvent) -> RunEventOut:
     return RunEventOut(**asdict(event))
 
@@ -132,6 +144,45 @@ async def run_events(
     except NotFoundError:
         raise HTTPException(404, "Run not found") from None
     return [_event_out(e) for e in events]
+
+
+@router.get("/v1/runs/{run_id}/artifacts", response_model=list[ArtifactOut])
+async def run_artifacts(run_id: UUID, principal: Reader, svc: ServicesDep) -> list[ArtifactOut]:
+    """The answered files of a run, newest version first."""
+    try:
+        artifacts = await svc.runs.artifacts(principal.org_id, run_id)
+    except NotFoundError:
+        raise HTTPException(404, "Run not found") from None
+    return [ArtifactOut.model_validate(a, from_attributes=True) for a in artifacts]
+
+
+@router.get(
+    "/v1/runs/{run_id}/artifacts/{artifact_id}/download",
+    response_class=FileResponse,
+    responses={200: {"content": {"application/octet-stream": {}}}},
+)
+async def download_artifact(
+    run_id: UUID, artifact_id: UUID, request: Request, principal: Reader, svc: ServicesDep
+) -> FileResponse:
+    """Download one answered file. Another organization's file is "not found"."""
+    try:
+        artifact = await svc.runs.artifact_for_download(
+            principal.org_id,
+            run_id,
+            artifact_id,
+            Actor(principal.user_id, principal.email, client_ip(request)),
+        )
+    except NotFoundError:
+        raise HTTPException(404, "File not found") from None
+    path = svc.blobs.path(artifact.blob_key)
+    if not await asyncio.to_thread(path.is_file):
+        raise HTTPException(404, "File not found")
+    return FileResponse(
+        path,
+        media_type=artifact.media_type,
+        filename=artifact.filename,  # sent as an attachment, never rendered inline
+        headers={"Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"},
+    )
 
 
 @router.post("/v1/runs", response_model=RunOut, status_code=201)

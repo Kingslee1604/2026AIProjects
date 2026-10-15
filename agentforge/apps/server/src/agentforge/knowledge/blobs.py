@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 from typing import Protocol
+from uuid import uuid4
 
 
 class BlobStore(Protocol):
@@ -27,7 +28,9 @@ class LocalBlobStore:
     def put(self, key: str, source: Path) -> None:
         target = self._resolve(key)
         target.parent.mkdir(parents=True, exist_ok=True)
-        tmp = target.with_suffix(target.suffix + ".partial")
+        # Unique per write, so two writers of the same key (a recovered worker racing the
+        # original) never interleave; the last complete file wins atomically.
+        tmp = target.with_name(f"{target.name}.{uuid4().hex}.partial")
         with source.open("rb") as reader, tmp.open("wb") as writer:
             while chunk := reader.read(1 << 20):
                 writer.write(chunk)

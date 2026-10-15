@@ -10,8 +10,10 @@ from uuid import UUID, uuid4
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from agentforge import audit
 from agentforge.core.logging import get_logger
 from agentforge.db.tenancy import TenantContext, tenant_session
+from agentforge.knowledge.service import Actor
 from agentforge.runs.events import RunEvent, emit, events_after
 from agentforge.runs.port import RunEngine
 
@@ -69,6 +71,23 @@ class RunItem:
     evidence: list[dict[str, Any]]
     completed_at: datetime | None
 
+
+@dataclass(frozen=True, slots=True)
+class Artifact:
+    id: UUID
+    run_id: UUID
+    node_id: str
+    epoch: int
+    filename: str
+    media_type: str
+    size_bytes: int
+    created_at: datetime
+    blob_key: str
+
+
+_ARTIFACT_COLUMNS = (
+    "id, run_id, node_id, epoch, filename, media_type, size_bytes, created_at, blob_key"
+)
 
 _RUN_COLUMNS = (
     "r.id, r.template_key, r.title, r.status, r.input, r.budgets, r.usage, r.epoch, "
@@ -216,6 +235,52 @@ class RunService:
     async def events(self, org_id: UUID, run_id: UUID, after_seq: int = 0) -> list[RunEvent]:
         await self.get(org_id, run_id)  # 404 for unknown and other tenants' runs
         return await events_after(self._sessions, org_id, run_id, after_seq)
+
+    async def artifacts(self, org_id: UUID, run_id: UUID) -> list[Artifact]:
+        """Files the run produced, newest version first."""
+        await self.get(org_id, run_id)
+        async with tenant_session(self._sessions, TenantContext(org_id)) as db:
+            rows = await db.execute(
+                text(
+                    f"SELECT {_ARTIFACT_COLUMNS} FROM app.artifacts "  # noqa: S608
+                    "WHERE run_id = :r ORDER BY epoch DESC, created_at DESC"
+                ),
+                {"r": run_id},
+            )
+            return [Artifact(**r._mapping) for r in rows]  # pyright: ignore[reportPrivateUsage]
+
+    async def artifact_for_download(
+        self, org_id: UUID, run_id: UUID, artifact_id: UUID, actor: Actor
+    ) -> Artifact:
+        """One artifact of one run, read under the caller's tenant (another organization's
+        artifact is simply not found), with the download audited."""
+        async with tenant_session(self._sessions, TenantContext(org_id)) as db:
+            row = (
+                await db.execute(
+                    text(
+                        f"SELECT {_ARTIFACT_COLUMNS} FROM app.artifacts "  # noqa: S608
+                        "WHERE id = :a AND run_id = :r"
+                    ),
+                    {"a": artifact_id, "r": run_id},
+                )
+            ).one_or_none()
+        if row is None:
+            raise NotFoundError("artifact not found")
+        found = Artifact(**row._mapping)  # pyright: ignore[reportPrivateUsage]
+        await audit.record(
+            self._sessions,
+            audit.AuditEvent(
+                "artifact.download",
+                "success",
+                org_id=org_id,
+                actor_user_id=actor.user_id,
+                actor_email=actor.email,
+                target=f"run:{run_id}#artifact:{artifact_id}",
+                ip=actor.ip,
+                details={"epoch": found.epoch},
+            ),
+        )
+        return found
 
     async def stale_queued(self, older_than_seconds: float) -> list[tuple[UUID, UUID, str]]:
         """(org_id, run_id, template_key) of runs created but never started, across tenants,
