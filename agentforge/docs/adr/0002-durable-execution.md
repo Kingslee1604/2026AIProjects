@@ -1,6 +1,6 @@
 # ADR-0002: Durable execution engine for runs
 
-- **Status:** Proposed (awaiting owner approval)
+- **Status:** Accepted (owner approved 2026-10-14)
 - **Date:** 2026-10-14
 - **Decision rule (architecture §7.1, RELEASE_1_PLAN R1-24):** choose the **simplest** candidate
   that passes **every** hard gate.
@@ -67,7 +67,7 @@ Findings worth keeping:
 4. DBOS stores step inputs and outputs with pickle in the `engine` schema. Our steps take and
    return IDs only (H6 confirms), and only the engine role can write that schema.
 
-## Decision (proposed)
+## Decision
 
 **Adopt DBOS Transact** as the run engine for Release 1.
 
