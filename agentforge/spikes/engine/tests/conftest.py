@@ -31,7 +31,9 @@ from spikes.engine.harness.worker import load_engine
 os.environ.setdefault("TESTCONTAINERS_RYUK_DISABLED", "true")
 
 ROOT = Path(__file__).resolve().parents[3]  # agentforge/
-RESULTS = ROOT / "spikes" / "engine" / "results"
+# The committed ADR-0002 evidence lives in spikes/engine/results; routine runs (CI, `make
+# engine-conformance`) write elsewhere so they never rewrite that record.
+RESULTS = Path(os.environ.get("CONF_RESULTS", ROOT / "spikes" / "engine" / "results"))
 ENGINE = os.environ.get("CONF_ENGINE", "stub")
 PG_IMAGE = (
     "pgvector/pgvector:0.8.7-pg18-trixie"

@@ -27,6 +27,7 @@ x-server: &server
     AGENTFORGE_MODEL_PROVIDER: ${AGENTFORGE_MODEL_PROVIDER:-auto}
     AGENTFORGE_OLLAMA_BASE_URL: ${AGENTFORGE_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
     AGENTFORGE_DATABASE_URL: postgresql://agentforge_app:${AGENTFORGE_APP_DB_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
+    AGENTFORGE_ENGINE_DATABASE_URL: postgresql://agentforge_engine:${AGENTFORGE_ENGINE_DB_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
   extra_hosts:
     - "host.docker.internal:host-gateway"
   volumes:

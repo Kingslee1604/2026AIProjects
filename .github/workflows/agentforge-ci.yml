@@ -63,6 +63,36 @@ jobs:
       - name: make check (includes integration tests on real Postgres)
         run: make check
 
+  engine:
+    name: run-engine hard gates H1-H8 (DBOS, ADR-0002)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.local/bin
+            ~/.local/opt
+            ~/.local/share/uv
+            ~/.cache/uv
+          key: engine-${{ runner.os }}-${{ hashFiles('agentforge/scripts/install-*.sh', 'agentforge/uv.lock') }}
+      - name: Install pinned tools
+        run: ./scripts/install-dev-tools.sh && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Install dependencies from the lockfile
+        run: uv sync --frozen
+      - name: Conformance suite (kill -9 chaos, review waits, fan-out, cancel, idempotent export)
+        run: make engine-conformance
+      - name: Gate results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: engine-conformance
+          path: agentforge/build/engine-conformance/
+          if-no-files-found: warn
+
   security:
     name: dependency and history scans
     runs-on: ubuntu-24.04

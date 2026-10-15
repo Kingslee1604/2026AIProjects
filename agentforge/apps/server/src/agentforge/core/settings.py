@@ -56,6 +56,11 @@ class Settings(BaseSettings):
     # schema owner and is only needed by `agentforge migrate`.
     database_url: SecretStr | None = None
     migration_database_url: SecretStr | None = None
+    # The run engine (DBOS, ADR-0002) with the agentforge_engine role: only the `engine` schema.
+    engine_database_url: SecretStr | None = None
+    # Stable per worker (the Compose service name), so a restarted worker recovers its own runs.
+    engine_executor_id: str = "worker-1"
+    engine_max_threads: int = Field(default=32, ge=4, le=256)
 
     # Sessions (security baseline S3). Cookies are Secure whenever served over TLS; production
     # refuses to start without it.

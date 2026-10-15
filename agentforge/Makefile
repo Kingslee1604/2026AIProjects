@@ -102,7 +102,11 @@ ci-tools: ## Install the CI security scanners (Trivy, Syft, OSV-Scanner, pip-aud
 security: ## Dependency, image, and history scans with SBOMs (images: build them first)
 	./scripts/security-scan.sh all
 
-PLAYWRIGHT_IMAGE := mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+engine-conformance: ## Run-engine hard gates H1-H8 against DBOS (ADR-0002; ~5 min, needs Docker)
+	CONF_ENGINE=dbos CONF_RESULTS=build/engine-conformance \
+	  uv run --frozen pytest spikes/engine/tests -q -p no:cacheprovider
+
+PLAYWRIGHT_IMAGE :=mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
 
 e2e: ## Browser tests (Chromium in the Playwright image) against the running stack (make up first)
 	@email="e2e-$$(date +%s)@example.test"; pw="$$(python3 -c 'import secrets; print(secrets.token_urlsafe(18))')"; \

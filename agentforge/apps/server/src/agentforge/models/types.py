@@ -60,6 +60,7 @@ class CallContext:
     org_id: UUID
     purpose: str  # e.g. "draft", "verify", "plan", "embed", "smoke"
     run_id: UUID | None = None
+    step_id: UUID | None = None  # the run step that made the call (trace view)
 
 
 @dataclass(frozen=True, slots=True)

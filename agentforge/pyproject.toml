@@ -14,7 +14,6 @@ dev = [
     "testcontainers>=4.15.0",
 ]
 engine-spikes = [
-    "dbos>=3.1.0",
     "langgraph>=1.2.12",
     "langgraph-checkpoint-postgres>=3.1.2",
 ]
@@ -75,6 +74,7 @@ forbidden_modules = [
   "agentforge.knowledge",
   "agentforge.agents",
   "agentforge.qa",
+  "agentforge.runs",
   "agentforge.services",
   "agentforge.api",
   "agentforge.worker",
@@ -90,6 +90,7 @@ source_modules = [
   "agentforge.knowledge",
   "agentforge.agents",
   "agentforge.qa",
+  "agentforge.runs",
 ]
 forbidden_modules = [
   "agentforge.api",

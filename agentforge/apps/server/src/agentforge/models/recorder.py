@@ -12,10 +12,10 @@ from agentforge.models.types import CallRecord
 _INSERT = text(
     """
     INSERT INTO app.llm_calls
-      (org_id, run_id, purpose, model, model_digest, status, attempt, latency_ms,
+      (org_id, run_id, step_id, purpose, model, model_digest, status, attempt, latency_ms,
        prompt_tokens, completion_tokens, error_class, request, response, json_schema, trace_id)
     VALUES
-      (:org_id, :run_id, :purpose, :model, :model_digest, :status, :attempt, :latency_ms,
+      (:org_id, :run_id, :step_id, :purpose, :model, :model_digest, :status, :attempt, :latency_ms,
        :prompt_tokens, :completion_tokens, :error_class, CAST(:request AS jsonb), :response,
        CAST(:json_schema AS jsonb), :trace_id)
     """
@@ -34,6 +34,7 @@ class DbRecorder:
                 {
                     "org_id": context.org_id,
                     "run_id": context.run_id,
+                    "step_id": context.step_id,
                     "purpose": context.purpose,
                     "model": record.model,
                     "model_digest": record.model_digest,

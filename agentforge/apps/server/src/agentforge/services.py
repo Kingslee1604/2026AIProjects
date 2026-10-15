@@ -18,6 +18,9 @@ from agentforge.qa.fake import with_grounded_answers
 from agentforge.qa.pipeline import GroundedAnswerer, QAConfig
 from agentforge.qa.purge import purge_documents
 from agentforge.qa.service import QAService
+from agentforge.runs.dbos_engine import DbosEngine
+from agentforge.runs.port import NoEngine, RunEngine
+from agentforge.runs.service import RunService
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,8 +33,13 @@ class Services:
     retriever: Retriever
     agents: AgentRegistry
     qa: QAService
+    run_engine: RunEngine
+    runs: RunService
+    blobs: LocalBlobStore
 
     async def close(self) -> None:
+        if isinstance(self.run_engine, DbosEngine):
+            self.run_engine.close()
         await self.engine.dispose()
 
 
@@ -66,14 +74,21 @@ def build_services(settings: Settings, *, pool_size: int = 5) -> Services:
     fake = gateway.provider("fake")
     if isinstance(fake, FakeProvider):  # fake mode answers questions from the evidence
         fake.responder = with_grounded_answers(fake.responder)
+    run_engine: RunEngine = (
+        DbosEngine(settings) if settings.engine_database_url is not None else NoEngine()
+    )
+    blobs = LocalBlobStore(settings.blob_root)
     return Services(
         engine=engine,
         sessions=sessions,
         gateway=gateway,
         embedding_table=table,
+        run_engine=run_engine,
+        runs=RunService(sessions, run_engine),
+        blobs=blobs,
         knowledge=KnowledgeService(
             sessions,
-            LocalBlobStore(settings.blob_root),
+            blobs,
             gateway,
             embedding_model=settings.embedding_model,
             embedding_table=table,

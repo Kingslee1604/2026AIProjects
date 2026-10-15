@@ -12,12 +12,13 @@ from opentelemetry.propagate import extract
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from agentforge import __version__
-from agentforge.api import admin_routes, auth_routes, knowledge_routes, qa_routes
+from agentforge.api import admin_routes, auth_routes, knowledge_routes, qa_routes, run_routes
 from agentforge.api.limits import BodySizeLimitMiddleware
 from agentforge.auth.service import AuthService
 from agentforge.core.logging import configure_logging, get_logger
 from agentforge.core.settings import Settings, get_settings
 from agentforge.core.telemetry import configure_tracing, current_trace_id
+from agentforge.runs.events import EventHub
 from agentforge.services import build_services
 
 log = get_logger("agentforge.api")
@@ -113,9 +114,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.services = services
         app.state.sessions = services.sessions
         app.state.auth = AuthService(services.sessions, settings)
+        hub = EventHub(settings.database_url.get_secret_value())
+        await hub.start()
+        app.state.event_hub = hub
         try:
             yield
         finally:
+            await hub.stop()
             await services.close()
 
     app = FastAPI(
@@ -129,6 +134,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.auth = None
     app.state.sessions = None
     app.state.services = None
+    app.state.event_hub = None
     app.middleware("http")(_trace_and_log)
     app.add_middleware(
         BodySizeLimitMiddleware,
@@ -153,4 +159,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_routes.router)
     app.include_router(knowledge_routes.router)
     app.include_router(qa_routes.router)
+    app.include_router(run_routes.router)
     return app

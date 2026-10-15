@@ -1,8 +1,9 @@
 """Worker main loop with graceful shutdown.
 
-Processes ingestion (R1-13) and answer (R1-17) jobs; the run engine (R1-24) plugs into `_tick`. The
-heartbeat runs as its own task, so a long job (embedding a big document on CPU) never makes
-the container look dead.
+Processes ingestion (R1-13) and answer (R1-17) jobs, and hosts the run engine (DBOS,
+ADR-0002) when AGENTFORGE_ENGINE_DATABASE_URL is set, plus its start reconciler. The heartbeat
+runs as its own task, so a long job (embedding a big document on CPU) never makes the
+container look dead.
 """
 
 import asyncio
@@ -13,10 +14,13 @@ import time
 from agentforge.core.logging import configure_logging, get_logger
 from agentforge.core.settings import Settings, get_settings
 from agentforge.core.telemetry import configure_tracing
+from agentforge.runs.dbos_engine import launch_worker, shutdown_worker
 from agentforge.services import Services, build_services
 
 log = get_logger("agentforge.worker")
 MAX_JOBS_PER_TICK = 10
+RECONCILE_EVERY_SECONDS = 5.0
+RECONCILE_AFTER_SECONDS = 10.0  # a run 'queued' this long had its start lost
 
 
 class Worker:
@@ -24,6 +28,8 @@ class Worker:
         self.settings = settings
         self.services = services
         self._stop = asyncio.Event()
+        self._engine_running = False
+        self._last_reconcile = 0.0
 
     def request_stop(self) -> None:
         self._stop.set()
@@ -63,12 +69,33 @@ class Worker:
             if len(idle) == len(handlers):
                 return
 
+    async def _reconcile_runs(self) -> None:
+        """Start runs whose start was lost (committed row, crash before the enqueue: gate H7)."""
+        if self.services is None or not self._engine_running:
+            return
+        now = time.monotonic()
+        if now - self._last_reconcile < RECONCILE_EVERY_SECONDS:
+            return
+        self._last_reconcile = now
+        try:
+            for org_id, run_id, template_key in await self.services.runs.stale_queued(
+                RECONCILE_AFTER_SECONDS
+            ):
+                await self.services.run_engine.start(org_id, run_id, template_key)
+        except Exception:
+            log.exception("run_reconcile_failed")
+
     async def run(self) -> None:
         log.info("worker_started", poll_seconds=self.settings.worker_poll_seconds)
         self._heartbeat()
         heartbeat = asyncio.create_task(self._heartbeats())
+        if self.services is not None and self.settings.engine_database_url is not None:
+            await launch_worker(self.settings)  # DBOS resumes this worker's unfinished runs
+            self._engine_running = True
+            log.info("run_engine_started", executor_id=self.settings.engine_executor_id)
         try:
             while not self._stop.is_set():
+                await self._reconcile_runs()
                 await self._tick()
                 with contextlib.suppress(TimeoutError):  # timeout = next poll, not an error
                     await asyncio.wait_for(
@@ -77,6 +104,8 @@ class Worker:
         finally:
             self._stop.set()
             await heartbeat
+            if self._engine_running:
+                shutdown_worker()
             self.settings.worker_heartbeat_path.unlink(missing_ok=True)
             if self.services is not None:
                 await self.services.close()
