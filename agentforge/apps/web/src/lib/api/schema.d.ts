@@ -481,6 +481,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/runs/{run_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Review */
+        get: operations["get_review_v1_runs__run_id__review_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runs/{run_id}/review/approve-supported": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve Supported
+         * @description Approve every undecided answer that is verified with high confidence.
+         */
+        post: operations["approve_supported_v1_runs__run_id__review_approve_supported_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/runs/{run_id}/review/complete": {
         parameters: {
             query?: never;
@@ -492,9 +529,29 @@ export interface paths {
         put?: never;
         /**
          * Complete Review
-         * @description Finish the review and export. (R1-34 replaces this with per-item decisions.)
+         * @description Close the review (every answer needs a decision); the run then exports the file.
          */
         post: operations["complete_review_v1_runs__run_id__review_complete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runs/{run_id}/review/items/{item_index}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decide Item
+         * @description Approve, edit and approve (`edited_answer` required), or reject (`reason` required).
+         */
+        post: operations["decide_item_v1_runs__run_id__review_items__item_index__post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -614,6 +671,11 @@ export interface components {
             /** Trace Id */
             trace_id: string | null;
         };
+        /** BulkOut */
+        BulkOut: {
+            /** Approved */
+            approved: number;
+        };
         /** ClaimOut */
         ClaimOut: {
             /** Citations */
@@ -661,6 +723,18 @@ export interface components {
             question: string;
             /** Section */
             section?: string | null;
+        };
+        /** DecisionIn */
+        DecisionIn: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "approved" | "edited" | "rejected";
+            /** Edited Answer */
+            edited_answer?: string | null;
+            /** Reason */
+            reason?: string | null;
         };
         /** DocumentOut */
         DocumentOut: {
@@ -879,6 +953,54 @@ export interface components {
             sheet: string | null;
             /** Warnings */
             warnings: string[];
+        };
+        /** ReviewItemOut */
+        ReviewItemOut: {
+            /** Auto Accept Candidate */
+            auto_accept_candidate: boolean;
+            /** Decided At */
+            decided_at: string | null;
+            /** Decided By */
+            decided_by: string | null;
+            /** Decision */
+            decision: ("approved" | "edited" | "rejected") | null;
+            /** Edited Answer */
+            edited_answer: string | null;
+            /** Item Index */
+            item_index: number;
+            /** Reason */
+            reason: string | null;
+        };
+        /** ReviewOut */
+        ReviewOut: {
+            /** Completed At */
+            completed_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Epoch */
+            epoch: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Items */
+            items: components["schemas"]["ReviewItemOut"][];
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "completed";
+            /** Undecided */
+            undecided: number;
         };
         /** RunEventOut */
         RunEventOut: {
@@ -1985,6 +2107,68 @@ export interface operations {
             };
         };
     };
+    get_review_v1_runs__run_id__review_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approve_supported_v1_runs__run_id__review_approve_supported_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BulkOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     complete_review_v1_runs__run_id__review_complete_post: {
         parameters: {
             query?: never;
@@ -1997,14 +2181,48 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Successful Response */
-            202: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: string;
-                    };
+                    "application/json": components["schemas"]["ReviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_item_v1_runs__run_id__review_items__item_index__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+                item_index: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewItemOut"];
                 };
             };
             /** @description Validation Error */

@@ -8,6 +8,7 @@ export writes one artifact per (run, epoch) whatever retries happen (gate H4). S
 
 import asyncio
 import hashlib
+import json
 import tempfile
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -284,6 +285,16 @@ class QuestionnaireSteps:
                         "i": index,
                     },
                 )
+                # A retried item in an open review gets a fresh review (its old decision was
+                # cleared when it was reopened) and a recomputed bulk-approval flag.
+                await db.execute(
+                    text(
+                        "UPDATE app.review_items ri SET auto_accept_candidate = :a "
+                        "FROM app.review_batches b WHERE b.id = ri.batch_id "
+                        "AND b.run_id = :r AND b.status = 'open' AND ri.item_index = :i"
+                    ),
+                    {"a": _auto_accept(result.status, result.confidence), "r": run_id, "i": index},
+                )
                 await emit(
                     db,
                     org_id,
@@ -374,12 +385,16 @@ class QuestionnaireSteps:
                 await emit(db, org_id, run_id, "run_failed", data={"error_class": error_class})
 
     async def route(self, org_id: UUID, run_id: UUID) -> dict[str, int]:
-        """Sort answers for review and wait: verified high-confidence answers are candidates for
-        bulk approval; everything else needs a reviewer's attention (R1-34)."""
+        """Open the review: one review item per answered item (skipped items need none), in the
+        same transaction that moves the run to waiting_review. Verified high-confidence answers
+        are candidates for bulk approval; the rest need a reviewer's attention (R1-34)."""
         async with self._tx(org_id) as db:
             rows = (
                 await db.execute(
-                    text("SELECT status, confidence FROM app.run_items WHERE run_id = :r"),
+                    text(
+                        "SELECT id, item_index, status, confidence FROM app.run_items "
+                        "WHERE run_id = :r ORDER BY item_index"
+                    ),
                     {"r": run_id},
                 )
             ).all()
@@ -387,7 +402,7 @@ class QuestionnaireSteps:
             for row in rows:
                 if row.status == "skipped":
                     counts["skipped"] += 1
-                elif row.status == "answered" and row.confidence == "high":
+                elif _auto_accept(row.status, row.confidence):
                     counts["auto_accept_candidates"] += 1
                 else:
                     counts["needs_review"] += 1
@@ -395,12 +410,41 @@ class QuestionnaireSteps:
                 await db.execute(
                     text(
                         "UPDATE app.runs SET status = 'waiting_review', updated_at = now() "
-                        "WHERE id = :r AND status = 'running' RETURNING id"
+                        "WHERE id = :r AND status = 'running' RETURNING epoch"
                     ),
                     {"r": run_id},
                 )
             ).one_or_none()
             if moved is not None:
+                batch_id = (
+                    await db.execute(
+                        text(
+                            "INSERT INTO app.review_batches (org_id, run_id, epoch) "
+                            "VALUES (:o, :r, :e) ON CONFLICT (run_id, epoch) DO UPDATE "
+                            "SET status = app.review_batches.status RETURNING id"
+                        ),
+                        {"o": org_id, "r": run_id, "e": moved.epoch},
+                    )
+                ).scalar_one()
+                reviewable = [r for r in rows if r.status != "skipped"]
+                if reviewable:
+                    await db.execute(
+                        text(
+                            "INSERT INTO app.review_items (org_id, batch_id, run_item_id, "
+                            "item_index, auto_accept_candidate) VALUES (:o, :b, :ri, :i, :a) "
+                            "ON CONFLICT (batch_id, item_index) DO NOTHING"
+                        ),
+                        [
+                            {
+                                "o": org_id,
+                                "b": batch_id,
+                                "ri": r.id,
+                                "i": r.item_index,
+                                "a": _auto_accept(r.status, r.confidence),
+                            }
+                            for r in reviewable
+                        ],
+                    )
                 await emit(db, org_id, run_id, "review_waiting", node_id="review", data=counts)
         return counts
 
@@ -444,8 +488,13 @@ class QuestionnaireSteps:
             items = (
                 await db.execute(
                     text(
-                        "SELECT source_ref, status, answer, claims, evidence FROM app.run_items "
-                        "WHERE run_id = :r ORDER BY item_index"
+                        # The latest review decision per item decides what is exported.
+                        "SELECT i.source_ref, i.status, i.answer, i.claims, i.evidence, "
+                        "rv.decision, rv.edited_answer FROM app.run_items i "
+                        "LEFT JOIN LATERAL (SELECT ri.decision, ri.edited_answer "
+                        "FROM app.review_items ri JOIN app.review_batches b ON b.id = ri.batch_id "
+                        "WHERE ri.run_item_id = i.id ORDER BY b.created_at DESC LIMIT 1) rv "
+                        "ON true WHERE i.run_id = :r ORDER BY i.item_index"
                     ),
                     {"r": run_id},
                 )
@@ -557,6 +606,23 @@ class QuestionnaireSteps:
                 ),
                 {"r": run_id, "i": index},
             )
+            # The new answer needs a new decision: clear this item's decision in the open review.
+            await db.execute(
+                text(
+                    "UPDATE app.review_items ri SET decision = NULL, edited_answer = NULL, "
+                    "reason = NULL, decided_by = NULL, decided_at = NULL, "
+                    "auto_accept_candidate = false FROM app.review_batches b "
+                    "WHERE b.id = ri.batch_id AND b.run_id = :r AND b.status = 'open' "
+                    "AND ri.item_index = :i"
+                ),
+                {"r": run_id, "i": index},
+            )
+
+
+def _auto_accept(status: str, confidence: str | None) -> bool:
+    """Verified, high-confidence answers may be approved in bulk; everything else is reviewed
+    one by one."""
+    return status == "answered" and confidence == "high"
 
 
 def _sources(claims: list[dict[str, Any]], evidence: list[dict[str, Any]]) -> str:
@@ -579,20 +645,21 @@ def _sources(claims: list[dict[str, Any]], evidence: list[dict[str, Any]]) -> st
 
 
 def _export_row(item: Any) -> ExportRow:
+    """What the customer gets: the reviewer's edit, nothing for a rejected answer (so a person
+    fills it in), otherwise the verified answer."""
+    sources = _sources(list(item.claims), list(item.evidence))
+    if item.decision == "rejected":
+        return ExportRow(row=int(item.source_ref), answer="", sources="")
+    if item.decision == "edited":
+        return ExportRow(row=int(item.source_ref), answer=item.edited_answer or "", sources=sources)
     if item.status == "answered":
         answer = item.answer or ""
     elif item.status == "insufficient_evidence":
         answer = INSUFFICIENT
     else:
         answer = ""
-    return ExportRow(
-        row=int(item.source_ref),
-        answer=answer,
-        sources=_sources(list(item.claims), list(item.evidence)),
-    )
+    return ExportRow(row=int(item.source_ref), answer=answer, sources=sources)
 
 
 def _json(value: Any) -> str:
-    import json
-
     return json.dumps(value, default=str)

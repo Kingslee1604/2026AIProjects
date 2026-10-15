@@ -20,6 +20,7 @@ from agentforge.qa.planner import Planner
 from agentforge.qa.purge import purge_documents
 from agentforge.qa.service import QAService
 from agentforge.questionnaires.service import QuestionnaireService
+from agentforge.reviews.service import ReviewService
 from agentforge.runs.dbos_engine import DbosEngine
 from agentforge.runs.port import NoEngine, RunEngine
 from agentforge.runs.questionnaire import QuestionnaireSteps, RunBudget
@@ -41,6 +42,7 @@ class Services:
     blobs: LocalBlobStore
     questionnaires: QuestionnaireService
     questionnaire_steps: QuestionnaireSteps
+    reviews: ReviewService
 
     async def close(self) -> None:
         if isinstance(self.run_engine, DbosEngine):
@@ -84,13 +86,15 @@ def build_services(settings: Settings, *, pool_size: int = 5) -> Services:
     )
     blobs = LocalBlobStore(settings.blob_root)
     answerer = GroundedAnswerer(gateway, retriever, agents, qa_config(settings))
+    runs = RunService(sessions, run_engine)
     return Services(
         engine=engine,
         sessions=sessions,
         gateway=gateway,
         embedding_table=table,
         run_engine=run_engine,
-        runs=RunService(sessions, run_engine),
+        runs=runs,
+        reviews=ReviewService(sessions, runs),
         blobs=blobs,
         questionnaires=QuestionnaireService(
             sessions, blobs, max_bytes=settings.max_upload_mb * 1024 * 1024

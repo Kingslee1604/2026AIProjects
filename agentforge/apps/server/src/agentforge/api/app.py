@@ -18,6 +18,7 @@ from agentforge.api import (
     knowledge_routes,
     qa_routes,
     questionnaire_routes,
+    review_routes,
     run_routes,
 )
 from agentforge.api.limits import BodySizeLimitMiddleware
@@ -168,4 +169,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(qa_routes.router)
     app.include_router(run_routes.router)
     app.include_router(questionnaire_routes.router)
+    app.include_router(review_routes.router)
     return app

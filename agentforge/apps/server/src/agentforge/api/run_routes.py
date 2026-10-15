@@ -24,7 +24,6 @@ router = APIRouter(tags=["runs"])
 
 Reader = Annotated[Principal, Depends(require(Permission.RUNS_READ))]
 Writer = Annotated[Principal, Depends(require(Permission.RUNS_WRITE))]
-Reviewer = Annotated[Principal, Depends(require(Permission.REVIEWS_DECIDE))]
 
 
 class StartRunIn(BaseModel):
@@ -182,18 +181,6 @@ async def retry_export(run_id: UUID, principal: Writer, svc: ServicesDep) -> Epo
         raise HTTPException(404, "Run not found") from None
     except InvalidStateError as error:
         raise HTTPException(409, str(error)) from None
-
-
-@router.post("/v1/runs/{run_id}/review/complete", status_code=202)
-async def complete_review(run_id: UUID, principal: Reviewer, svc: ServicesDep) -> dict[str, str]:
-    """Finish the review and export. (R1-34 replaces this with per-item decisions.)"""
-    try:
-        await svc.runs.signal_review(principal.org_id, run_id)
-    except NotFoundError:
-        raise HTTPException(404, "Run not found") from None
-    except InvalidStateError as error:
-        raise HTTPException(409, str(error)) from None
-    return {"status": "accepted"}
 
 
 @router.post("/v1/runs/{run_id}/cancel", response_model=RunOut)

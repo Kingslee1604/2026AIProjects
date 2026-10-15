@@ -271,6 +271,19 @@
         "title": "AuditEntryOut",
         "type": "object"
       },
+      "BulkOut": {
+        "properties": {
+          "approved": {
+            "title": "Approved",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "approved"
+        ],
+        "title": "BulkOut",
+        "type": "object"
+      },
       "ClaimOut": {
         "properties": {
           "citations": {
@@ -404,6 +417,48 @@
           "question"
         ],
         "title": "ColumnsIn",
+        "type": "object"
+      },
+      "DecisionIn": {
+        "properties": {
+          "decision": {
+            "enum": [
+              "approved",
+              "edited",
+              "rejected"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "edited_answer": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edited Answer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "DecisionIn",
         "type": "object"
       },
       "DocumentOut": {
@@ -946,6 +1001,157 @@
           "created_at"
         ],
         "title": "QuestionnaireOut",
+        "type": "object"
+      },
+      "ReviewItemOut": {
+        "properties": {
+          "auto_accept_candidate": {
+            "title": "Auto Accept Candidate",
+            "type": "boolean"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "decided_by": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By"
+          },
+          "decision": {
+            "anyOf": [
+              {
+                "enum": [
+                  "approved",
+                  "edited",
+                  "rejected"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision"
+          },
+          "edited_answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edited Answer"
+          },
+          "item_index": {
+            "title": "Item Index",
+            "type": "integer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "item_index",
+          "auto_accept_candidate",
+          "decision",
+          "edited_answer",
+          "reason",
+          "decided_by",
+          "decided_at"
+        ],
+        "title": "ReviewItemOut",
+        "type": "object"
+      },
+      "ReviewOut": {
+        "properties": {
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "epoch": {
+            "title": "Epoch",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "completed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "undecided": {
+            "title": "Undecided",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "run_id",
+          "epoch",
+          "status",
+          "items",
+          "undecided",
+          "created_at",
+          "completed_at"
+        ],
+        "title": "ReviewOut",
         "type": "object"
       },
       "RunEventOut": {
@@ -2813,9 +3019,96 @@
         ]
       }
     },
+    "/v1/runs/{run_id}/review": {
+      "get": {
+        "operationId": "get_review_v1_runs__run_id__review_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Review",
+        "tags": [
+          "reviews"
+        ]
+      }
+    },
+    "/v1/runs/{run_id}/review/approve-supported": {
+      "post": {
+        "description": "Approve every undecided answer that is verified with high confidence.",
+        "operationId": "approve_supported_v1_runs__run_id__review_approve_supported_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Approve Supported",
+        "tags": [
+          "reviews"
+        ]
+      }
+    },
     "/v1/runs/{run_id}/review/complete": {
       "post": {
-        "description": "Finish the review and export. (R1-34 replaces this with per-item decisions.)",
+        "description": "Close the review (every answer needs a decision); the run then exports the file.",
         "operationId": "complete_review_v1_runs__run_id__review_complete_post",
         "parameters": [
           {
@@ -2830,15 +3123,11 @@
           }
         ],
         "responses": {
-          "202": {
+          "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "title": "Response Complete Review V1 Runs  Run Id  Review Complete Post",
-                  "type": "object"
+                  "$ref": "#/components/schemas/ReviewOut"
                 }
               }
             },
@@ -2857,7 +3146,70 @@
         },
         "summary": "Complete Review",
         "tags": [
-          "runs"
+          "reviews"
+        ]
+      }
+    },
+    "/v1/runs/{run_id}/review/items/{item_index}": {
+      "post": {
+        "description": "Approve, edit and approve (`edited_answer` required), or reject (`reason` required).",
+        "operationId": "decide_item_v1_runs__run_id__review_items__item_index__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "item_index",
+            "required": true,
+            "schema": {
+              "title": "Item Index",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewItemOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decide Item",
+        "tags": [
+          "reviews"
         ]
       }
     },

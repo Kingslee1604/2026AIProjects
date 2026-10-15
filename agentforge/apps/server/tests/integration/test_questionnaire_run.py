@@ -269,9 +269,28 @@ def test_a_40_item_questionnaire_runs_to_an_exported_file(
     )[0][0]
     assert unlinked == 0
 
-    # Review, then export.
-    assert stack.post(f"/v1/runs/{run_id}/review/complete").status_code == 403  # no can_review
-    assert stack.post(f"/v1/runs/{run_id}/review/complete", as_reviewer=True).status_code == 202
+    # Review: a Member without can_review cannot decide; the reviewer bulk-approves verified
+    # answers, edits item 0, rejects item 1, approves the rest, and completes the review.
+    review = f"/v1/runs/{run_id}/review"
+    assert stack.post(f"{review}/items/0", {"decision": "approved"}).status_code == 403
+    stack.post(f"{review}/approve-supported", as_reviewer=True)
+    edited = stack.post(
+        f"{review}/items/0",
+        {"decision": "edited", "edited_answer": "Edited by the reviewer."},
+        as_reviewer=True,
+    )
+    assert edited.status_code == 200, edited.text
+    rejected = stack.post(
+        f"{review}/items/1", {"decision": "rejected", "reason": "Not our policy."}, as_reviewer=True
+    )
+    assert rejected.status_code == 200, rejected.text
+    for item in stack.client.get(review).json()["items"]:
+        if item["decision"] is None:
+            stack.post(
+                f"{review}/items/{item['item_index']}", {"decision": "approved"}, as_reviewer=True
+            )
+    completed = stack.post(f"{review}/complete", as_reviewer=True)
+    assert completed.status_code == 200, completed.text
     run = stack.wait(run_id, lambda r: r["status"] == "succeeded")
     assert run["usage"]["llm_calls"] >= 40
 
@@ -284,16 +303,20 @@ def test_a_40_item_questionnaire_runs_to_an_exported_file(
     assert sheet["D1"].value == "Answer"
     assert sheet["E1"].value == "Notes"  # the customer's own column is left alone
     assert sheet["F1"].value == "Sources"
+    # Row 2 is item 0 (edited), row 3 is item 1 (rejected: left blank for a person to fill).
+    assert sheet["D2"].value == "Edited by the reviewer."
+    assert sheet["D3"].value in (None, "")
+    assert sheet["F3"].value in (None, "")
     by_row = {i["question"]: i for i in items}
-    row_two = by_row[sheet["C2"].value]
+    row_four = by_row[sheet["C4"].value]
     expected = (
-        row_two["answer"]
-        if row_two["status"] == "answered"
-        else ("Insufficient evidence in the knowledge base.")
+        row_four["answer"]
+        if row_four["status"] == "answered"
+        else "Insufficient evidence in the knowledge base."
     )
-    assert sheet["D2"].value == expected
+    assert sheet["D4"].value == expected
     filled = sum(1 for r in range(2, 42) if sheet[f"D{r}"].value)
-    assert filled == 40
+    assert filled == 39
 
     events = [e["type"] for e in stack.client.get(f"/v1/runs/{run_id}/events").json()]
     for expected_type in (
@@ -331,6 +354,12 @@ def test_retrying_one_item_answers_only_that_item(stack: Stack, northwind_xlsx: 
         r=run_id,
     )
     assert {r.n for r in before} == {1}
+    decided = stack.post(
+        f"/v1/runs/{run_id}/review/items/3",
+        {"decision": "rejected", "reason": "Too vague."},
+        as_reviewer=True,
+    )
+    assert decided.status_code == 200
 
     response = stack.post(f"/v1/runs/{run_id}/items/3/retry")
     assert response.status_code == 202, response.text
@@ -349,6 +378,14 @@ def test_retrying_one_item_answers_only_that_item(stack: Stack, northwind_xlsx: 
         time.sleep(0.3)
     assert [(a.item_index, a.status) for a in again] == [(3, "succeeded")]
     assert stack.run(run_id)["status"] == "waiting_review"
+    # The new answer needs a new decision: the earlier rejection was cleared.
+    item = next(
+        i
+        for i in stack.client.get(f"/v1/runs/{run_id}/review").json()["items"]
+        if i["item_index"] == 3
+    )
+    assert item["decision"] is None
+    assert item["reason"] is None
     assert stack.post(f"/v1/runs/{run_id}/items/999/retry").status_code == 404
 
 
