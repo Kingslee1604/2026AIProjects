@@ -3,7 +3,7 @@ SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
 .PHONY: help tools setup lint format typecheck test docs-check secrets-scan licenses check \
-	up down logs ps doctor user-create user-list api-client api-client-check web-build e2e ci-tools security models-smoke demo-build demo-check durability
+	up down logs ps doctor user-create user-list api-client api-client-check web-build e2e ci-tools security models-smoke demo-build demo-check durability eval
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -92,6 +92,16 @@ demo-build: ## Build the Northwind demo corpus and questionnaires into demo/buil
 
 demo-check: ## Verify the demo questionnaire, gold set, and every evidence quote
 	uv run --frozen python -m tools.demo_corpus check
+
+EVAL_OUT ?= docs/evaluation/$(shell date +%Y-%m-%d)
+EVAL_ARGS ?=
+eval: demo-build ## Measure retrieval and answers on the Northwind gold set with the running stack's models (R1-40; slow on CPU). EVAL_ARGS="--questions demo --chat-model ollama:..."
+	@tmp="$$(mktemp -d)"; chmod 777 "$$tmp"; \
+	docker compose run --rm --no-deps -T -v "$(CURDIR)/demo:/eval/demo:ro" -v "$$tmp:/eval/out" \
+	  api eval run --data /eval/demo --out /eval/out \
+	  --git-sha "$$(git describe --always --dirty)" $(EVAL_ARGS) && \
+	mkdir -p "$(EVAL_OUT)" && cp "$$tmp"/report.json "$$tmp"/report.md "$(EVAL_OUT)/" && \
+	rm -rf "$$tmp" && echo "Report: $(EVAL_OUT)/report.md"
 
 check: api-client-check lint typecheck test docs-check demo-check secrets-scan licenses ## Run every check (same gates as CI)
 	@echo "All checks passed."

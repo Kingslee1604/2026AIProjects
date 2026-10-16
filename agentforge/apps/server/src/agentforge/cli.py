@@ -24,11 +24,22 @@ def main(argv: Sequence[str] | None = None) -> int:
     commands.add_parser("openapi", help="Print the API's OpenAPI schema (JSON)")
     models = commands.add_parser("models", help="Model gateway utilities")
     models.add_argument("action", choices=["smoke"], help="smoke: one chat + one embedding call")
+    from agentforge.evaluation_cli import add_arguments as add_eval_arguments
+
+    add_eval_arguments(commands.add_parser("eval", help="Evaluate retrieval and answer quality"))
     commands.add_parser("version", help="Print the version")
     args = parser.parse_args(argv)
 
     if args.command == "version":
         print(__version__)
+    elif args.command == "eval":
+        from agentforge.core.logging import configure_logging
+        from agentforge.core.settings import get_settings
+        from agentforge.evaluation_cli import run as run_eval
+
+        settings = get_settings()
+        configure_logging("WARNING", settings.log_format)
+        return run_eval(args, settings)
     elif args.command == "models":
         from agentforge.core.logging import configure_logging
         from agentforge.core.settings import get_settings
