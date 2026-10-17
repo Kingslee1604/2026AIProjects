@@ -1,0 +1,79 @@
+# AgentForge dependency license policy (architecture §20, Release 1 task R1-02).
+# Enforced by `make licenses` (tools/license_check.py), which is part of `make check`.
+#
+# Scopes:
+#   shipped - runtime dependencies that end up in AgentForge images or installs
+#   dev     - tooling used only to develop, test, or document AgentForge (never shipped)
+# A license expression passes when it is satisfiable from the lists below
+# ("A OR B" needs one allowed side, "A AND B" needs both).
+
+[allowed]
+# Permissive licenses (and MPL-2.0, which is file-level copyleft) allowed in any scope.
+spdx = [
+  "0BSD",
+  "Apache-2.0",
+  "BlueOak-1.0.0",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "CC-BY-4.0", # data files (e.g. caniuse-lite via Next.js); attribution listed in THIRD_PARTY_LICENSES
+  "CC0-1.0",
+  "ISC",
+  "MIT",
+  "MIT-0",
+  "MPL-2.0",
+  "PostgreSQL",
+  "PSF-2.0",
+  "Python-2.0",
+  "Unicode-3.0",
+  "Unicode-DFS-2016",
+  "Unlicense",
+  "Zlib",
+]
+
+[dev_only]
+# Allowed only for development-only dependencies. Must never reach a shipped install.
+spdx = [
+  "EPL-2.0", # elkjs, pulled in by mermaid (docs diagram validation only)
+]
+
+# Per-package exceptions: when registry metadata is missing or wrong, or an ADR approves a
+# license outside the lists above. Each one approves exactly one verified license for one
+# package; if the package later publishes a different license, the gate fails for re-review.
+
+# ADR-0013 (accepted 2026-10-13): psycopg 3 is LGPL-3.0-only and required by DBOS and the
+# LangGraph Postgres checkpointer. Allowed unmodified, installed as a normal package, with its
+# license text and source link shipped in THIRD_PARTY_LICENSES. No other LGPL package is allowed.
+[[exception]]
+ecosystem = "pypi"
+name = "psycopg"
+license = "LGPL-3.0-only"
+scope = "any"
+reason = "ADR-0013"
+
+[[exception]]
+ecosystem = "pypi"
+name = "psycopg-binary"
+license = "LGPL-3.0-only"
+scope = "any"
+reason = "ADR-0013"
+
+[[exception]]
+ecosystem = "pypi"
+name = "psycopg-pool"
+license = "LGPL-3.0-only"
+scope = "any"
+reason = "ADR-0013"
+
+[[exception]]
+ecosystem = "pypi"
+name = "pypdfium2"
+license = "Apache-2.0 OR BSD-3-Clause"
+scope = "any"
+reason = "Free-text License field ('BSD-3-Clause, Apache-2.0, dependency licenses') is not SPDX. Verified 2026-10-13 against the repository: dual Apache-2.0 / BSD-3-Clause; the bundled PDFium binary and its libraries are permissive, and their notices ship in THIRD_PARTY_LICENSES (verification finding F4)."
+
+[[exception]]
+ecosystem = "npm"
+name = "khroma"
+license = "MIT"
+scope = "dev"
+reason = "package.json has no license field; the repository and the license file shipped in the package are MIT (verified 2026-10-13). Pulled in by mermaid."

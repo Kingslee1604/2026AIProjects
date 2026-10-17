@@ -1,0 +1,74 @@
+# AgentForge model registry (Release 1 task R1-02; architecture §8.3 and §23.1).
+# Every model records its exact Ollama tag, its upstream source, and the upstream license.
+# Ollama library tags repackage upstream weights; the license follows the upstream model.
+# Verified 2026-10-13: tags exist in registry.ollama.ai, licenses from Hugging Face model cards.
+# Sizes are download sizes (Measured from the registry manifest), not RAM use at runtime.
+# Final defaults are chosen from the R1 eval harness (task R1-40); this file lists candidates.
+
+reference_machine: "Dell Inspiron 15 3520, i7-1255U, 16 GB RAM, Intel Iris Xe (CPU-only inference)"
+
+chat:
+  default: qwen3:4b
+  candidates:
+    - tag: qwen3:4b
+      upstream: https://huggingface.co/Qwen/Qwen3-4B
+      license: Apache-2.0
+      download_gb: 2.50
+      tier: cpu
+    - tag: granite4:micro
+      upstream: https://huggingface.co/ibm-granite/granite-4.0-micro
+      license: Apache-2.0
+      download_gb: 2.10
+      tier: cpu
+    - tag: phi4-mini:3.8b
+      upstream: https://huggingface.co/microsoft/Phi-4-mini-instruct
+      license: MIT
+      download_gb: 2.49
+      tier: cpu
+    - tag: qwen3.5:4b
+      upstream: https://huggingface.co/Qwen/Qwen3.5-4B
+      license: Apache-2.0
+      download_gb: 3.32
+      tier: cpu
+    # Optional tier: needs a discrete GPU or >= 32 GB RAM (pages heavily on the reference machine).
+    - tag: qwen3:8b
+      upstream: https://huggingface.co/Qwen/Qwen3-8B
+      license: Apache-2.0
+      download_gb: 5.23
+      tier: gpu
+    - tag: qwen3.5:9b
+      upstream: https://huggingface.co/Qwen/Qwen3.5-9B
+      license: Apache-2.0
+      download_gb: 6.55
+      tier: gpu
+    - tag: granite4:tiny-h
+      upstream: https://huggingface.co/ibm-granite/granite-4.0-h-tiny
+      license: Apache-2.0
+      download_gb: 4.23
+      tier: gpu
+
+embedding:
+  default: nomic-embed-text:v1.5
+  candidates:
+    - tag: nomic-embed-text:v1.5
+      upstream: https://huggingface.co/nomic-ai/nomic-embed-text-v1.5
+      license: Apache-2.0
+      download_gb: 0.27
+      dimensions: 768
+    - tag: qwen3-embedding:0.6b
+      upstream: https://huggingface.co/Qwen/Qwen3-Embedding-0.6B
+      license: Apache-2.0
+      download_gb: 0.64
+    - tag: bge-m3:latest
+      upstream: https://huggingface.co/BAAI/bge-m3
+      license: MIT
+      download_gb: 1.16
+      dimensions: 1024
+
+# Not defaults: custom licenses with use restrictions. Users may select them; the UI must show
+# a license notice (architecture §20.2).
+restricted_license_families:
+  - family: Llama
+    license: Llama Community License (MAU threshold, acceptable-use policy, attribution)
+  - family: Gemma
+    license: Gemma Terms of Use (use restrictions)

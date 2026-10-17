@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* Design tokens. Light by default, dark when the OS prefers it. */
+@theme {
+  --color-bg: oklch(0.985 0.002 250);
+  --color-surface: oklch(1 0 0);
+  --color-fg: oklch(0.22 0.02 260);
+  --color-muted: oklch(0.52 0.02 260);
+  --color-border: oklch(0.91 0.01 260);
+  --color-accent: oklch(0.52 0.17 262);
+  --color-accent-fg: oklch(0.99 0 0);
+  /* Status colours stay at 4.5:1 or more against the surface (small badge text, WCAG AA). */
+  --color-danger: oklch(0.5 0.19 27);
+  --color-ok: oklch(0.48 0.12 150);
+  --color-warn: oklch(0.5 0.12 70);
+  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: oklch(0.18 0.01 260);
+    --color-surface: oklch(0.22 0.012 260);
+    --color-fg: oklch(0.94 0.005 260);
+    --color-muted: oklch(0.7 0.015 260);
+    --color-border: oklch(0.32 0.015 260);
+    --color-accent: oklch(0.68 0.15 262);
+    --color-accent-fg: oklch(0.16 0.01 260);
+    --color-danger: oklch(0.72 0.16 27);
+    --color-ok: oklch(0.76 0.13 150);
+    --color-warn: oklch(0.8 0.12 80);
+  }
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

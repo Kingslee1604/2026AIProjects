@@ -11,4 +11,9 @@ paths = [
   '''(^|/)\.git/''',
   '''(^|/)uv\.lock$''',
   '''(^|/)pnpm-lock\.yaml$''',
+  # Git-ignored build output: Next.js writes per-build preview keys into .next/; SBOMs and
+  # browser-test traces are generated artifacts.
+  '''(^|/)\.next/''',
+  '''(^|/)build/sbom/''',
+  '''(^|/)test-results/''',
 ]

@@ -6,7 +6,17 @@ requires-python = ">=3.12,<3.14"
 dependencies = ["agentforge"]
 
 [dependency-groups]
-dev = ["pytest", "ruff"]
+dev = [
+    "httpx2>=2.13.1",
+    "import-linter>=2.15",
+    "pytest",
+    "ruff",
+    "testcontainers>=4.15.0",
+]
+engine-spikes = [
+    "langgraph>=1.2.12",
+    "langgraph-checkpoint-postgres>=3.1.2",
+]
 
 [tool.uv]
 package = false
@@ -23,14 +33,99 @@ agentforge = { workspace = true }
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["apps/server/src", "apps/server/tests"]
+src = ["apps/server/src", "apps/server/tests", "."]
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "UP", "S", "C4", "SIM", "RUF", "PT"]
 
 [tool.ruff.lint.per-file-ignores]
-"apps/server/tests/**" = ["S101"]
+# Tests use asserts and throwaway test passwords.
+"apps/server/tests/**" = ["S101", "S105", "S106"]
+"tools/tests/**" = ["S101"]
+# Engine prototypes (M3): spike code with test-style asserts, kept for the ADR-2 record.
+"spikes/**" = ["S101", "E501"]
+# Repository tooling runs fixed commands (uv, pnpm) found on PATH; no user input reaches them.
+"tools/license_check.py" = ["S603", "S607"]
 
 [tool.pytest.ini_options]
-testpaths = ["apps/server/tests"]
+testpaths = ["apps/server/tests", "tools/tests"]
+pythonpath = ["."]
 addopts = "-ra --strict-markers --strict-config"
+
+# Module boundaries (architecture §5.4), checked by `make lint` via import-linter.
+[tool.importlinter]
+root_package = "agentforge"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "core is infrastructure: it never imports db, api, or worker"
+type = "forbidden"
+source_modules = ["agentforge.core"]
+forbidden_modules = ["agentforge.db", "agentforge.api", "agentforge.worker"]
+
+[[tool.importlinter.contracts]]
+name = "db is infrastructure: it never imports domain modules, api, or worker"
+type = "forbidden"
+source_modules = ["agentforge.db"]
+forbidden_modules = [
+  "agentforge.auth",
+  "agentforge.audit",
+  "agentforge.models",
+  "agentforge.knowledge",
+  "agentforge.agents",
+  "agentforge.qa",
+  "agentforge.runs",
+  "agentforge.questionnaires",
+  "agentforge.reviews",
+  "agentforge.evaluation",
+  "agentforge.services",
+  "agentforge.api",
+  "agentforge.worker",
+]
+
+[[tool.importlinter.contracts]]
+name = "domain modules never import api, worker, or the service wiring (HTTP stays in api)"
+type = "forbidden"
+source_modules = [
+  "agentforge.auth",
+  "agentforge.audit",
+  "agentforge.models",
+  "agentforge.knowledge",
+  "agentforge.agents",
+  "agentforge.qa",
+  "agentforge.runs",
+  "agentforge.questionnaires",
+  "agentforge.reviews",
+  "agentforge.evaluation",
+]
+forbidden_modules = [
+  "agentforge.api",
+  "agentforge.worker",
+  "agentforge.services",
+  "fastapi",
+  "starlette",
+]
+
+[[tool.importlinter.contracts]]
+name = "knowledge and models sit below agents and qa"
+type = "forbidden"
+source_modules = ["agentforge.knowledge", "agentforge.models", "agentforge.auth"]
+forbidden_modules = ["agentforge.agents", "agentforge.qa"]
+
+[[tool.importlinter.contracts]]
+name = "the sandboxed parser imports nothing from AgentForge"
+type = "forbidden"
+source_modules = ["agentforge.knowledge.parse_worker"]
+forbidden_modules = [
+  "agentforge.core",
+  "agentforge.db",
+  "agentforge.auth",
+  "agentforge.models",
+  "agentforge.api",
+  "agentforge.services",
+]
+
+[[tool.importlinter.contracts]]
+name = "api and worker are independent process types"
+type = "independence"
+modules = ["agentforge.api", "agentforge.worker"]

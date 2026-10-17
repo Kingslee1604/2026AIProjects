@@ -3,6 +3,21 @@
 node_modules/
 .pytest_cache/
 .ruff_cache/
+.import_linter_cache/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+test-results/
+playwright-report/
+build/
+
+# Generated from the backend's OpenAPI schema (make api-client)
+apps/web/src/lib/api/openapi.json
+apps/web/src/lib/api/schema.d.ts
+
+# Measurements written by tools (make durability, make eval)
+bench/results/
+docs/evaluation/*/report.json
 
 # Markdown is hand-formatted (wide tables, Mermaid); Python is formatted by ruff.
 *.md

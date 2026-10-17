@@ -1,0 +1,8 @@
+{"engine": "custom", "gate": "H8", "passed": true, "at": 1791986835.6717803, "finished": true, "runs": 3}
+{"engine": "custom", "gate": "H3", "passed": true, "at": 1791986838.5452647, "finished": true, "peak_concurrency": {"5fe291fb-df9c-47fb-8624-94d09c148e94": 4, "aaba46db-d599-46b8-927b-08ce28a564b1": 3, "3e6b327d-1ab0-4463-9c8e-ce247d3676f2": 4}, "limit": 4}
+{"engine": "custom", "gate": "H4", "passed": true, "at": 1791986842.588665, "retried": true, "artifacts": {"38c3c6ce-00d3-451b-8986-941a5ffaff1d": [1, 2], "55971cfc-62e6-496b-bb69-f9fc5eb306c2": [1]}}
+{"engine": "custom", "gate": "H5", "passed": true, "at": 1791991020.971026, "calls_started_2s_after_cancel": 0, "calls_total": 4, "status": "cancelled"}
+{"engine": "custom", "gate": "H7", "passed": true, "at": 1792001808.2057114, "lost_start_recovered": true, "ghost_rows": 0, "worker_healthy_after": true}
+{"engine": "custom", "gate": "H6", "passed": true, "at": 1792001821.116883, "engine_tables": ["runs", "jobs"], "rows_scanned": 50, "leaks": []}
+{"engine": "custom", "gate": "H2", "passed": true, "at": 1792001930.9538932, "waiting_runs": 40, "wait_seconds": 15.0, "connections_idle": 2, "connections_20_waiting": 10, "connections_40_waiting": 10, "threads_idle": 2, "threads_20_waiting": 2, "threads_40_waiting": 2, "all_waiting": true, "still_waiting_after_restart": true, "resumed_after_signal": true, "scaled_from": "10 min wait in the design"}
+{"engine": "custom", "gate": "H1", "passed": true, "at": 1792001998.622363, "runs": 50, "kills": 12, "succeeded": 50, "calls_after_item_completed": 0, "calls_lost_to_kills": 23, "artifacts": 50, "runs_with_exact_events": 50, "recovery_seconds": [0.91, 1.78, 4.28, 1.29, 2.39, 1.18, 1.59, 1.19, 0.92, 0.92, 1.3, 1.19]}

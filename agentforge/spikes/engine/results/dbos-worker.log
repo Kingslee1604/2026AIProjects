@@ -1,0 +1,135 @@
+11:21:01 [ WARNING] (dbos:_core.py:791) Workflow run-d7c6560f-4b87-4d0b-b937-19ef28de95b8-item-0 outcome was not recorded: the workflow is no longer owned by this execution. Waiting for the recorded outcome
+11:21:01 [ WARNING] (dbos:_core.py:791) Workflow run-d7c6560f-4b87-4d0b-b937-19ef28de95b8-item-1 outcome was not recorded: the workflow is no longer owned by this execution. Waiting for the recorded outcome
+11:21:01 [ WARNING] (dbos:_core.py:791) Workflow run-d7c6560f-4b87-4d0b-b937-19ef28de95b8-item-3 outcome was not recorded: the workflow is no longer owned by this execution. Waiting for the recorded outcome
+11:21:01 [ WARNING] (dbos:_core.py:791) Workflow run-d7c6560f-4b87-4d0b-b937-19ef28de95b8-item-2 outcome was not recorded: the workflow is no longer owned by this execution. Waiting for the recorded outcome
+11:21:01 [   ERROR] (dbos:_core.py:1161) Exception encountered in asynchronous workflow:
+Traceback (most recent call last):
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_core.py", line 1145, in _execute_workflow_async
+    return await result()
+           ^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 359, in __call__
+    return await self._func()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 257, in _wrap
+    return cast(R, await result.resolve_async())
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 63, in resolve_async
+    return await self._async_resolve()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 2230, in await_workflow_result_async
+    result = await asyncio.to_thread(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 2202, in check_workflow_result
+    raise DBOSAwaitedWorkflowCancelledError(workflow_id)
+dbos._error.DBOSAwaitedWorkflowCancelledError: DBOS Error 13: Awaited workflow run-d7c6560f-4b87-4d0b-b937-19ef28de95b8-item-0 was cancelled
+11:21:01 [   ERROR] (dbos:_core.py:1161) Exception encountered in asynchronous workflow:
+Traceback (most recent call last):
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_core.py", line 1145, in _execute_workflow_async
+    return await result()
+           ^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 359, in __call__
+    return await self._func()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 257, in _wrap
+    return cast(R, await result.resolve_async())
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 63, in resolve_async
+    return await self._async_resolve()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 2230, in await_workflow_result_async
+    result = await asyncio.to_thread(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 2202, in check_workflow_result
+    raise DBOSAwaitedWorkflowCancelledError(workflow_id)
+dbos._error.DBOSAwaitedWorkflowCancelledError: DBOS Error 13: Awaited workflow run-d7c6560f-4b87-4d0b-b937-19ef28de95b8-item-1 was cancelled
+11:21:01 [   ERROR] (dbos:_core.py:1161) Exception encountered in asynchronous workflow:
+Traceback (most recent call last):
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_core.py", line 1145, in _execute_workflow_async
+    return await result()
+           ^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 359, in __call__
+    return await self._func()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 257, in _wrap
+    return cast(R, await result.resolve_async())
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 63, in resolve_async
+    return await self._async_resolve()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 2230, in await_workflow_result_async
+    result = await asyncio.to_thread(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 2202, in check_workflow_result
+    raise DBOSAwaitedWorkflowCancelledError(workflow_id)
+dbos._error.DBOSAwaitedWorkflowCancelledError: DBOS Error 13: Awaited workflow run-d7c6560f-4b87-4d0b-b937-19ef28de95b8-item-3 was cancelled
+11:21:01 [   ERROR] (dbos:_core.py:1161) Exception encountered in asynchronous workflow:
+Traceback (most recent call last):
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_core.py", line 1145, in _execute_workflow_async
+    return await result()
+           ^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 359, in __call__
+    return await self._func()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 257, in _wrap
+    return cast(R, await result.resolve_async())
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 63, in resolve_async
+    return await self._async_resolve()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 2230, in await_workflow_result_async
+    result = await asyncio.to_thread(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 2202, in check_workflow_result
+    raise DBOSAwaitedWorkflowCancelledError(workflow_id)
+dbos._error.DBOSAwaitedWorkflowCancelledError: DBOS Error 13: Awaited workflow run-d7c6560f-4b87-4d0b-b937-19ef28de95b8-item-2 was cancelled
+11:21:01 [ WARNING] (dbos:_core.py:791) Workflow run-d7c6560f-4b87-4d0b-b937-19ef28de95b8 outcome was not recorded: the workflow is no longer owned by this execution. Waiting for the recorded outcome
+11:21:01 [   ERROR] (dbos:_core.py:1161) Exception encountered in asynchronous workflow:
+Traceback (most recent call last):
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_core.py", line 1145, in _execute_workflow_async
+    return await result()
+           ^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 359, in __call__
+    return await self._func()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 257, in _wrap
+    return cast(R, await result.resolve_async())
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_outcome.py", line 63, in resolve_async
+    return await self._async_resolve()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 2230, in await_workflow_result_async
+    result = await asyncio.to_thread(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 2202, in check_workflow_result
+    raise DBOSAwaitedWorkflowCancelledError(workflow_id)
+dbos._error.DBOSAwaitedWorkflowCancelledError: DBOS Error 13: Awaited workflow run-d7c6560f-4b87-4d0b-b937-19ef28de95b8 was cancelled

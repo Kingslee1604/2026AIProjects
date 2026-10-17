@@ -2,5 +2,6 @@ AgentForge AI
 Copyright 2026 The AgentForge AI Authors
 
 This product is licensed under the Apache License, Version 2.0 (see LICENSE).
-Third-party components and their licenses are listed in THIRD_PARTY_LICENSES.md
-once dependencies are added (Release 1 task R1-02).
+Third-party components and their licenses are listed in THIRD_PARTY_LICENSES.md,
+generated from the lockfiles for each release. The license policy and its verification
+record are in licenses/policy.toml and docs/licenses/.

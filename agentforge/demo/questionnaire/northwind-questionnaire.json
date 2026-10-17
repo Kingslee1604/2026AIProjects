@@ -1,0 +1,247 @@
+{
+  "title": "Vendor Security Questionnaire (fictional, for the AgentForge demo)",
+  "license": "CC-BY-4.0",
+  "note": "Written for AgentForge; not copied from any proprietary questionnaire. demo=true marks the 12-question live-demo subset.",
+  "questions": [
+    {
+      "id": "Q01",
+      "section": "Governance",
+      "demo": true,
+      "question": "Who owns your information security program, and who do they report to?"
+    },
+    {
+      "id": "Q02",
+      "section": "Governance",
+      "demo": false,
+      "question": "How often are your security policies reviewed, and who approves them?"
+    },
+    {
+      "id": "Q03",
+      "section": "Governance",
+      "demo": false,
+      "question": "Do you perform a formal information security risk assessment? How often?"
+    },
+    {
+      "id": "Q04",
+      "section": "Compliance",
+      "demo": true,
+      "question": "Do you have a SOC 2 report? Which type, and which trust services criteria does it cover?"
+    },
+    {
+      "id": "Q05",
+      "section": "Compliance",
+      "demo": false,
+      "question": "Are you certified to ISO/IEC 27001?"
+    },
+    {
+      "id": "Q06",
+      "section": "Hosting",
+      "demo": false,
+      "question": "Where is the platform hosted, and in which regions?"
+    },
+    {
+      "id": "Q07",
+      "section": "Hosting",
+      "demo": false,
+      "question": "Can customer data be stored in the European Union?"
+    },
+    {
+      "id": "Q08",
+      "section": "Access Control",
+      "demo": true,
+      "question": "Is multi-factor authentication required for all workforce accounts?"
+    },
+    {
+      "id": "Q09",
+      "section": "Access Control",
+      "demo": false,
+      "question": "What type of multi-factor authentication do production administrators use?"
+    },
+    {
+      "id": "Q10",
+      "section": "Vulnerability Management",
+      "demo": false,
+      "question": "Do you run a public bug bounty program, and what is the maximum payout?"
+    },
+    {
+      "id": "Q11",
+      "section": "Access Control",
+      "demo": false,
+      "question": "How is privileged production access granted, and how long does it last?"
+    },
+    {
+      "id": "Q12",
+      "section": "Access Control",
+      "demo": true,
+      "question": "How often do you review user access to production systems and customer data?"
+    },
+    {
+      "id": "Q13",
+      "section": "Access Control",
+      "demo": true,
+      "question": "How quickly is access removed when an employee or contractor leaves?"
+    },
+    {
+      "id": "Q14",
+      "section": "Encryption",
+      "demo": true,
+      "question": "Is customer data encrypted at rest? Which algorithm do you use?"
+    },
+    {
+      "id": "Q15",
+      "section": "Encryption",
+      "demo": false,
+      "question": "Which TLS versions do you support for data in transit?"
+    },
+    {
+      "id": "Q16",
+      "section": "Encryption",
+      "demo": false,
+      "question": "How are encryption keys generated and stored?"
+    },
+    {
+      "id": "Q17",
+      "section": "Encryption",
+      "demo": false,
+      "question": "How often are the keys that protect customer data rotated?"
+    },
+    {
+      "id": "Q18",
+      "section": "Compliance",
+      "demo": false,
+      "question": "Will you sign a HIPAA Business Associate Agreement (BAA)?"
+    },
+    {
+      "id": "Q19",
+      "section": "Governance",
+      "demo": false,
+      "question": "How many full-time employees work on your security team?"
+    },
+    {
+      "id": "Q20",
+      "section": "Logging",
+      "demo": true,
+      "question": "How long do you retain access logs for production systems?"
+    },
+    {
+      "id": "Q21",
+      "section": "Logging",
+      "demo": false,
+      "question": "How are logs protected against tampering?"
+    },
+    {
+      "id": "Q22",
+      "section": "Logging",
+      "demo": false,
+      "question": "Are security alerts monitored around the clock?"
+    },
+    {
+      "id": "Q23",
+      "section": "Incident Response",
+      "demo": false,
+      "question": "How quickly are security incidents triaged?"
+    },
+    {
+      "id": "Q24",
+      "section": "Incident Response",
+      "demo": true,
+      "question": "How quickly will you notify us of a breach involving our personal data?"
+    },
+    {
+      "id": "Q25",
+      "section": "Incident Response",
+      "demo": false,
+      "question": "Do you test your incident response plan? How often?"
+    },
+    {
+      "id": "Q26",
+      "section": "Business Continuity",
+      "demo": true,
+      "question": "What are your recovery point objective (RPO) and recovery time objective (RTO)?"
+    },
+    {
+      "id": "Q27",
+      "section": "Business Continuity",
+      "demo": false,
+      "question": "How long are database backups retained, and where are they stored?"
+    },
+    {
+      "id": "Q28",
+      "section": "Business Continuity",
+      "demo": false,
+      "question": "How often do you test backup restores and disaster recovery failover?"
+    },
+    {
+      "id": "Q29",
+      "section": "Vendor Management",
+      "demo": false,
+      "question": "How do you review the security of your critical vendors?"
+    },
+    {
+      "id": "Q30",
+      "section": "Vendor Management",
+      "demo": false,
+      "question": "Will you notify us before adding a new subprocessor? How much notice do you give?"
+    },
+    {
+      "id": "Q31",
+      "section": "Secure Development",
+      "demo": false,
+      "question": "Is code reviewed before it reaches production?"
+    },
+    {
+      "id": "Q32",
+      "section": "Secure Development",
+      "demo": true,
+      "question": "What are your remediation timelines for critical and high vulnerabilities?"
+    },
+    {
+      "id": "Q33",
+      "section": "Secure Development",
+      "demo": false,
+      "question": "Do you perform independent penetration tests? How often?"
+    },
+    {
+      "id": "Q34",
+      "section": "Privacy",
+      "demo": false,
+      "question": "What happens to our data after our contract ends?"
+    },
+    {
+      "id": "Q35",
+      "section": "Privacy",
+      "demo": false,
+      "question": "Do you sign a data processing agreement, and how are transfers out of the EEA covered?"
+    },
+    {
+      "id": "Q36",
+      "section": "Personnel Security",
+      "demo": false,
+      "question": "Do you perform background checks on new employees?"
+    },
+    {
+      "id": "Q37",
+      "section": "Personnel Security",
+      "demo": false,
+      "question": "How often do employees complete security awareness training?"
+    },
+    {
+      "id": "Q38",
+      "section": "Compliance",
+      "demo": true,
+      "question": "Do you hold a FedRAMP authorization? At which impact level?"
+    },
+    {
+      "id": "Q39",
+      "section": "Compliance",
+      "demo": false,
+      "question": "Are you PCI DSS compliant, and at which merchant or service provider level?"
+    },
+    {
+      "id": "Q40",
+      "section": "Insurance",
+      "demo": true,
+      "question": "What is the coverage limit of your cyber liability insurance policy?"
+    }
+  ]
+}
