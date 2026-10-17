@@ -8,6 +8,7 @@ const PURPOSE: Record<string, string> = {
   plan: "Plan the questions",
   draft: "Draft the answer",
   verify: "Verify a sentence",
+  relevance: "Check it answers the question",
 };
 
 /** Every model call with its outcome, and the exact prompt and reply behind it. */

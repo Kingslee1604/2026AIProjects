@@ -88,12 +88,12 @@ def test_ask_is_answered_with_verified_citations(
     cited = next(e for e in body["evidence"] if e["id"] == "E1")
     assert cited["filename"] == "policy.md"
     assert cited["section_path"][-1] == "Logging"
-    assert set(body["agent_versions"]) == {"drafter"}
+    assert set(body["agent_versions"]) == {"drafter", "relevance"}
     assert body["completed_at"] is not None
-    assert body["timings"]["budget"]["llm_calls"] == 1
+    assert body["timings"]["budget"]["llm_calls"] == 2  # draft, then the relevance check
     assert next(a["id"] for a in client.get("/v1/answers").json()) == answer_id
 
-    # Every model call made for this answer (query embedding + draft) is linked to it.
+    # Every model call made for this answer (query embedding, draft, relevance) is linked to it.
     owner = create_sync_engine(database.url("agentforge_owner"))
     with owner.connect() as connection:
         purposes = (
@@ -112,7 +112,7 @@ def test_ask_is_answered_with_verified_citations(
             .all()
         )
     owner.dispose()
-    assert purposes == ["retrieve", "draft"]
+    assert purposes == ["retrieve", "draft", "relevance"]
     assert jobs == ["done"]
 
 
@@ -238,7 +238,7 @@ def test_answer_calls_show_what_the_model_was_sent(asker: tuple[TestClient, str,
     answer_id = ask(client, csrf, kb, "How long are access logs retained?")
     answer_queue(client)
     calls = client.get(f"/v1/answers/{answer_id}/calls").json()
-    assert [c["purpose"] for c in calls] == ["retrieve", "draft"]
+    assert [c["purpose"] for c in calls] == ["retrieve", "draft", "relevance"]
     draft = calls[1]
     assert draft["status"] == "ok"
     assert draft["model"].startswith("fake:")

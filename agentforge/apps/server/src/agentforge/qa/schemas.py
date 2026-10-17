@@ -28,3 +28,13 @@ Verdict = Literal["supported", "partially_supported", "not_supported"]
 class VerifierOutput(BaseModel):
     verdict: Verdict
     reason: str = Field(max_length=400)
+
+
+Relevance = Literal["answers", "partially_answers", "does_not_answer"]
+
+
+class RelevanceOutput(BaseModel):
+    """Does the (already verified) answer respond to what the question asks?"""
+
+    relevance: Relevance
+    reason: str = Field(max_length=400)

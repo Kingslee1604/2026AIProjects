@@ -9,6 +9,8 @@ from pathlib import Path
 from sqlalchemy import text
 
 from agentforge.db.engine import create_sync_engine
+from agentforge.db.migrate import DEFAULT_ORG_ID
+from agentforge.evaluation.runner import TEMPORARY
 from agentforge.evaluation_cli import add_arguments, run
 from tools.demo_corpus import BUILD, ROOT, build
 
@@ -37,9 +39,26 @@ def _leftovers(database: Database) -> int:
         engine.dispose()
 
 
+def _leave_a_killed_runs_knowledge_base(database: Database) -> None:
+    engine = create_sync_engine(database.url("agentforge_owner"))
+    try:
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    "INSERT INTO app.knowledge_bases (org_id, workspace_id, name, description) "
+                    "SELECT org_id, id, 'eval-northwind-killed', :d FROM app.workspaces "
+                    "WHERE org_id = :o ORDER BY created_at LIMIT 1"
+                ),
+                {"d": TEMPORARY, "o": DEFAULT_ORG_ID},
+            )
+    finally:
+        engine.dispose()
+
+
 def test_an_evaluation_writes_a_complete_report(database: Database, tmp_path: Path) -> None:
     if not (BUILD / "corpus").is_dir():
         build()
+    _leave_a_killed_runs_knowledge_base(database)  # removed before the evaluation starts
     settings = settings_for(database, model_provider="fake", blob_root=tmp_path / "blobs")
     out = tmp_path / "report"
     code = run(
@@ -78,5 +97,6 @@ def test_an_evaluation_writes_a_complete_report(database: Database, tmp_path: Pa
     for heading in ("## Retrieval", "## Abstention gate", f"## Answers: `{model}`"):
         assert heading in markdown
 
-    # Nothing is left behind: the temporary knowledge base was deleted.
+    # Nothing is left behind: the temporary knowledge base was deleted, and so was the one a
+    # killed evaluation had left.
     assert _leftovers(database) == 0

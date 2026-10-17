@@ -48,6 +48,8 @@ class Settings(BaseSettings):
     qa_top_k: int = Field(default=6, ge=1, le=20)
     qa_max_distance: float = Field(default=0.5, gt=0, le=2)
     qa_verifier_mode: Literal["all", "low_confidence_only", "off"] = "low_confidence_only"
+    # One extra model call per answered question: does the answer respond to the question?
+    qa_relevance_check: bool = True
     qa_max_llm_calls: int = Field(default=12, ge=2, le=100)
 
     # Knowledge: where uploaded files are stored, and request size limits (baseline S5).

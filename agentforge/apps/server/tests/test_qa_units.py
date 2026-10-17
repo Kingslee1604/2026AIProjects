@@ -225,6 +225,8 @@ def run(
     **config: Any,
 ) -> tuple[GroundedAnswer, FakeProvider]:
     provider = FakeProvider(script=script, responder=responder)
+    # Off unless a test turns it on: the scripts below are drafter and verifier replies only.
+    config.setdefault("relevance_check", False)
     answerer = GroundedAnswerer(
         ModelGateway({"fake": provider}),
         StubRetriever(hits),  # type: ignore[arg-type]
@@ -456,3 +458,94 @@ def test_garbled_numbers_and_truncation_are_not_proven() -> None:
         DraftClaim(text="Keys rotate every...", citations=["E1"], quote=long_quote), evidence
     )
     assert not cut.proven
+
+
+# --- Relevance and repeated sentences (R1-40 follow-up) -------------------------------------
+
+RETAINED = "Access logs are retained for ninety days."
+
+
+def relevance(value: str, reason: str = "because") -> str:
+    return json.dumps({"relevance": value, "reason": reason})
+
+
+def test_a_true_but_off_topic_answer_becomes_insufficient_evidence() -> None:
+    script: list[FakeOutcome] = [
+        draft((RETAINED, ["E1"], RETAINED)),
+        relevance("does_not_answer", "It is about logs, not the size of the security team."),
+    ]
+    result, provider = run([hit(LOGGING, 0.2)], script, relevance_check=True)
+    assert result.status == "insufficient_evidence"
+    assert result.answer == INSUFFICIENT
+    assert result.reason.startswith("the passages found do not answer this question")
+    assert "size of the security team" in result.reason
+    assert result.claims[0].status == "verified"  # kept in the trace: true, just off-topic
+    assert set(result.agent_versions) == {"drafter", "relevance"}
+    # The checker saw the question and the answer, the answer fenced as untrusted content.
+    checked = provider.calls[1][1][-1].content
+    assert "Question: How long are logs kept?" in checked
+    assert '<evidence id="A1"' in checked
+    assert RETAINED in checked
+
+
+def test_a_partial_answer_is_kept_with_low_confidence() -> None:
+    script: list[FakeOutcome] = [
+        draft((RETAINED, ["E1"], RETAINED)),
+        relevance("partially_answers", "It does not say where logs are stored."),
+    ]
+    result, _ = run([hit(LOGGING, 0.2)], script, relevance_check=True)
+    assert result.status == "answered"
+    assert result.confidence == "low"
+    assert "answers only part of the question" in result.reason
+
+
+def test_a_relevant_answer_costs_one_more_call_and_stays_high_confidence() -> None:
+    script: list[FakeOutcome] = [draft((RETAINED, ["E1"], RETAINED)), relevance("answers")]
+    result, provider = run([hit(LOGGING, 0.2)], script, relevance_check=True)
+    assert (result.status, result.confidence) == ("answered", "high")
+    assert len(provider.calls) == 2
+    assert "relevance_ms" in result.timings
+
+
+def test_without_budget_for_it_the_relevance_check_is_skipped_and_said_so() -> None:
+    script: list[FakeOutcome] = ["invalid_json", draft((RETAINED, ["E1"], RETAINED))]
+    result, provider = run([hit(LOGGING, 0.2)], script, relevance_check=True, max_llm_calls=3)
+    assert result.status == "answered"
+    assert len(provider.calls) == 2
+    assert "relevance not checked" in result.reason
+
+
+def test_a_repeated_sentence_is_left_out_without_lowering_confidence() -> None:
+    quote = "Customer data at rest is encrypted with AES-256."
+    script: list[FakeOutcome] = [
+        draft(
+            (quote, ["E1"], quote),
+            ("Data at rest is encrypted with AES-256.", ["E1"], quote),  # nothing new
+            (quote, ["E1"], quote),  # the same sentence again
+        )
+    ]
+    result, provider = run([hit(ENCRYPTION, 0.3)], script)
+    assert len(provider.calls) == 1  # all three are proven mechanically
+    assert result.answer == quote  # once
+    assert [(c.status, c.duplicate) for c in result.claims] == [
+        ("verified", False),
+        ("dropped", True),
+        ("dropped", True),
+    ]
+    assert result.confidence == "high"
+    assert result.reason == "1 of 1 claims verified"
+
+
+def test_two_claims_from_one_passage_for_different_parts_are_both_kept() -> None:
+    quote = "Customer data at rest is encrypted with AES-256."
+    script: list[FakeOutcome] = [
+        draft(
+            ("Data at rest is encrypted.", ["E1"], quote),  # part one: yes
+            ("It uses AES-256.", ["E1"], quote),  # part two: the algorithm
+        )
+    ]
+    result, _ = run([hit(ENCRYPTION, 0.3)], script)
+    assert [(c.text, c.kept) for c in result.claims] == [
+        ("Data at rest is encrypted.", True),
+        ("It uses AES-256.", True),
+    ]

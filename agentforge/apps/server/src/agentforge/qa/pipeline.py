@@ -26,7 +26,7 @@ from agentforge.qa.matching import (
     numbers_supported,
     quote_found,
 )
-from agentforge.qa.schemas import DraftAnswer, DraftClaim, VerifierOutput
+from agentforge.qa.schemas import DraftAnswer, DraftClaim, RelevanceOutput, VerifierOutput
 
 log = get_logger("agentforge.qa")
 
@@ -48,9 +48,12 @@ class QAConfig:
     fallback_models: Sequence[str] = ()
     top_k: int = 6
     # Abstain without calling the drafter when no passage is at least this close (cosine
-    # distance). Tuned on the Northwind eval set; see docs/evaluation/.
+    # distance). Measured on the Northwind eval set; see docs/evaluation/.
     max_distance: float = 0.5
     verifier_mode: VerifierMode = "low_confidence_only"
+    # One model call per answered question: does the verified answer respond to the question?
+    # Catches true-but-off-topic answers, which pass every check on the quotes.
+    relevance_check: bool = True
     max_llm_calls: int = 12
     max_tokens: int = 40_000
     max_seconds: float = 900.0
@@ -86,6 +89,7 @@ class Claim:
     verdict: str | None = None  # LLM verifier verdict, when it ran
     reason: str | None = None
     status: ClaimStatus = "dropped"
+    duplicate: bool = False  # left out because an earlier sentence says the same
 
     @property
     def kept(self) -> bool:
@@ -184,6 +188,29 @@ def mechanical_check(draft: DraftClaim, evidence: dict[str, Evidence]) -> Claim:
         quote_supports_claim=supports,
         drafted_text=drafted,
     )
+
+
+def _key(text: str) -> str:
+    return " ".join(text.lower().split())
+
+
+def drop_repeats(claims: Sequence[Claim]) -> None:
+    """Leave out a kept claim that says nothing new: the same sentence as an earlier one, or
+    the same quote as an earlier claim that already shows that whole quote. (A claim that
+    quotes the same passage for a different part of the question is kept.)"""
+    texts: set[str] = set()
+    shown_quotes: set[str] = set()
+    for claim in claims:
+        if not claim.kept:
+            continue
+        text, quote = _key(claim.text), _key(claim.quote)
+        if text in texts or quote in shown_quotes:
+            claim.status, claim.duplicate = "dropped", True
+            claim.reason = "repeats an earlier sentence"
+            continue
+        texts.add(text)
+        if text == quote:
+            shown_quotes.add(quote)
 
 
 class GroundedAnswerer:
@@ -336,6 +363,7 @@ class GroundedAnswerer:
         await self._verify(org_id, run_id, question, claims, by_id, budget, versions)
         timings["verify_ms"] = round((time.perf_counter() - t0) * 1000, 1)
 
+        drop_repeats(claims)
         kept = [c for c in claims if c.kept]
         if not kept:
             only_abstentions = all(is_non_answer(c.text) for c in claims)
@@ -353,7 +381,8 @@ class GroundedAnswerer:
                 )
             )
         statuses = {c.status for c in kept}
-        dropped = len(kept) < len(claims)
+        # A repeated sentence was left out, not refuted: it does not lower confidence.
+        dropped = any(not c.kept and not c.duplicate for c in claims)
         confidence: Confidence = (
             "low"
             if dropped or "partial" in statuses
@@ -362,17 +391,70 @@ class GroundedAnswerer:
             else "high"
         )
         # The answer is exactly the surviving claims: no unverified prose reaches the customer.
-        return finish(
-            GroundedAnswer(
-                "answered",
-                " ".join(c.text for c in kept),
-                confidence,
-                claims,
-                evidence,
-                versions,
-                f"{len(kept)} of {len(claims)} claims verified",
+        answer = " ".join(c.text for c in kept)
+        drafted = sum(1 for c in claims if not c.duplicate)
+        reason = f"{len(kept)} of {drafted} claims verified"
+
+        if config.relevance_check:
+            t0 = time.perf_counter()
+            relevance = await self._check_relevance(
+                org_id, run_id, question, answer, budget, versions
             )
+            timings["relevance_ms"] = round((time.perf_counter() - t0) * 1000, 1)
+            if relevance is None:
+                reason += "; relevance not checked (model-call budget spent)"
+            elif relevance.relevance == "does_not_answer":
+                # True sentences about something else: say so, rather than answer off-topic.
+                return finish(
+                    GroundedAnswer(
+                        "insufficient_evidence",
+                        INSUFFICIENT,
+                        None,
+                        claims,
+                        evidence,
+                        versions,
+                        f"the passages found do not answer this question: {relevance.reason}",
+                    )
+                )
+            elif relevance.relevance == "partially_answers":
+                confidence = "low"
+                reason += f"; answers only part of the question: {relevance.reason}"
+
+        return finish(
+            GroundedAnswer("answered", answer, confidence, claims, evidence, versions, reason)
         )
+
+    async def _check_relevance(
+        self,
+        org_id: UUID,
+        run_id: UUID | None,
+        question: str,
+        answer: str,
+        budget: Budget,
+        versions: dict[str, str],
+    ) -> RelevanceOutput | None:
+        """Does the verified answer respond to the question? None when the budget is spent."""
+        if budget.remaining_llm_calls() < 2:
+            return None
+        checker = await self._registry.version(org_id, "relevance")
+        versions["relevance"] = str(checker.id)
+        model, fallbacks = self._models(checker.definition)
+        budget.step()
+        output, result = await self._gateway.generate_structured(
+            CallContext(org_id, "relevance", run_id, _STEP.get()),
+            build_messages(
+                checker.definition.system_prompt,
+                f"Question: {question}",
+                [EvidencePassage("A1", "answer", "", "", answer)],
+            ),
+            RelevanceOutput,
+            model=model,
+            fallbacks=fallbacks,
+            temperature=checker.definition.temperature,
+            max_tokens=checker.definition.max_tokens,
+        )
+        budget.charge(result)
+        return output
 
     async def _verify(
         self,

@@ -67,12 +67,22 @@ def select(dataset: Dataset, which: str) -> list[EvalQuestion]:
     return [q for q in dataset.questions if which == "all" or q.demo]
 
 
+TEMPORARY = "Temporary knowledge base for `agentforge eval run`; deleted when it finishes."
+
+
+async def _remove_leftovers(deps: EvalDeps, org_id: UUID, progress: Progress) -> None:
+    """An evaluation that was killed never reached its clean-up: delete what it left (one
+    evaluation runs at a time)."""
+    for kb in await deps.knowledge.list_kbs(org_id):
+        if kb.name.startswith("eval-") and kb.description == TEMPORARY:
+            await deps.knowledge.delete_kb(org_id, kb.id, Actor(None, "agentforge eval"))
+            progress(f"removed {kb.name}, left by an interrupted evaluation")
+
+
 async def _load_corpus(deps: EvalDeps, dataset: Dataset, org_id: UUID, progress: Progress) -> UUID:
+    await _remove_leftovers(deps, org_id, progress)
     kb_id = await deps.knowledge.create_kb(
-        org_id,
-        None,
-        f"eval-{dataset.name}-{uuid4().hex[:8]}",
-        "Temporary knowledge base for `agentforge eval run`; deleted when it finishes.",
+        org_id, None, f"eval-{dataset.name}-{uuid4().hex[:8]}", TEMPORARY
     )
     for path in dataset.corpus:
         await deps.knowledge.add_document(org_id, kb_id, None, path, path.name, path.stat().st_size)
@@ -267,7 +277,9 @@ async def _answers(
             )
             progress(f"{model} {n}/{len(questions)} {q.id}: failed")
             continue
-        claims = _claim_summary(result, dataset)
+        # Only an answer shows its sentences; an abstention shows none, whatever was drafted.
+        answered = result.status == "answered"
+        claims = _claim_summary(result, dataset) if answered else []
         rows.append(
             {
                 "id": q.id,
@@ -279,7 +291,7 @@ async def _answers(
                 "expected": q.expected,
                 "reason": result.reason,
                 "claims": claims,
-                "cites_gold": _cites_gold(result, q) if q.answerable else None,
+                "cites_gold": (answered and _cites_gold(result, q)) if q.answerable else None,
                 "cites_adversarial": any(c["adversarial"] for c in claims),
                 "seconds": round(time.perf_counter() - started, 1),
             }
@@ -297,7 +309,7 @@ def _answer_summary(rows: list[dict[str, Any]], calls: list[CallRecord]) -> dict
     not_proven = sum(1 for r in done if r["answerable"] for c in r["claims"] if not c["proven"])
     answered_answerable = [r for r in done if r["answerable"] and r["status"] == "answered"]
     targets = [r for r in done if r.get("injection_target")]
-    structured = [c for c in calls if c.context.purpose in {"draft", "verify"}]
+    structured = [c for c in calls if c.context.purpose in {"draft", "verify", "relevance"}]
     invalid = sum(1 for c in structured if c.status == "invalid_output")
     seconds = [r["seconds"] for r in done]
     return {

@@ -63,6 +63,7 @@ def qa_config(settings: Settings) -> QAConfig:
         top_k=settings.qa_top_k,
         max_distance=max_distance,
         verifier_mode=settings.qa_verifier_mode,
+        relevance_check=settings.qa_relevance_check,
         max_llm_calls=settings.qa_max_llm_calls,
     )
 

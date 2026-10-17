@@ -117,3 +117,27 @@ four are the open problems:
    believed. Every document in a knowledge base is treated as equally authoritative.
 3. Minor: some answers repeat a sentence (Q14, Q32), when two claims quote the same passage.
 
+## Relevance check (2026-10-16)
+
+Problems 1 and 3 are fixed: after verification, one model call asks whether the answer responds
+to the question (`relevance` agent: answers / partially / does not answer; "does not answer"
+becomes insufficient evidence, "partially" lowers confidence), and a claim that repeats an
+earlier sentence is left out without lowering confidence. Setting: `AGENTFORGE_QA_RELEVANCE_CHECK`
+(on by default). Measured in [`2026-10-16-relevance`](2026-10-16-relevance/report.md), all 40
+questions with `qwen3:4b`:
+
+| | Baseline | With the relevance check |
+| --- | --- | --- |
+| Answerable refused (of 34) | 0 | **0** |
+| Unanswerable answered (of 6) | 4 | **2** (Q38, Q39: the adversarial FAQ) |
+| Unsupported-claim rate | 14.8% | **8.5%** |
+| Repeated sentences (Q14, Q32) | yes | no |
+| Model calls for 40 questions | 41 | 83 |
+| Seconds per question p50 / p95 | 43.9 / 73.7 | 72.1 / 108.8 |
+
+The time is not a like-for-like comparison: during the second run the laptop was on battery
+(Windows throttles the CPU) with 0.2 GB of 16 GB memory free. The relevance call itself is one
+short call per answered question; R1-49 measures time on mains power. Problem 2 (statements of
+an adversarial document believed) remains open: "Northwind holds FedRAMP High authorization"
+does answer the FedRAMP question; it is false, not off-topic.
+

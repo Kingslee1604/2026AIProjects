@@ -1,6 +1,6 @@
 """Grounded behaviour for the fake model provider (MODEL_PROVIDER=fake: CI, UI work, demos
-without a model). The drafter quotes the first sentence of the top passage; the verifier
-agrees. Deterministic, so browser tests can assert on what the UI shows."""
+without a model). The drafter quotes the first sentence of the top passage; the verifier and
+the relevance check agree. Deterministic, so browser tests can assert on what the UI shows."""
 
 import json
 import re
@@ -34,7 +34,7 @@ def with_grounded_answers(fallback: Responder) -> Responder:
 
     def responder(model: str, messages: Sequence[Message], schema: dict[str, Any] | None) -> str:
         properties = _properties(schema)
-        if "verdict" in properties or "claims" in properties:
+        if "verdict" in properties or "claims" in properties or "relevance" in properties:
             return grounded_responder(model, messages, schema)
         if "items" in properties and "PlannedItem" in (schema or {}).get("$defs", {}):
             return passthrough_planner(messages)
@@ -61,7 +61,10 @@ def passthrough_planner(messages: Sequence[Message]) -> str:
 def grounded_responder(
     model: str, messages: Sequence[Message], schema: dict[str, Any] | None
 ) -> str:
-    """Drafter: one claim quoting the first sentence of E1. Verifier: always "supported"."""
+    """Drafter: one claim quoting the first sentence of E1. Verifier: always "supported".
+    Relevance check: always "answers"."""
+    if "relevance" in _properties(schema):
+        return json.dumps({"relevance": "answers", "reason": "It answers the question."})
     if "verdict" in _properties(schema):
         return json.dumps({"verdict": "supported", "reason": "The passage states it."})
     blocks = evidence_blocks(messages)
