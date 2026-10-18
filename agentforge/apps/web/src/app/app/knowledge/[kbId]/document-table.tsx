@@ -2,7 +2,7 @@
 
 import type { UseQueryResult } from "@tanstack/react-query";
 
-import { DocumentStatus } from "@/components/ui/badge";
+import { Badge, DocumentStatus } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 import { formatAge, formatBytes } from "@/lib/format";
@@ -74,9 +74,26 @@ export function DocumentTable({
               <td className="py-2 pr-3">
                 <span className="font-medium">{d.filename}</span>
                 {d.error && <p className="mt-1 text-xs text-danger">{d.error}</p>}
+                {(d.risk_flags ?? []).length > 0 && (
+                  <details className="mt-1 text-xs" data-testid="risk-flags">
+                    <summary className="cursor-pointer text-danger">
+                      Looks like it tries to steer an AI: answers that cite it are marked for review
+                    </summary>
+                    <ul className="mt-1 space-y-1 text-muted">
+                      {d.risk_flags?.map((f) => (
+                        <li key={f.kind}>
+                          <span className="font-medium">It {f.reason}:</span> “{f.excerpt}”
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
               </td>
               <td className="py-2 pr-3">
-                <DocumentStatus status={d.status} />
+                <span className="flex flex-wrap gap-1">
+                  <DocumentStatus status={d.status} />
+                  {(d.risk_flags ?? []).length > 0 && <Badge tone="danger">Suspicious</Badge>}
+                </span>
               </td>
               <td className="py-2 pr-3 whitespace-nowrap text-muted">
                 {formatBytes(d.size_bytes)}

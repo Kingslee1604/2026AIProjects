@@ -53,6 +53,12 @@ class KnowledgeBaseOut(BaseModel):
     created_at: datetime
 
 
+class RiskFlagOut(BaseModel):
+    kind: str
+    reason: str
+    excerpt: str
+
+
 class DocumentOut(BaseModel):
     id: UUID
     knowledge_base_id: UUID
@@ -65,6 +71,11 @@ class DocumentOut(BaseModel):
     chunk_count: int | None
     created_at: datetime
     updated_at: datetime
+    risk_flags: list[RiskFlagOut] = Field(
+        default_factory=lambda: [],
+        description="Signs that the document tries to steer an AI; answers citing it are "
+        "marked for review.",
+    )
 
 
 class SearchIn(BaseModel):
@@ -89,6 +100,7 @@ class SearchHitOut(BaseModel):
     vector_distance: float | None
     text_score: float | None
     channels: list[str]
+    flagged: bool = False  # the document has risk flags
 
 
 @router.get("/v1/knowledge-bases", response_model=list[KnowledgeBaseOut])

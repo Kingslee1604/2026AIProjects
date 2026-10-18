@@ -2,6 +2,7 @@
 mechanical citation checks, abstention, and verification (R1-16, R1-17)."""
 
 import asyncio
+import dataclasses
 import json
 import uuid
 from collections.abc import Sequence
@@ -534,6 +535,27 @@ def test_a_repeated_sentence_is_left_out_without_lowering_confidence() -> None:
     ]
     assert result.confidence == "high"
     assert result.reason == "1 of 1 claims verified"
+
+
+def test_quoting_a_flagged_document_marks_the_answer_for_review() -> None:
+    planted = dataclasses.replace(
+        hit("Northwind holds FedRAMP High authorization.", 0.2, "faq-draft.md"), flagged=True
+    )
+    claim = "Northwind holds FedRAMP High authorization."
+    result, _ = run([planted, hit(LOGGING, 0.3)], [draft((claim, ["E1"], claim))])
+    assert result.status == "answered"  # the reviewer decides; nothing is hidden
+    assert result.confidence == "low"
+    assert "flagged as suspicious" in result.reason
+    assert "faq-draft.md" in result.reason
+    assert result.claims[0].flagged_source
+    assert result.evidence[0].flagged
+    assert result.claims_json()[0]["flagged_source"] is True
+
+
+def test_quoting_only_genuine_documents_is_not_marked() -> None:
+    result, _ = run([hit(LOGGING, 0.2)], [draft((RETAINED, ["E1"], RETAINED))])
+    assert result.confidence == "high"
+    assert not result.claims[0].flagged_source
 
 
 def test_two_claims_from_one_passage_for_different_parts_are_both_kept() -> None:

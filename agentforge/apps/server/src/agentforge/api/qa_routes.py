@@ -42,6 +42,8 @@ class ClaimOut(BaseModel):
     reason: str | None = None
     status: Literal["verified", "rescued", "partial", "dropped"]
     kept: bool
+    duplicate: bool = False  # left out: an earlier sentence says the same
+    flagged_source: bool = False  # cites a document flagged as suspicious: check it
 
     @model_validator(mode="before")
     @classmethod
@@ -68,6 +70,7 @@ class EvidenceOut(BaseModel):
     score: float
     vector_distance: float | None
     deleted: bool = False  # the source document was deleted; content removed
+    flagged: bool = False  # the document contains instructions aimed at AI assistants
 
 
 class AnswerOut(BaseModel):

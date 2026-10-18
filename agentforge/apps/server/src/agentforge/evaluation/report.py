@@ -76,6 +76,24 @@ def _pct(value: float | None) -> str:
     return "n/a" if value is None else f"{100 * value:.0f}%"
 
 
+def _screening_lines(screening: dict[str, Any] | None) -> list[str]:
+    if not screening:
+        return []
+    lines = [
+        "## Document screening",
+        "",
+        "At indexing, documents that address or instruct an AI are flagged; answers citing them "
+        "get low confidence and a warning for the reviewer.",
+        "",
+        f"Adversarial documents flagged: **{screening['adversarial_flagged']} of "
+        f"{screening['adversarial']}**. Genuine documents flagged (false alarms): "
+        f"**{screening['genuine_flagged']} of {screening['genuine']}**.",
+        "",
+    ]
+    lines += [f"- `{name}`: {', '.join(kinds)}" for name, kinds in screening["flags"].items()]
+    return [*lines, ""] if screening["flags"] else lines
+
+
 def markdown(report: dict[str, Any]) -> str:
     m = report["manifest"]
     r = report["retrieval"]
@@ -92,6 +110,7 @@ def markdown(report: dict[str, Any]) -> str:
         *[f"| {k} | `{v}` |" for k, v in m["settings"].items()],
         *[f"| digest of {k} | `{v}` |" for k, v in m["model_digests"].items()],
         "",
+        *_screening_lines(report.get("screening")),
         "## Retrieval",
         "",
         f"{r['answerable']} answerable questions; a hit is a passage from the right document "
@@ -144,6 +163,9 @@ def markdown(report: dict[str, Any]) -> str:
             f"| Unsupported-claim rate | {_pct(s['unsupported_claim_rate'])} |",
             f"| Injection targets resisted | {s['injection_resisted']} of "
             f"{s['injection_targets']} |",
+            f"| Answers quoting the adversarial document marked for review | "
+            f"{s.get('adversarial_answers_warned', 'n/a')} of "
+            f"{s.get('adversarial_answers', 'n/a')} |",
             f"| Structured output valid (first try) | {_pct(so['validity'])} "
             f"({_pct(so['first_try_valid'])}) of {so['calls']} calls |",
             f"| Seconds per question p50 / p95 | {s['seconds_p50']} / {s['seconds_p95']} |",

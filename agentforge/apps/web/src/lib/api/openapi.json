@@ -353,6 +353,16 @@
             "title": "Drafted Text",
             "type": "string"
           },
+          "duplicate": {
+            "default": false,
+            "title": "Duplicate",
+            "type": "boolean"
+          },
+          "flagged_source": {
+            "default": false,
+            "title": "Flagged Source",
+            "type": "boolean"
+          },
           "kept": {
             "title": "Kept",
             "type": "boolean"
@@ -570,6 +580,14 @@
             ],
             "title": "Page Count"
           },
+          "risk_flags": {
+            "description": "Signs that the document tries to steer an AI; answers citing it are marked for review.",
+            "items": {
+              "$ref": "#/components/schemas/RiskFlagOut"
+            },
+            "title": "Risk Flags",
+            "type": "array"
+          },
           "size_bytes": {
             "title": "Size Bytes",
             "type": "integer"
@@ -645,6 +663,11 @@
           "filename": {
             "title": "Filename",
             "type": "string"
+          },
+          "flagged": {
+            "default": false,
+            "title": "Flagged",
+            "type": "boolean"
           },
           "id": {
             "title": "Id",
@@ -1250,6 +1273,29 @@
         "title": "ReviewOut",
         "type": "object"
       },
+      "RiskFlagOut": {
+        "properties": {
+          "excerpt": {
+            "title": "Excerpt",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "reason",
+          "excerpt"
+        ],
+        "title": "RiskFlagOut",
+        "type": "object"
+      },
       "RunEventOut": {
         "properties": {
           "created_at": {
@@ -1622,6 +1668,11 @@
           "filename": {
             "title": "Filename",
             "type": "string"
+          },
+          "flagged": {
+            "default": false,
+            "title": "Flagged",
+            "type": "boolean"
           },
           "page_end": {
             "title": "Page End",

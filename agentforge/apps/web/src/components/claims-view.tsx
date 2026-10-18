@@ -10,11 +10,16 @@ import { cn } from "@/lib/utils";
 
 const BORDER = { ok: "border-l-ok", warn: "border-l-warn", danger: "border-l-danger" } as const;
 
+const FLAGGED_HELP =
+  "The cited document contains instructions aimed at AI assistants, so it may have been " +
+  "planted. The quote is real, but check that the document is genuine before using this.";
+
 /** An answer as its checked sentences, colored by how well they are supported; choosing one
  * shows the cited passage with the quote highlighted. Used by Ask and by review. */
 export function ClaimsView({ claims, evidence }: { claims: Claim[]; evidence: Evidence[] }) {
   const kept = claims.filter((c) => c.kept);
-  const removed = claims.filter((c) => !c.kept);
+  // A repeated sentence was left out, not refuted: it is not listed as removed.
+  const removed = claims.filter((c) => !c.kept && !c.duplicate);
   const [selected, setSelected] = useState(0);
   const sourceRef = useRef<HTMLDivElement>(null);
   const byId = new Map(evidence.map((e) => [e.id, e]));
@@ -41,7 +46,7 @@ export function ClaimsView({ claims, evidence }: { claims: Claim[]; evidence: Ev
                   }}
                   className={cn(
                     "w-full rounded-md border border-border border-l-4 p-3 text-left text-sm hover:bg-bg",
-                    BORDER[status.tone],
+                    c.flagged_source ? BORDER.danger : BORDER[status.tone],
                     index === selected && "bg-bg ring-1 ring-accent",
                   )}
                 >
@@ -53,6 +58,11 @@ export function ClaimsView({ claims, evidence }: { claims: Claim[]; evidence: Ev
                     <Badge tone={status.tone} title={status.help}>
                       {status.label}
                     </Badge>
+                    {c.flagged_source && (
+                      <Badge tone="danger" data-testid="claim-warning" title={FLAGGED_HELP}>
+                        Check this source
+                      </Badge>
+                    )}
                     <span className="text-xs text-muted">
                       {c.citations.map((id) => byId.get(id)?.filename ?? id).join(", ")}
                     </span>
@@ -111,6 +121,11 @@ function SourcePassages({ claim, evidence }: { claim: Claim; evidence: Map<strin
               <span className="block text-xs text-muted">{e.section_path.join(" / ")}</span>
             )}
           </figcaption>
+          {e.flagged && (
+            <p className="text-sm text-danger" data-testid="source-warning">
+              {FLAGGED_HELP}
+            </p>
+          )}
           {e.deleted ? (
             <p className="text-sm text-muted italic">The source document was deleted.</p>
           ) : (

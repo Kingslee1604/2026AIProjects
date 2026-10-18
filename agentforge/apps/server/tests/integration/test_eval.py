@@ -68,6 +68,10 @@ def test_an_evaluation_writes_a_complete_report(database: Database, tmp_path: Pa
     assert code == 0
 
     report = json.loads((out / "report.json").read_text())
+    # Screening flags exactly the two adversarial documents, none of the ten policies.
+    screening = report["screening"]
+    assert (screening["adversarial_flagged"], screening["adversarial"]) == (2, 2)
+    assert (screening["genuine_flagged"], screening["genuine"]) == (0, 10)
     retrieval = report["retrieval"]
     assert retrieval["questions"] == 12
     assert retrieval["answerable"] == 10  # the demo subset has 2 unanswerable questions

@@ -73,6 +73,7 @@ class Evidence:
     content: str
     score: float
     vector_distance: float | None
+    flagged: bool = False  # from a document that tries to steer an AI (knowledge/screening)
 
 
 @dataclass(slots=True)
@@ -90,6 +91,7 @@ class Claim:
     reason: str | None = None
     status: ClaimStatus = "dropped"
     duplicate: bool = False  # left out because an earlier sentence says the same
+    flagged_source: bool = False  # cites a passage from a flagged document: check before use
 
     @property
     def kept(self) -> bool:
@@ -135,6 +137,7 @@ def _evidence(hits: Sequence[SearchHit]) -> list[Evidence]:
             content=h.content,
             score=h.score,
             vector_distance=h.vector_distance,
+            flagged=h.flagged,
         )
         for i, h in enumerate(hits, start=1)
     ]
@@ -394,6 +397,25 @@ class GroundedAnswerer:
         answer = " ".join(c.text for c in kept)
         drafted = sum(1 for c in claims if not c.duplicate)
         reason = f"{len(kept)} of {drafted} claims verified"
+
+        # Quoted from a document that tries to steer an AI: true to the document, but the
+        # document itself may be planted. A person checks it before it is used.
+        for claim in claims:
+            claim.flagged_source = any(by_id[c].flagged for c in claim.citations if c in by_id)
+        suspicious = sorted(
+            {
+                by_id[c].filename
+                for k in kept
+                for c in k.citations
+                if c in by_id and by_id[c].flagged
+            }
+        )
+        if suspicious:
+            confidence = "low"
+            reason += (
+                "; cites a document flagged as suspicious (it contains instructions aimed at "
+                f"AI assistants): {', '.join(suspicious)}"
+            )
 
         if config.relevance_check:
             t0 = time.perf_counter()

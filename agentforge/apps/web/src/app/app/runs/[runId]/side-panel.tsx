@@ -45,6 +45,7 @@ interface Claim {
   status: string;
   kept: boolean;
   citations?: string[];
+  flagged_source?: boolean;
 }
 
 /** Details of one question or step: what went in, what came out, the model calls with their
@@ -248,7 +249,7 @@ function ItemOutput({ item }: { item: RunItem }) {
                 <Badge tone={c.status === "verified" ? "ok" : c.kept ? "warn" : "danger"}>
                   {c.status}
                 </Badge>{" "}
-                {c.text}
+                {c.flagged_source && <Badge tone="danger">Check this source</Badge>} {c.text}
               </li>
             ))}
           </ul>

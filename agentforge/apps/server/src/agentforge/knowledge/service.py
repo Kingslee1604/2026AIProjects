@@ -21,6 +21,7 @@ from agentforge.knowledge.blobs import BlobStore
 from agentforge.knowledge.chunking import chunk, embedding_text, normalize
 from agentforge.knowledge.embeddings import EmbeddingTable, vector_literal
 from agentforge.knowledge.parsing import ParseError, parse_file
+from agentforge.knowledge.screening import screen
 from agentforge.knowledge.validation import validate_upload
 from agentforge.models import CallContext, ModelError, ModelGateway
 
@@ -63,11 +64,12 @@ class Document:
     chunk_count: int | None
     created_at: datetime
     updated_at: datetime
+    risk_flags: list[dict[str, str]]  # what screening found (see knowledge/screening.py)
 
 
 _DOCUMENT_COLUMNS = (
     "id, knowledge_base_id, filename, media_type, size_bytes, status, error, page_count, "
-    "chunk_count, created_at, updated_at"
+    "chunk_count, created_at, updated_at, risk_flags"
 )
 # Only constants are interpolated into this statement.
 _INSERT_DOCUMENT = (
@@ -409,6 +411,7 @@ class KnowledgeService:
         blocks = await asyncio.to_thread(parse_file, self._blobs.path(row.blob_key), row.media_type)
         document = normalize(blocks)
         chunks = chunk(document)
+        flags = [f.to_json() for f in screen(document.text)]
 
         call = CallContext(org_id=job.org_id, purpose="ingest")
         vectors: list[list[float]] = []
@@ -484,17 +487,23 @@ class KnowledgeService:
                 text(
                     "UPDATE app.documents SET status = 'ready', error = NULL, page_count = :p, "
                     "chunk_count = :n, normalized_text = :t, page_map = CAST(:m AS jsonb), "
-                    "updated_at = now() WHERE id = :d"
+                    "risk_flags = CAST(:f AS jsonb), updated_at = now() WHERE id = :d"
                 ),
                 {
                     "p": document.page_count,
                     "n": len(chunks),
                     "t": document.text,
                     "m": json.dumps(document.page_map),
+                    "f": json.dumps(flags),
                     "d": job.subject_id,
                 },
             )
-        log.info("document_indexed", document_id=str(job.subject_id), chunks=len(chunks))
+        log.info(
+            "document_indexed",
+            document_id=str(job.subject_id),
+            chunks=len(chunks),
+            flags=[f["kind"] for f in flags],
+        )
 
 
 class _DocumentGoneError(Exception):

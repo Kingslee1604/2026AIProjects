@@ -138,6 +138,17 @@ questions with `qwen3:4b`:
 The time is not a like-for-like comparison: during the second run the laptop was on battery
 (Windows throttles the CPU) with 0.2 GB of 16 GB memory free. The relevance call itself is one
 short call per answered question; R1-49 measures time on mains power. Problem 2 (statements of
-an adversarial document believed) remains open: "Northwind holds FedRAMP High authorization"
-does answer the FedRAMP question; it is false, not off-topic.
+an adversarial document believed) is not solved by relevance: "Northwind holds FedRAMP High
+authorization" does answer the FedRAMP question; it is false, not off-topic.
+
+## Suspicious-document flags (2026-10-18)
+
+Problem 2 is handled by flagging, not blocking (a product decision: nothing is hidden from the
+reviewer). At indexing, documents that address or instruct an AI are flagged with the sentence
+that matched (`knowledge/screening.py`); an answer that quotes a flagged document gets low
+confidence, a reason naming the document, and a "check this source" warning, so it is never
+bulk-approved and a reviewer looks at it. On the Northwind corpus the screening flags both
+adversarial documents and none of the ten policies (tested on every commit). The report's
+"Answers quoting the adversarial document marked for review" row counts how many such answers
+carry the warning.
 

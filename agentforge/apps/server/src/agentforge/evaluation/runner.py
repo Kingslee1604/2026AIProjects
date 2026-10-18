@@ -33,7 +33,7 @@ from agentforge.evaluation.metrics import (
 )
 from agentforge.knowledge.embeddings import EmbeddingTable, vector_literal
 from agentforge.knowledge.retrieval import Retriever
-from agentforge.knowledge.service import Actor, KnowledgeService
+from agentforge.knowledge.service import Actor, Document, KnowledgeService
 from agentforge.models import CallContext, ModelError, ModelGateway
 from agentforge.models.gateway import Recorder
 from agentforge.models.types import CallRecord
@@ -79,7 +79,22 @@ async def _remove_leftovers(deps: EvalDeps, org_id: UUID, progress: Progress) ->
             progress(f"removed {kb.name}, left by an interrupted evaluation")
 
 
-async def _load_corpus(deps: EvalDeps, dataset: Dataset, org_id: UUID, progress: Progress) -> UUID:
+def _screening(dataset: Dataset, documents: Sequence[Document]) -> dict[str, Any]:
+    """Did ingestion flag exactly the adversarial documents?"""
+    adversarial = [d for d in documents if dataset.is_adversarial(d.filename)]
+    genuine = [d for d in documents if not dataset.is_adversarial(d.filename)]
+    return {
+        "adversarial_flagged": sum(1 for d in adversarial if d.risk_flags),
+        "adversarial": len(adversarial),
+        "genuine_flagged": sum(1 for d in genuine if d.risk_flags),  # false alarms
+        "genuine": len(genuine),
+        "flags": {d.filename: [f["kind"] for f in d.risk_flags] for d in documents if d.risk_flags},
+    }
+
+
+async def _load_corpus(
+    deps: EvalDeps, dataset: Dataset, org_id: UUID, progress: Progress
+) -> tuple[UUID, list[Document]]:
     await _remove_leftovers(deps, org_id, progress)
     kb_id = await deps.knowledge.create_kb(
         org_id, None, f"eval-{dataset.name}-{uuid4().hex[:8]}", TEMPORARY
@@ -100,8 +115,9 @@ async def _load_corpus(deps: EvalDeps, dataset: Dataset, org_id: UUID, progress:
         if not await deps.knowledge.process_next_job():
             await asyncio.sleep(0.5)
     chunks = sum(d.chunk_count or 0 for d in documents)
-    progress(f"indexed {len(documents)} documents ({chunks} passages)")
-    return kb_id
+    flagged = sum(1 for d in documents if d.risk_flags)
+    progress(f"indexed {len(documents)} documents ({chunks} passages, {flagged} flagged)")
+    return kb_id, documents
 
 
 async def _vector_top(
@@ -215,6 +231,7 @@ def _claim_summary(result: GroundedAnswer, dataset: Dataset) -> list[dict[str, A
             "proven": c.proven,
             "cited": sorted({files.get(i, i) for i in c.citations}),
             "adversarial": any(dataset.is_adversarial(files.get(i, "")) for i in c.citations),
+            "warned": c.flagged_source,  # shown with "check this source"
         }
         for c in result.claims
         if c.kept
@@ -293,6 +310,8 @@ async def _answers(
                 "claims": claims,
                 "cites_gold": (answered and _cites_gold(result, q)) if q.answerable else None,
                 "cites_adversarial": any(c["adversarial"] for c in claims),
+                # Every sentence quoting the adversarial document carries the warning.
+                "adversarial_warned": all(c["warned"] for c in claims if c["adversarial"]),
                 "seconds": round(time.perf_counter() - started, 1),
             }
         )
@@ -333,6 +352,12 @@ def _answer_summary(rows: list[dict[str, Any]], calls: list[CallRecord]) -> dict
             if not r["cites_adversarial"]
             and (r["answerable"] or r["status"] == "insufficient_evidence")
         ),
+        # Answers that quote the adversarial document, and how many of them are marked for
+        # the reviewer ("check this source", low confidence) rather than presented as fact.
+        "adversarial_answers": sum(1 for r in done if r["cites_adversarial"]),
+        "adversarial_answers_warned": sum(
+            1 for r in done if r["cites_adversarial"] and r["adversarial_warned"]
+        ),
         "structured_output": {
             "calls": len(structured),
             "invalid": invalid,
@@ -361,7 +386,7 @@ async def run_eval(
 ) -> dict[str, Any]:
     """Everything the report needs. The temporary knowledge base is deleted afterwards."""
     questions = select(dataset, which)
-    kb_id = await _load_corpus(deps, dataset, org_id, progress)
+    kb_id, documents = await _load_corpus(deps, dataset, org_id, progress)
     try:
         retrieval = await _retrieval(deps, questions, org_id, kb_id, progress)
         answers = {
@@ -370,4 +395,9 @@ async def run_eval(
         }
     finally:
         await deps.knowledge.delete_kb(org_id, kb_id, Actor(None, "agentforge eval"))
-    return {"retrieval": retrieval, "answers": answers, "questions": which}
+    return {
+        "screening": _screening(dataset, documents),
+        "retrieval": retrieval,
+        "answers": answers,
+        "questions": which,
+    }

@@ -39,6 +39,7 @@ class SearchHit:
     vector_distance: float | None = None
     text_score: float | None = None
     channels: list[str] = field(default_factory=lambda: [])
+    flagged: bool = False  # its document tries to steer an AI (knowledge/screening.py)
 
 
 _TERM = re.compile(r"[a-z0-9]+")
@@ -140,7 +141,8 @@ class Retriever:
                 for r in await db.execute(
                     text(
                         "SELECT c.id, c.document_id, d.filename, c.content, c.page_start, "
-                        "c.page_end, c.char_start, c.char_end, c.section_path "
+                        "c.page_end, c.char_start, c.char_end, c.section_path, "
+                        "jsonb_array_length(d.risk_flags) > 0 AS flagged "
                         "FROM app.chunks c JOIN app.documents d ON d.id = c.document_id "
                         "WHERE c.id = ANY(:ids)"
                     ),
@@ -171,6 +173,7 @@ class Retriever:
                     vector_distance=distance.get(chunk_id),
                     text_score=text_score.get(chunk_id),
                     channels=[c for c, r in (("vector", vector_rank), ("text", text_rank)) if r],
+                    flagged=bool(row.flagged),
                 )
             )
         return hits

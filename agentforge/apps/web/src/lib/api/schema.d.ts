@@ -815,6 +815,16 @@ export interface components {
              * @default
              */
             drafted_text: string;
+            /**
+             * Duplicate
+             * @default false
+             */
+            duplicate: boolean;
+            /**
+             * Flagged Source
+             * @default false
+             */
+            flagged_source: boolean;
             /** Kept */
             kept: boolean;
             /** Quote */
@@ -891,6 +901,11 @@ export interface components {
             media_type: string;
             /** Page Count */
             page_count: number | null;
+            /**
+             * Risk Flags
+             * @description Signs that the document tries to steer an AI; answers citing it are marked for review.
+             */
+            risk_flags?: components["schemas"]["RiskFlagOut"][];
             /** Size Bytes */
             size_bytes: number;
             /** Status */
@@ -931,6 +946,11 @@ export interface components {
             document_id: string;
             /** Filename */
             filename: string;
+            /**
+             * Flagged
+             * @default false
+             */
+            flagged: boolean;
             /** Id */
             id: string;
             /** Page End */
@@ -1153,6 +1173,15 @@ export interface components {
             /** Undecided */
             undecided: number;
         };
+        /** RiskFlagOut */
+        RiskFlagOut: {
+            /** Excerpt */
+            excerpt: string;
+            /** Kind */
+            kind: string;
+            /** Reason */
+            reason: string;
+        };
         /** RunEventOut */
         RunEventOut: {
             /**
@@ -1290,6 +1319,11 @@ export interface components {
             document_id: string;
             /** Filename */
             filename: string;
+            /**
+             * Flagged
+             * @default false
+             */
+            flagged: boolean;
             /** Page End */
             page_end: number;
             /** Page Start */
