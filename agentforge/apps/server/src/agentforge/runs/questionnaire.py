@@ -266,6 +266,11 @@ class QuestionnaireSteps:
                 ),
                 {"r": run_id, "i": index},
             )
+            # With item_done / item_failed, this orders fan-out by event sequence, which does
+            # not depend on the clock (gate H3 is checked this way; WSL2 clocks can step back).
+            await emit(
+                db, org_id, run_id, "item_started", node_id="answer", item_index=index, epoch=epoch
+            )
         reason = await self.budget_problem(org_id, run_id)
         if reason is not None:
             await self.item_failed(org_id, run_id, index, "budget_exceeded", reason)

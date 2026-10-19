@@ -183,7 +183,14 @@ export default function RunPage() {
 
       <Card>
         <CardTitle>Events</CardTitle>
-        <div className="mt-3 max-h-80 overflow-auto" data-testid="run-events">
+        {/* Focusable, so a keyboard can scroll it once it overflows. */}
+        <div
+          className="mt-3 max-h-80 overflow-auto"
+          data-testid="run-events"
+          tabIndex={0}
+          role="region"
+          aria-label="Run events"
+        >
           <EventList events={stream.events} />
         </div>
       </Card>

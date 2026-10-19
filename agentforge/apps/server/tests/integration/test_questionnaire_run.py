@@ -263,19 +263,24 @@ def test_a_40_item_questionnaire_runs_to_an_exported_file(
     assert answered["claims"]
     assert answered["evidence"]
 
-    # Bounded fan-out (gate H3): never more than 4 items answered at once in this run.
-    steps = stack.query(
-        "SELECT started_at, finished_at FROM app.step_records "
-        "WHERE run_id = :r AND node_id = 'answer'",
+    # Bounded fan-out (gate H3): never more than 4 items answered at once in this run. Counted
+    # in event order (seq), not by timestamps: a WSL2 clock that steps back made timestamped
+    # steps appear to overlap that never did.
+    events = stack.query(
+        "SELECT type FROM app.run_events WHERE run_id = :r "
+        "AND type IN ('item_started', 'item_done', 'item_failed') ORDER BY seq",
         r=run_id,
     )
-    assert len(steps) == 40
-    points = sorted([(s.started_at, 1) for s in steps] + [(s.finished_at, -1) for s in steps])
+    assert sum(e.type == "item_started" for e in events) == 40
     peak = current = 0
-    for _, delta in points:
-        current += delta
+    for event in events:
+        current += 1 if event.type == "item_started" else -1
         peak = max(peak, current)
     assert peak <= 4, f"{peak} items answered at once"
+    steps = stack.query(
+        "SELECT count(*) FROM app.step_records WHERE run_id = :r AND node_id = 'answer'", r=run_id
+    )
+    assert steps[0][0] == 40
 
     # Every model call is linked to its run and step (trace view).
     unlinked = stack.query(

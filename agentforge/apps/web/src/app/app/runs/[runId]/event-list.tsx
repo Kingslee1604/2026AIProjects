@@ -4,6 +4,7 @@ const LABEL: Record<string, string> = {
   run_created: "Run created",
   run_started: "Started",
   plan_done: "Questions planned",
+  item_started: "Answering",
   item_done: "Answered",
   item_failed: "Could not answer",
   item_retry_requested: "Asked to answer again",

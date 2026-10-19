@@ -129,7 +129,11 @@ function SourcePassages({ claim, evidence }: { claim: Claim; evidence: Map<strin
           {e.deleted ? (
             <p className="text-sm text-muted italic">The source document was deleted.</p>
           ) : (
-            <blockquote className="max-h-80 overflow-y-auto rounded bg-bg p-3 text-sm whitespace-pre-line">
+            <blockquote
+              className="max-h-80 overflow-y-auto rounded bg-bg p-3 text-sm whitespace-pre-line"
+              tabIndex={0} // a long passage scrolls: keyboard users need to reach it
+              aria-label="Cited passage"
+            >
               {highlightQuote(e.content, claim.quote).map((segment, index) =>
                 segment.highlight ? (
                   <mark key={index} className="rounded bg-accent/20 px-0.5 text-fg">

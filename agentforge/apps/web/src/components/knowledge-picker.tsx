@@ -51,7 +51,7 @@ export function KnowledgePicker({
       ) : usable.length === 0 ? (
         <p className="mt-2 text-sm text-muted">
           No knowledge base has ready documents yet.{" "}
-          <Link href="/app/knowledge" className="text-accent hover:underline">
+          <Link href="/app/knowledge" className="text-accent underline">
             Upload documents first
           </Link>
           .

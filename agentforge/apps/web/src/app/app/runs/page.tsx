@@ -66,7 +66,7 @@ export default function RunsPage() {
         ) : all.length === 0 ? (
           <p className="text-sm text-muted">
             No questionnaires yet.{" "}
-            <Link href="/app/runs/new" className="text-accent hover:underline">
+            <Link href="/app/runs/new" className="text-accent underline">
               Answer your first one
             </Link>
             .
