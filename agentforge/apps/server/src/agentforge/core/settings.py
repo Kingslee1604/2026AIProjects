@@ -77,6 +77,13 @@ class Settings(BaseSettings):
     run_max_llm_calls: int = Field(default=3000, ge=10)
     run_max_seconds: float = Field(default=6 * 3600, gt=0)
 
+    # MCP server at /mcp (R1-43). Browser origins allowed to call it (none by default: MCP hosts
+    # are programs, which send no Origin header); requests per API key per minute, overall
+    # and for answers (each answer runs the model).
+    mcp_allowed_origins: list[str] = Field(default_factory=lambda: [])
+    mcp_requests_per_minute: int = Field(default=60, ge=1)
+    mcp_answers_per_minute: int = Field(default=6, ge=1)
+
     # Sessions (security baseline S3). Cookies are Secure whenever served over TLS; production
     # refuses to start without it.
     cookie_secure: bool = False

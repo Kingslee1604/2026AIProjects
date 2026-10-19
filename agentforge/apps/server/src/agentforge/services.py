@@ -37,6 +37,7 @@ class Services:
     retriever: Retriever
     agents: AgentRegistry
     qa: QAService
+    answerer: GroundedAnswerer
     run_engine: RunEngine
     runs: RunService
     blobs: LocalBlobStore
@@ -115,6 +116,7 @@ def build_services(settings: Settings, *, pool_size: int = 5) -> Services:
         retriever=retriever,
         agents=agents,
         qa=QAService(sessions, answerer),
+        answerer=answerer,
         questionnaire_steps=QuestionnaireSteps(
             sessions,
             blobs,

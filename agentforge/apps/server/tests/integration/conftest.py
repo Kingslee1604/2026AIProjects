@@ -172,6 +172,12 @@ def outsider(app: FastAPI, database: Database) -> Iterator[tuple[TestClient, str
             text("INSERT INTO app.organizations (id, name, slug) VALUES (:o, 'Other', :s)"),
             {"o": org_id, "s": f"other-{org_id.hex[:8]}"},
         )
+        connection.execute(  # like every real organization, it has a workspace
+            text(
+                "INSERT INTO app.workspaces (org_id, name, slug) VALUES (:o, 'Default', 'default')"
+            ),
+            {"o": org_id},
+        )
     owner.dispose()
     email = f"outsider-{uuid.uuid4().hex[:8]}@example.test"
 

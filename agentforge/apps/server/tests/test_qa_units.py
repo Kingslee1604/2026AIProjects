@@ -23,6 +23,7 @@ from agentforge.qa.pipeline import (
     GroundedAnswer,
     GroundedAnswerer,
     QAConfig,
+    join_sentences,
     mechanical_check,
 )
 from agentforge.qa.schemas import DraftClaim
@@ -54,6 +55,13 @@ def test_changing_a_definition_changes_its_checksum(tmp_path: Path) -> None:
     after = load_definitions(tmp_path)["drafter"].checksum
     assert before != after
     assert load_definitions(tmp_path)["drafter"].checksum == after  # stable for equal content
+
+
+def test_claims_join_into_sentences_that_do_not_run_on() -> None:
+    assert join_sentences(["Logs are kept", "Keys rotate yearly.", "Is it audited?"]) == (
+        "Logs are kept. Keys rotate yearly. Is it audited?"
+    )
+    assert join_sentences([]) == ""
 
 
 def load_definitions_dir() -> Path:

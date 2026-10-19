@@ -6,7 +6,7 @@ database except through the retriever and the agent registry.
 """
 
 import time
-from collections.abc import Sequence
+from collections.abc import Awaitable, Callable, Sequence
 from contextvars import ContextVar
 from dataclasses import asdict, dataclass, field
 from typing import Literal
@@ -197,6 +197,12 @@ def _key(text: str) -> str:
     return " ".join(text.lower().split())
 
 
+def join_sentences(texts: Sequence[str]) -> str:
+    """The claims as one answer. A claim the model left without a full stop gets one, so the
+    next claim does not run on ("...immutable storage The security team...")."""
+    return " ".join(t if t.endswith((".", "!", "?", ":", ";")) else f"{t}." for t in texts)
+
+
 def drop_repeats(claims: Sequence[Claim]) -> None:
     """Leave out a kept claim that says nothing new: the same sentence as an earlier one, or
     the same quote as an earlier claim that already shows that whole quote. (A claim that
@@ -276,9 +282,11 @@ class GroundedAnswerer:
         step_id: UUID | None = None,
         search_queries: Sequence[str] = (),
         parts: Sequence[str] = (),
+        on_progress: Callable[[str], Awaitable[None]] | None = None,
     ) -> GroundedAnswer:
         """Answer one question. `search_queries` (from the planner) are searched in addition to
-        the question; `parts` tell the drafter to answer each part of a compound question."""
+        the question; `parts` tell the drafter to answer each part of a compound question.
+        `on_progress` hears each stage (MCP progress notifications)."""
         config = self._config
         budget = Budget(
             max_llm_calls=config.max_llm_calls,
@@ -289,7 +297,12 @@ class GroundedAnswerer:
         started = time.perf_counter()
         _STEP.set(step_id)
 
+        async def progress(message: str) -> None:
+            if on_progress is not None:
+                await on_progress(message)
+
         budget.step()
+        await progress("Searching the documents")
         hits = await self._search(org_id, knowledge_base_ids, [question, *search_queries], run_id)
         timings["retrieve_ms"] = round((time.perf_counter() - started) * 1000, 1)
         evidence = _evidence(hits)
@@ -331,6 +344,7 @@ class GroundedAnswerer:
         budget.step()
         budget.check()
         t0 = time.perf_counter()
+        await progress(f"Drafting an answer from {len(evidence)} passages")
         draft, result = await self._gateway.generate_structured(
             CallContext(org_id, "draft", run_id, _STEP.get()),
             build_messages(
@@ -363,6 +377,7 @@ class GroundedAnswerer:
         by_id = {e.id: e for e in evidence}
         claims = [mechanical_check(c, by_id) for c in draft.claims]
         t0 = time.perf_counter()
+        await progress(f"Checking {len(claims)} drafted sentences against their sources")
         await self._verify(org_id, run_id, question, claims, by_id, budget, versions)
         timings["verify_ms"] = round((time.perf_counter() - t0) * 1000, 1)
 
@@ -394,7 +409,7 @@ class GroundedAnswerer:
             else "high"
         )
         # The answer is exactly the surviving claims: no unverified prose reaches the customer.
-        answer = " ".join(c.text for c in kept)
+        answer = join_sentences([c.text for c in kept])
         drafted = sum(1 for c in claims if not c.duplicate)
         reason = f"{len(kept)} of {drafted} claims verified"
 

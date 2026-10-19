@@ -23,6 +23,7 @@ from agentforge.api import (
     run_routes,
 )
 from agentforge.api.limits import BodySizeLimitMiddleware
+from agentforge.api.mcp_server import mount_mcp
 from agentforge.auth.api_keys import ApiKeyService
 from agentforge.auth.service import AuthService
 from agentforge.core.logging import configure_logging, get_logger
@@ -129,7 +130,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         await hub.start()
         app.state.event_hub = hub
         try:
-            yield
+            async with mcp.running():  # the /mcp server for this lifespan
+                yield
         finally:
             await hub.stop()
             await services.close()
@@ -175,4 +177,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(run_routes.router)
     app.include_router(questionnaire_routes.router)
     app.include_router(review_routes.router)
+    # /mcp: API keys with mcp:use only (checked by its gate, not by FastAPI dependencies).
+    mcp = mount_mcp(app, settings)
     return app
