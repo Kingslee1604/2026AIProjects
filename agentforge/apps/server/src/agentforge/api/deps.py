@@ -10,6 +10,7 @@ from collections.abc import Awaitable, Callable
 
 from fastapi import Depends, HTTPException, Request
 
+from agentforge.auth.api_keys import ApiKeyService
 from agentforge.auth.rbac import Permission, Principal, authorize
 from agentforge.auth.service import AuthService
 from agentforge.core.settings import Settings
@@ -44,11 +45,31 @@ def get_auth(request: Request) -> AuthService:
     return auth
 
 
+def get_api_keys(request: Request) -> ApiKeyService:
+    keys: ApiKeyService | None = request.app.state.api_keys
+    if keys is None:
+        raise HTTPException(503, "Database is not configured")
+    return keys
+
+
 async def current_principal(
     request: Request,
     auth: AuthService = Depends(get_auth),  # noqa: B008 - FastAPI dependency
     settings: Settings = Depends(get_settings_from_app),  # noqa: B008
+    keys: ApiKeyService = Depends(get_api_keys),  # noqa: B008
 ) -> Principal:
+    """A signed-in session (cookie, with CSRF on unsafe methods) or an API key
+    (`Authorization: Bearer af_...`: no cookie, so no CSRF). A presented key that does not
+    resolve is refused; it never falls back to a cookie."""
+    authorization = request.headers.get("Authorization")
+    if authorization is not None:
+        scheme, _, credential = authorization.partition(" ")
+        if scheme.lower() != "bearer" or not credential.strip():
+            raise HTTPException(401, "Use Authorization: Bearer <API key>")
+        principal = await keys.resolve(credential.strip())
+        if principal is None:
+            raise HTTPException(401, "API key invalid, expired, or revoked")
+        return principal
     token = request.cookies.get(session_cookie_name(settings))
     if not token:
         raise HTTPException(401, "Authentication required")
@@ -61,6 +82,13 @@ async def current_principal(
         if not secrets.compare_digest(sent.encode(), csrf_token.encode()):
             raise HTTPException(403, "CSRF token missing or invalid")
     request.state.csrf_token = csrf_token
+    return principal
+
+
+async def session_principal(principal: Principal = Depends(current_principal)) -> Principal:  # noqa: B008
+    """Only a signed-in person, not an API key (session info, sign-out, key management)."""
+    if principal.api_key_id is not None:
+        raise HTTPException(403, "This needs a signed-in session, not an API key")
     return principal
 
 

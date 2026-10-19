@@ -66,7 +66,8 @@ test("create a knowledge base, upload, watch it index, search, and delete", asyn
 });
 
 test("a planted document is flagged, and so is an answer that quotes it", async ({ page }) => {
-  test.setTimeout(240_000); // locally the real model answers on a CPU
+  // Locally the real model runs on a CPU, shared with the other test files running at once.
+  test.setTimeout(420_000);
   await signIn(page);
   await page.goto("/app/knowledge");
   const name = `E2E planted ${Date.now()}`;
@@ -79,7 +80,7 @@ test("a planted document is flagged, and so is an answer that quotes it", async 
     buffer: Buffer.from(PLANTED),
   });
   const row = page.getByTestId("document-row").filter({ hasText: "faq-draft.md" });
-  await expect(row.getByText("Ready")).toBeVisible({ timeout: 90_000 });
+  await expect(row.getByText("Ready")).toBeVisible({ timeout: 180_000 });
   await expect(row.getByText("Suspicious")).toBeVisible(); // flagged, not blocked
   await row
     .getByTestId("risk-flags")

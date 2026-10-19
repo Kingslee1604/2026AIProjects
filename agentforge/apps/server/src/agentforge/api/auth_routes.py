@@ -8,10 +8,10 @@ from pydantic import BaseModel, Field
 
 from agentforge.api.deps import client_ip as _client_ip
 from agentforge.api.deps import (
-    current_principal,
     get_auth,
     get_settings_from_app,
     session_cookie_name,
+    session_principal,
 )
 from agentforge.auth.rbac import Principal
 from agentforge.auth.service import (
@@ -26,7 +26,8 @@ router = APIRouter(prefix="/v1/auth", tags=["auth"])
 
 AuthDep = Annotated[AuthService, Depends(get_auth)]
 SettingsDep = Annotated[Settings, Depends(get_settings_from_app)]
-PrincipalDep = Annotated[Principal, Depends(current_principal)]
+# A session, not an API key: a key must not end its creator's sessions or read session info.
+PrincipalDep = Annotated[Principal, Depends(session_principal)]
 
 
 class LoginRequest(BaseModel):

@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import { ApiKeys } from "./api-keys";
 import { Card, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api/client";
 
@@ -45,6 +46,7 @@ export default function AdminPage() {
           </tbody>
         </table>
       </Card>
+      <ApiKeys />
       <Card>
         <CardTitle>Recent security events</CardTitle>
         <ul className="mt-4 divide-y divide-border text-sm">

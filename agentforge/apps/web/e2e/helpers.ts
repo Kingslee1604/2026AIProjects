@@ -5,13 +5,17 @@ export const email = process.env.E2E_EMAIL ?? "";
 export const password = process.env.E2E_PASSWORD ?? "";
 
 export function requireCredentials(): void {
-  if (!email || !password || !reviewerEmail) {
-    throw new Error("Set E2E_EMAIL, E2E_REVIEWER_EMAIL, and E2E_PASSWORD (make e2e does this)");
+  if (!email || !password || !reviewerEmail || !adminEmail) {
+    throw new Error(
+      "Set E2E_EMAIL, E2E_REVIEWER_EMAIL, E2E_ADMIN_EMAIL, and E2E_PASSWORD (make e2e does this)",
+    );
   }
 }
 
-/** A second user who may decide reviews (same password; make e2e creates both). */
+/** Users with more rights (same password; make e2e creates them): may decide reviews, and an
+ * admin (API keys). */
 export const reviewerEmail = process.env.E2E_REVIEWER_EMAIL ?? "";
+export const adminEmail = process.env.E2E_ADMIN_EMAIL ?? "";
 
 export async function signIn(page: Page, as: string = email): Promise<void> {
   await page.goto("/login");

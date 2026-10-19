@@ -14,6 +14,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from agentforge import __version__
 from agentforge.api import (
     admin_routes,
+    api_key_routes,
     auth_routes,
     knowledge_routes,
     qa_routes,
@@ -22,6 +23,7 @@ from agentforge.api import (
     run_routes,
 )
 from agentforge.api.limits import BodySizeLimitMiddleware
+from agentforge.auth.api_keys import ApiKeyService
 from agentforge.auth.service import AuthService
 from agentforge.core.logging import configure_logging, get_logger
 from agentforge.core.settings import Settings, get_settings
@@ -122,6 +124,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.services = services
         app.state.sessions = services.sessions
         app.state.auth = AuthService(services.sessions, settings)
+        app.state.api_keys = ApiKeyService(services.sessions)
         hub = EventHub(settings.database_url.get_secret_value())
         await hub.start()
         app.state.event_hub = hub
@@ -140,6 +143,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = settings
     app.state.auth = None
+    app.state.api_keys = None
     app.state.sessions = None
     app.state.services = None
     app.state.event_hub = None
@@ -165,6 +169,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(v1)
     app.include_router(auth_routes.router)
     app.include_router(admin_routes.router)
+    app.include_router(api_key_routes.router)
     app.include_router(knowledge_routes.router)
     app.include_router(qa_routes.router)
     app.include_router(run_routes.router)

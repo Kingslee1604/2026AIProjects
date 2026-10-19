@@ -125,13 +125,16 @@ PLAYWRIGHT_IMAGE :=mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f
 
 e2e: ## Browser tests (Chromium in the Playwright image) against the running stack (make up first)
 	@stamp="$$(date +%s)"; email="e2e-$$stamp@example.test"; reviewer="e2e-reviewer-$$stamp@example.test"; \
+	admin="e2e-admin-$$stamp@example.test"; \
 	pw="$$(python3 -c 'import secrets; print(secrets.token_urlsafe(18))')"; \
 	printf '%s\n' "$$pw" | docker compose run --rm --no-deps -T api user create \
 	  --email "$$email" --role member --password-stdin >/dev/null && \
 	printf '%s\n' "$$pw" | docker compose run --rm --no-deps -T api user create \
 	  --email "$$reviewer" --role member --can-review --password-stdin >/dev/null && \
+	printf '%s\n' "$$pw" | docker compose run --rm --no-deps -T api user create \
+	  --email "$$admin" --role admin --password-stdin >/dev/null && \
 	docker run --rm --network agentforge_default --user "$$(id -u):$$(id -g)" \
 	  -v "$(CURDIR):/work" -w /work/apps/web -e HOME=/tmp \
 	  -e E2E_BASE_URL=http://web:3000 -e E2E_EMAIL="$$email" -e E2E_PASSWORD="$$pw" \
-	  -e E2E_REVIEWER_EMAIL="$$reviewer" \
+	  -e E2E_REVIEWER_EMAIL="$$reviewer" -e E2E_ADMIN_EMAIL="$$admin" \
 	  $(PLAYWRIGHT_IMAGE) npx playwright test $(E2E_ARGS)
