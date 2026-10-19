@@ -29,6 +29,8 @@ playwright-report/
 .env
 .env.*
 !.env.example
+# Local Compose settings (agentforge docs/guides/configuration.md)
+compose.override.yaml
 
 # Personal Claude Code settings (shared .claude/settings.json may be committed)
 .claude/settings.local.json

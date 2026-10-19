@@ -3,7 +3,7 @@ SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
 .PHONY: help tools setup lint format typecheck test docs-check secrets-scan licenses check \
-	up down logs ps doctor user-create user-list api-client api-client-check web-build e2e ci-tools security models-smoke demo-build demo-check durability eval
+	up down logs ps doctor user-create user-list api-client api-client-check web-build e2e ci-tools security models-smoke demo-build demo-check durability eval bench
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -120,6 +120,9 @@ DURABILITY_RESULTS ?= bench/results
 durability: ## Kill the worker at random across 50 fake-model runs with model faults (R1-36; ~5 min)
 	AGENTFORGE_DURABILITY=1 AGENTFORGE_BENCH_RESULTS=$(DURABILITY_RESULTS) \
 	  uv run --frozen pytest apps/server/tests/integration/test_durability.py -q -s -p no:cacheprovider
+
+bench: demo-build ## Measure run times, memory, tokens, latencies on this machine (R1-49; ~1 h on CPU; mains power). BENCH_MACHINE=name
+	BENCH_MACHINE=$(BENCH_MACHINE) ./bench/measure.sh
 
 PLAYWRIGHT_IMAGE :=mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
 

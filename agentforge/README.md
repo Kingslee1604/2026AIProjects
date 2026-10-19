@@ -82,8 +82,14 @@ All numbers come from the reference machine: a Dell Inspiron 15 3520 laptop (Int
 | Kept sentences proven by a verbatim quote | 98% | same |
 | Durability: 50 runs, worker `kill -9` 29 times, 10% model faults | **50/50** succeeded, 0 duplicate exports, 0 items answered twice; recovery p50 3.1 s, p95 6.6 s | [durability.json](bench/results/durability.json) |
 | Prompt injection | 0 tool executions possible, 0 of 2 injected instructions followed | [report](docs/security/prompt-injection.md) |
+| Questionnaire run, 12 questions, default settings | **31 min** end to end (12/12 answered), 19k tokens | [2026-10-19 measurements](bench/results/2026-10-19-inspiron-3520/summary.md) |
+| Questionnaire run, 40 questions, default settings | **110 min** end to end (40/40 answered), 55k tokens | same |
+| Memory during a run | Ollama ≤ 4.6 GB; the stack in WSL2 ≤ 1.6 GB | same |
+| Search latency | p50 168 ms, p95 208 ms | same |
+| Run start overhead (no model time) | p95 1.1 s with 30 runs started at once | same |
 
-End-to-end run times and memory under load are measured in R1-49.
+On this CPU, the run times include model calls that timed out while queued behind each other,
+four questions at a time, and were redone. The measurement report explains this.
 
 ## Security
 

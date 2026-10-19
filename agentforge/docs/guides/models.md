@@ -30,11 +30,18 @@ comparable: measure yours with `make eval` (see the evaluation README).
 
 ## Changing models
 
-In `.env`, then `make up`:
+In a `compose.override.yaml` next to `compose.yaml` (git-ignored; see
+[configuration](configuration.md)), then `make up`:
 
-```bash
-AGENTFORGE_CHAT_MODEL=ollama:qwen2.5:7b
-AGENTFORGE_CHAT_FALLBACK_MODELS=["ollama:qwen3:4b"]   # tried if the first fails
+```yaml
+x-models: &models
+  AGENTFORGE_CHAT_MODEL: ollama:qwen2.5:7b
+  AGENTFORGE_CHAT_FALLBACK_MODELS: '["ollama:qwen3:4b"]'   # tried if the first fails
+services:
+  api:
+    environment: *models
+  worker:
+    environment: *models
 ```
 
 - **More RAM or a GPU:** an 8B model (for example `qwen3:8b`) is more careful but slower. On

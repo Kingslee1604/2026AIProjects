@@ -1,9 +1,28 @@
 # Configuration
 
-Settings are environment variables. For the Compose stack, put them in `.env` (created by
-`make up` from `.env.example`, git-ignored, readable only by you) and run `make up` again. Every
-application setting starts with `AGENTFORGE_`. The full list, with types and limits, is
-`apps/server/src/agentforge/core/settings.py`.
+Settings are environment variables; every application setting starts with `AGENTFORGE_`. The
+full list, with types and limits, is `apps/server/src/agentforge/core/settings.py`.
+
+**Where to put them with Docker Compose.** `.env` (created by `make up`, git-ignored, readable
+only by you) holds the passwords and ports, plus three settings that Compose passes to the
+containers: `AGENTFORGE_LOG_LEVEL`, `AGENTFORGE_MODEL_PROVIDER`, and
+`AGENTFORGE_OLLAMA_BASE_URL`. **Any other setting goes in a `compose.override.yaml`** next to
+`compose.yaml`. Compose loads that file automatically, and it is git-ignored. Set it on both
+services, then run `make up`:
+
+```yaml
+# compose.override.yaml
+x-settings: &settings
+  AGENTFORGE_CHAT_MODEL: ollama:qwen2.5:7b
+  AGENTFORGE_RATE_ANSWERS_PER_MINUTE: "40"
+services:
+  api:
+    environment: *settings
+  worker:
+    environment: *settings
+```
+
+Outside Compose (`uv run agentforge api`), plain environment variables work.
 
 ## Stack (`.env`)
 
