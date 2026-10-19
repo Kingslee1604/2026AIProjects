@@ -152,6 +152,7 @@ def start_stack(
         model_provider="fake",
         blob_root=blobs,
         engine_database_url=SecretStr(database.url("agentforge_engine")),
+        rate_runs_per_minute=1000,  # the durability test starts 50 runs at once
     )
     log = (root / "worker.log").open("ab")
     worker = spawn_worker(database, blobs, log, latency_ms=latency_ms, **worker_settings)

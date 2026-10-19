@@ -11,7 +11,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
-from agentforge.api.deps import client_ip, require
+from agentforge.api.deps import client_ip, require, require_limited
 from agentforge.auth.rbac import Permission, Principal
 from agentforge.knowledge.retrieval import SearchHit
 from agentforge.knowledge.service import (
@@ -27,6 +27,7 @@ router = APIRouter(tags=["knowledge"])
 
 Reader = Annotated[Principal, Depends(require(Permission.KB_READ))]
 Writer = Annotated[Principal, Depends(require(Permission.KB_WRITE))]
+Uploader = Annotated[Principal, Depends(require_limited(Permission.KB_WRITE, "uploads"))]
 
 
 def services(request: Request) -> Services:
@@ -147,7 +148,7 @@ async def list_documents(kb_id: UUID, principal: Reader, svc: ServicesDep) -> li
 async def upload_document(
     kb_id: UUID,
     request: Request,
-    principal: Writer,
+    principal: Uploader,
     svc: ServicesDep,
     x_filename: Annotated[str, Header(description="URL-encoded file name")],
 ) -> DocumentOut:

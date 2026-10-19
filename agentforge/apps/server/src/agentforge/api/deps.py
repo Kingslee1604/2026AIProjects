@@ -10,6 +10,7 @@ from collections.abc import Awaitable, Callable
 
 from fastapi import Depends, HTTPException, Request
 
+from agentforge.api.limits import RateBucket, RateLimits
 from agentforge.auth.api_keys import ApiKeyService
 from agentforge.auth.rbac import Permission, Principal, authorize
 from agentforge.auth.service import AuthService
@@ -96,6 +97,33 @@ def require(permission: Permission) -> Callable[..., Awaitable[Principal]]:
     async def dependency(principal: Principal = Depends(current_principal)) -> Principal:  # noqa: B008
         if not authorize(principal, permission):
             raise HTTPException(403, f"Missing permission: {permission.value}")
+        return principal
+
+    return dependency
+
+
+_TOO_MANY: dict[RateBucket, str] = {
+    "uploads": "Too many uploads",
+    "answers": "Too many questions",
+    "runs": "Too many questionnaire runs started",
+}
+
+
+def require_limited(
+    permission: Permission, bucket: RateBucket
+) -> Callable[..., Awaitable[Principal]]:
+    """`require`, then a per-caller rate limit (baseline S8): 429 with Retry-After."""
+    allowed = require(permission)
+
+    async def dependency(request: Request, principal: Principal = Depends(allowed)) -> Principal:  # noqa: B008
+        limits: RateLimits = request.app.state.rate_limits
+        retry = limits.refused(bucket, principal.api_key_id or principal.user_id)
+        if retry is not None:
+            raise HTTPException(
+                429,
+                f"{_TOO_MANY[bucket]}: try again in {retry} s",
+                headers={"Retry-After": str(retry)},
+            )
         return principal
 
     return dependency

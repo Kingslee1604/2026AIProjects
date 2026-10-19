@@ -13,7 +13,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
-from agentforge.api.deps import client_ip, require
+from agentforge.api.deps import client_ip, require, require_limited
 from agentforge.api.knowledge_routes import ServicesDep
 from agentforge.api.qa_routes import ModelCallOut
 from agentforge.auth.rbac import Permission, Principal
@@ -26,6 +26,7 @@ router = APIRouter(tags=["runs"])
 
 Reader = Annotated[Principal, Depends(require(Permission.RUNS_READ))]
 Writer = Annotated[Principal, Depends(require(Permission.RUNS_WRITE))]
+Starter = Annotated[Principal, Depends(require_limited(Permission.RUNS_WRITE, "runs"))]
 
 
 class StartRunIn(BaseModel):
@@ -232,7 +233,7 @@ async def download_artifact(
 
 
 @router.post("/v1/runs", response_model=RunOut, status_code=201)
-async def start_run(body: StartRunIn, principal: Writer, svc: ServicesDep) -> RunOut:
+async def start_run(body: StartRunIn, principal: Starter, svc: ServicesDep) -> RunOut:
     """Start answering an uploaded questionnaire from the chosen knowledge bases."""
     try:
         questionnaire = await svc.questionnaires.get(principal.org_id, body.questionnaire_id)

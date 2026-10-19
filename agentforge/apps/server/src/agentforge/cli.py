@@ -76,9 +76,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "api":
         import uvicorn
 
-        from agentforge.core.settings import get_settings
+        from agentforge.core.settings import bind_refusal, get_settings
 
         settings = get_settings()
+        if refusal := bind_refusal(settings):
+            print(refusal, file=sys.stderr)
+            return 2
         uvicorn.run(
             "agentforge.api.app:create_app",
             factory=True,

@@ -8,14 +8,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field, model_validator
 
-from agentforge.api.deps import require
+from agentforge.api.deps import require, require_limited
 from agentforge.api.knowledge_routes import ServicesDep
 from agentforge.auth.rbac import Permission, Principal
 from agentforge.qa.service import NotFoundError
 
 router = APIRouter(tags=["answers"])
 
-Asker = Annotated[Principal, Depends(require(Permission.RUNS_WRITE))]
+Asker = Annotated[Principal, Depends(require_limited(Permission.RUNS_WRITE, "answers"))]
 Reader = Annotated[Principal, Depends(require(Permission.RUNS_READ))]
 
 

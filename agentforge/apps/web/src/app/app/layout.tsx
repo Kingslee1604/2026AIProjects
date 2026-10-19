@@ -50,6 +50,13 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen">
+      {/* First Tab stop: keyboard users skip the header and navigation on every page. */}
+      <a
+        href="#main"
+        className="sr-only rounded-md bg-surface px-3 py-2 text-sm font-medium shadow focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50"
+      >
+        Skip to content
+      </a>
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <Link href="/app" className="font-semibold tracking-tight">
@@ -101,7 +108,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             ))}
           </ul>
         </nav>
-        <main className="min-w-0 flex-1">{children}</main>
+        <main id="main" tabIndex={-1} className="min-w-0 flex-1 focus:outline-none">
+          {children}
+        </main>
       </div>
     </div>
   );

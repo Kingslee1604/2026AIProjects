@@ -22,7 +22,7 @@ from agentforge.api import (
     review_routes,
     run_routes,
 )
-from agentforge.api.limits import BodySizeLimitMiddleware
+from agentforge.api.limits import BodySizeLimitMiddleware, RateLimits
 from agentforge.api.mcp_server import mount_mcp
 from agentforge.auth.api_keys import ApiKeyService
 from agentforge.auth.service import AuthService
@@ -144,6 +144,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = settings
+    app.state.rate_limits = RateLimits(settings)
     app.state.auth = None
     app.state.api_keys = None
     app.state.sessions = None

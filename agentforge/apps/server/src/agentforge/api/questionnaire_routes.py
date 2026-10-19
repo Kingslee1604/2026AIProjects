@@ -12,7 +12,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from openpyxl.utils import column_index_from_string
 from pydantic import BaseModel, Field
 
-from agentforge.api.deps import require
+from agentforge.api.deps import require, require_limited
 from agentforge.api.knowledge_routes import ServicesDep
 from agentforge.auth.rbac import Permission, Principal
 from agentforge.knowledge.validation import UploadRejectedError
@@ -23,6 +23,7 @@ router = APIRouter(tags=["questionnaires"])
 
 Reader = Annotated[Principal, Depends(require(Permission.RUNS_READ))]
 Writer = Annotated[Principal, Depends(require(Permission.RUNS_WRITE))]
+Uploader = Annotated[Principal, Depends(require_limited(Permission.RUNS_WRITE, "uploads"))]
 
 COLUMN = r"^[A-Za-z]{1,3}$"
 
@@ -92,7 +93,7 @@ def _out(record: Any) -> QuestionnaireOut:
 )
 async def upload_questionnaire(
     request: Request,
-    principal: Writer,
+    principal: Uploader,
     svc: ServicesDep,
     x_filename: Annotated[str, Header(description="URL-encoded file name")],
 ) -> QuestionnaireOut:

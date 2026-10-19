@@ -1,12 +1,59 @@
-"""Request body size limits, enforced while the body streams in (security baseline S5).
+"""Request limits: body size (security baseline S5) and request rates (S8).
 
 Content-Length is checked up front; chunked or lying bodies are counted as they arrive, so
 an oversized request is rejected without buffering it.
 """
 
+import time
+from collections import defaultdict, deque
+from collections.abc import Hashable
+from typing import Literal
+
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from agentforge.core.settings import Settings
+
 UPLOAD_PATH_SUFFIXES = ("/documents", "/questionnaires")
+
+RateBucket = Literal["uploads", "answers", "runs"]
+
+
+class SlidingWindow:
+    """At most `limit` events per key in any 60-second window (in-process: per API replica)."""
+
+    def __init__(self, limit: int, window: float = 60.0) -> None:
+        self.limit, self.window = limit, window
+        self._events: dict[Hashable, deque[float]] = defaultdict(deque)
+
+    def allow(self, key: Hashable) -> bool:
+        now = time.monotonic()
+        events = self._events[key]
+        while events and now - events[0] >= self.window:
+            events.popleft()
+        if len(events) >= self.limit:
+            return False
+        events.append(now)
+        return True
+
+    def retry_after(self, key: Hashable) -> int:
+        events = self._events[key]
+        return max(1, int(self.window - (time.monotonic() - events[0])) + 1) if events else 1
+
+
+class RateLimits:
+    """Per caller (a person, or an API key) limits on uploads, questions, and runs."""
+
+    def __init__(self, settings: Settings) -> None:
+        self._windows: dict[RateBucket, SlidingWindow] = {
+            "uploads": SlidingWindow(settings.rate_uploads_per_minute),
+            "answers": SlidingWindow(settings.rate_answers_per_minute),
+            "runs": SlidingWindow(settings.rate_runs_per_minute),
+        }
+
+    def refused(self, bucket: RateBucket, caller: Hashable) -> int | None:
+        """None if allowed (and counted); otherwise the seconds until the next is allowed."""
+        window = self._windows[bucket]
+        return None if window.allow(caller) else window.retry_after(caller)
 
 
 class BodyTooLargeError(Exception):

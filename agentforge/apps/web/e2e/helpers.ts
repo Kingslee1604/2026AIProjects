@@ -22,7 +22,8 @@ export async function signIn(page: Page, as: string = email): Promise<void> {
   await page.getByLabel("Email").fill(as);
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/app$/);
+  // Argon2id is slow on purpose; several workers signing in at once on a laptop CPU take ~7 s.
+  await expect(page).toHaveURL(/\/app$/, { timeout: 20_000 });
 }
 
 /** Fails on serious or critical WCAG 2.2 A/AA violations (the R1 accessibility bar). */

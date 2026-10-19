@@ -16,9 +16,7 @@ the app (a human gate must not be satisfiable by another agent).
 """
 
 import asyncio
-import time
-from collections import defaultdict, deque
-from collections.abc import AsyncGenerator, Awaitable, Callable, Hashable
+from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Annotated, Any, Literal
@@ -35,6 +33,7 @@ from starlette.responses import JSONResponse
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from agentforge import __version__, audit
+from agentforge.api.limits import SlidingWindow
 from agentforge.audit import AuditEvent
 from agentforge.auth.api_keys import ApiKeyService
 from agentforge.auth.rbac import Permission, Principal, authorize
@@ -59,28 +58,6 @@ READ_ONLY = {"read_only_hint": True, "destructive_hint": False, "open_world_hint
 class McpToolError(ToolError):
     """A failure the caller should see: the SDK returns its message as an is_error tool result
     (any other exception reaches the client only as a generic "Error executing tool")."""
-
-
-class SlidingWindow:
-    """At most `limit` events per key in any 60-second window (in-process: per API replica)."""
-
-    def __init__(self, limit: int, window: float = 60.0) -> None:
-        self.limit, self.window = limit, window
-        self._events: dict[Hashable, deque[float]] = defaultdict(deque)
-
-    def allow(self, key: Hashable) -> bool:
-        now = time.monotonic()
-        events = self._events[key]
-        while events and now - events[0] >= self.window:
-            events.popleft()
-        if len(events) >= self.limit:
-            return False
-        events.append(now)
-        return True
-
-    def retry_after(self, key: Hashable) -> int:
-        events = self._events[key]
-        return max(1, int(self.window - (time.monotonic() - events[0])) + 1) if events else 1
 
 
 @dataclass(frozen=True, slots=True)

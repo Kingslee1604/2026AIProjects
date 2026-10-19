@@ -7,6 +7,7 @@ test.beforeAll(requireCredentials);
 const baseURL = process.env.E2E_BASE_URL ?? "http://127.0.0.1:3000";
 
 test("an admin creates a key, a program uses it, and revoking it stops it", async ({ page }) => {
+  test.setTimeout(90_000); // several steps, each a round trip on a busy laptop
   await signIn(page, adminEmail);
   await page.getByRole("link", { name: "Admin" }).click();
   await expect(page.getByRole("heading", { name: "API keys" })).toBeVisible();

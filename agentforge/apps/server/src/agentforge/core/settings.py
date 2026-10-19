@@ -18,9 +18,11 @@ class Settings(BaseSettings):
     log_format: Literal["json", "console"] = "json"
     otel_exporter: Literal["none", "console"] = "none"
 
-    # Loopback by default (security baseline S1). Containers override this to 0.0.0.0 and rely
-    # on Compose publishing the port on 127.0.0.1 only.
+    # Loopback by default (security baseline S1). The image sets 0.0.0.0 and in_container, and
+    # relies on Compose publishing the port on 127.0.0.1 only. Anything else must be production
+    # (see bind_refusal).
     api_host: str = "127.0.0.1"
+    in_container: bool = False
     api_port: int = Field(default=8000, ge=1, le=65535)
 
     worker_heartbeat_path: Path = Path("/tmp/agentforge-worker.heartbeat")  # noqa: S108
@@ -84,6 +86,12 @@ class Settings(BaseSettings):
     mcp_requests_per_minute: int = Field(default=60, ge=1)
     mcp_answers_per_minute: int = Field(default=6, ge=1)
 
+    # Per person (or API key) per minute, for the requests that cost the most (baseline S8):
+    # uploads (documents and questionnaires), questions, and questionnaire runs.
+    rate_uploads_per_minute: int = Field(default=30, ge=1)
+    rate_answers_per_minute: int = Field(default=20, ge=1)
+    rate_runs_per_minute: int = Field(default=10, ge=1)
+
     # Sessions (security baseline S3). Cookies are Secure whenever served over TLS; production
     # refuses to start without it.
     cookie_secure: bool = False
@@ -100,6 +108,27 @@ class Settings(BaseSettings):
         if self.env == "production" and not self.cookie_secure:
             raise ValueError("AGENTFORGE_COOKIE_SECURE must be true in production (TLS required)")
         return self
+
+
+LOOPBACK_HOSTS = frozenset({"127.0.0.1", "::1", "localhost"})
+
+
+def bind_refusal(settings: Settings) -> str | None:
+    """Why the API must not listen on `api_host`, or None (security baseline S1).
+
+    Loopback is always fine, and so is the container (Compose publishes its port on 127.0.0.1).
+    Any other address must be production, which already requires TLS (Secure cookies), and
+    needs a configured database (there are no default credentials to fall back to)."""
+    if settings.api_host in LOOPBACK_HOSTS or settings.in_container:
+        return None
+    if settings.env != "production":
+        return (
+            f"Refusing to listen on {settings.api_host}: outside a container the API listens on "
+            "127.0.0.1 unless AGENTFORGE_ENV=production (with TLS)"
+        )
+    if settings.database_url is None:
+        return "Refusing to listen publicly without AGENTFORGE_DATABASE_URL"
+    return None
 
 
 @lru_cache
