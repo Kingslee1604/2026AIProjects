@@ -19,7 +19,7 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Admin</h1>
+      <h1 className="text-3xl font-semibold tracking-tight">Admin</h1>
       <Card>
         <CardTitle>Members</CardTitle>
         <p className="mt-1 text-sm text-muted">

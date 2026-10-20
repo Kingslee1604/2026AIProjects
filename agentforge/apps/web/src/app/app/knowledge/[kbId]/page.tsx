@@ -21,7 +21,7 @@ export default function KnowledgeBasePage() {
   if (documents.data === null || (kbs.isSuccess && !kb)) {
     return (
       <div className="space-y-3">
-        <h1 className="text-2xl font-semibold">Knowledge base not found</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Knowledge base not found</h1>
         <Link href="/app/knowledge" className="text-sm text-accent hover:underline">
           Back to knowledge bases
         </Link>
@@ -36,7 +36,7 @@ export default function KnowledgeBasePage() {
           <Link href="/app/knowledge" className="text-sm text-accent hover:underline">
             ← Knowledge
           </Link>
-          <h1 className="mt-1 text-2xl font-semibold">{kb?.name ?? "…"}</h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight">{kb?.name ?? "…"}</h1>
           {kb?.description && <p className="mt-1 text-sm text-muted">{kb.description}</p>}
         </div>
         <ConfirmButton

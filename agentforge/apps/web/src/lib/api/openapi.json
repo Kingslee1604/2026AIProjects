@@ -1,6 +1,36 @@
 {
   "components": {
     "schemas": {
+      "ActivityOut": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "title",
+          "type",
+          "at"
+        ],
+        "title": "ActivityOut",
+        "type": "object"
+      },
       "AnswerOut": {
         "properties": {
           "agent_versions": {
@@ -1065,6 +1095,44 @@
         "title": "ModelCallOut",
         "type": "object"
       },
+      "ModelStatusOut": {
+        "properties": {
+          "chat_model": {
+            "title": "Chat Model",
+            "type": "string"
+          },
+          "chat_model_installed": {
+            "title": "Chat Model Installed",
+            "type": "boolean"
+          },
+          "embedding_model": {
+            "title": "Embedding Model",
+            "type": "string"
+          },
+          "embedding_model_installed": {
+            "title": "Embedding Model Installed",
+            "type": "boolean"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "reachable": {
+            "title": "Reachable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "provider",
+          "reachable",
+          "chat_model",
+          "chat_model_installed",
+          "embedding_model",
+          "embedding_model_installed"
+        ],
+        "title": "ModelStatusOut",
+        "type": "object"
+      },
       "NewApiKeyOut": {
         "properties": {
           "api_key": {
@@ -1081,6 +1149,123 @@
           "api_key"
         ],
         "title": "NewApiKeyOut",
+        "type": "object"
+      },
+      "OverviewOut": {
+        "properties": {
+          "activity": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityOut"
+            },
+            "title": "Activity",
+            "type": "array"
+          },
+          "answers_to_review": {
+            "description": "Undecided answers in open reviews.",
+            "title": "Answers To Review",
+            "type": "integer"
+          },
+          "call_seconds_p50_7d": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Call Seconds P50 7D"
+          },
+          "documents_by_status": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Documents By Status",
+            "type": "object"
+          },
+          "documents_flagged": {
+            "title": "Documents Flagged",
+            "type": "integer"
+          },
+          "knowledge_bases": {
+            "title": "Knowledge Bases",
+            "type": "integer"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ModelStatusOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model_calls_7d": {
+            "title": "Model Calls 7D",
+            "type": "integer"
+          },
+          "model_timeouts_7d": {
+            "title": "Model Timeouts 7D",
+            "type": "integer"
+          },
+          "pipeline": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Questions of queued or running runs, by status (pending, answering, ...).",
+            "title": "Pipeline",
+            "type": "object"
+          },
+          "questions_7d": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Questions 7D",
+            "type": "object"
+          },
+          "reviews_open": {
+            "title": "Reviews Open",
+            "type": "integer"
+          },
+          "runs_by_status": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Runs By Status",
+            "type": "object"
+          },
+          "sentences_30d": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Kept sentences of the last 30 days by proof: verified (exact quote), rescued (AI check), partial.",
+            "title": "Sentences 30D",
+            "type": "object"
+          },
+          "tokens_7d": {
+            "title": "Tokens 7D",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "runs_by_status",
+          "answers_to_review",
+          "reviews_open",
+          "pipeline",
+          "sentences_30d",
+          "questions_7d",
+          "model_calls_7d",
+          "model_timeouts_7d",
+          "tokens_7d",
+          "call_seconds_p50_7d",
+          "knowledge_bases",
+          "documents_by_status",
+          "documents_flagged",
+          "activity",
+          "model"
+        ],
+        "title": "OverviewOut",
         "type": "object"
       },
       "QuestionnaireItemOut": {
@@ -2991,6 +3176,28 @@
           }
         },
         "summary": "Meta"
+      }
+    },
+    "/v1/overview": {
+      "get": {
+        "description": "Counts for the dashboard: runs, reviews, verification, model use, documents, activity.",
+        "operationId": "overview_v1_overview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Overview",
+        "tags": [
+          "overview"
+        ]
       }
     },
     "/v1/questionnaires": {

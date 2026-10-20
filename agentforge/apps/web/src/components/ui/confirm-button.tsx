@@ -52,7 +52,7 @@ export function ConfirmButton({
       <span className="text-sm">{question}</span>
       <Button
         size={size}
-        className="bg-danger text-accent-fg"
+        className="bg-danger-fill bg-none text-accent-fg shadow-none"
         onClick={() => {
           setAsking(false);
           onConfirm();

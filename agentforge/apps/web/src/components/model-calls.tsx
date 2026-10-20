@@ -16,7 +16,11 @@ export function ModelCallList({ calls }: { calls: ModelCall[] }) {
   return (
     <ol className="space-y-2">
       {calls.map((call) => (
-        <li key={call.id} className="rounded-md border border-border p-3" data-testid="model-call">
+        <li
+          key={call.id}
+          className="rounded-xl border border-border/70 bg-surface-2/40 p-3"
+          data-testid="model-call"
+        >
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-medium">{PURPOSE[call.purpose] ?? call.purpose}</span>
             <Badge tone={call.status === "ok" ? "ok" : "danger"}>{call.status}</Badge>

@@ -14,6 +14,7 @@ from agentforge.knowledge.service import KnowledgeService
 from agentforge.models import ModelGateway, build_gateway
 from agentforge.models.providers import FakeProvider
 from agentforge.models.recorder import DbRecorder
+from agentforge.overview import OverviewService
 from agentforge.qa.fake import with_grounded_answers
 from agentforge.qa.pipeline import GroundedAnswerer, QAConfig
 from agentforge.qa.planner import Planner
@@ -44,6 +45,7 @@ class Services:
     questionnaires: QuestionnaireService
     questionnaire_steps: QuestionnaireSteps
     reviews: ReviewService
+    overview: OverviewService
 
     async def close(self) -> None:
         if isinstance(self.run_engine, DbosEngine):
@@ -101,6 +103,13 @@ def build_services(settings: Settings, *, pool_size: int = 5) -> Services:
         run_engine=run_engine,
         runs=runs,
         reviews=ReviewService(sessions, runs),
+        overview=OverviewService(
+            sessions,
+            gateway,
+            model_provider=settings.model_provider,
+            chat_model=settings.chat_model,
+            embedding_model=settings.embedding_model,
+        ),
         blobs=blobs,
         questionnaires=QuestionnaireService(
             sessions, blobs, max_bytes=settings.max_upload_mb * 1024 * 1024

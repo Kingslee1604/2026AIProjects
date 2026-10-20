@@ -4,12 +4,13 @@ import { cn } from "@/lib/utils";
 
 type Tone = "neutral" | "progress" | "ok" | "warn" | "danger";
 
+// Tinted fill plus coloured text; the fill is faint so the text keeps its contrast.
 const TONES: Record<Tone, string> = {
-  neutral: "border-border text-muted",
-  progress: "border-accent/40 text-accent",
-  ok: "border-ok/40 text-ok",
-  warn: "border-warn/50 text-warn",
-  danger: "border-danger/40 text-danger",
+  neutral: "border-border bg-surface-2/60 text-muted",
+  progress: "border-accent/40 bg-accent/10 text-accent",
+  ok: "border-ok/40 bg-ok/10 text-ok",
+  warn: "border-warn/50 bg-warn/10 text-warn",
+  danger: "border-danger/40 bg-danger/10 text-danger",
 };
 
 export function Badge({

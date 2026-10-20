@@ -26,6 +26,9 @@ x-server: &server
     AGENTFORGE_LOG_LEVEL: ${AGENTFORGE_LOG_LEVEL:-INFO}
     AGENTFORGE_MODEL_PROVIDER: ${AGENTFORGE_MODEL_PROVIDER:-auto}
     AGENTFORGE_OLLAMA_BASE_URL: ${AGENTFORGE_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+    # Questions answered at once by the worker. 1 suits a CPU-only Ollama, which answers one
+    # request at a time (measured: bench/results/2026-10-19-inspiron-3520); raise it with a GPU.
+    AGENTFORGE_RUN_WORKER_CONCURRENCY: ${AGENTFORGE_RUN_WORKER_CONCURRENCY:-1}
     AGENTFORGE_DATABASE_URL: postgresql://agentforge_app:${AGENTFORGE_APP_DB_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
     AGENTFORGE_ENGINE_DATABASE_URL: postgresql://agentforge_engine:${AGENTFORGE_ENGINE_DB_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
   extra_hosts:

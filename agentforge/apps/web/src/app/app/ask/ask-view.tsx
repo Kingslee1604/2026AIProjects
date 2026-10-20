@@ -33,7 +33,7 @@ export function AskView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Ask</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Ask</h1>
         <p className="mt-1 text-sm text-muted">
           Answers come only from your documents. Every sentence links to the passage that proves it;
           when the documents do not say, the answer says so instead of guessing.
@@ -60,7 +60,7 @@ export function AskView() {
               }}
               placeholder="How long are access logs retained?"
               aria-describedby="question-hint"
-              className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm placeholder:text-muted"
+              className="w-full rounded-lg border border-border bg-surface-2/60 px-3 py-2 text-sm placeholder:text-muted"
             />
             <p id="question-hint" className="text-xs text-muted">
               Ctrl+Enter to ask.

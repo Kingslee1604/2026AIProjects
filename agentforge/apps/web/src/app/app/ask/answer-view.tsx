@@ -81,7 +81,7 @@ function AnswerCard({ answer }: { answer: Answer }) {
           </p>
         ) : answer.status === "insufficient_evidence" ? (
           <div
-            className="rounded-md border border-border border-l-4 border-l-warn p-4"
+            className="rounded-xl border border-border/70 border-l-4 bg-surface-2/40 border-l-warn p-4"
             data-testid="insufficient"
           >
             <p className="font-medium">Insufficient evidence in the knowledge base.</p>

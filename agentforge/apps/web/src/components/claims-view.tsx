@@ -45,7 +45,7 @@ export function ClaimsView({ claims, evidence }: { claims: Claim[]; evidence: Ev
                     sourceRef.current?.focus();
                   }}
                   className={cn(
-                    "w-full rounded-md border border-border border-l-4 p-3 text-left text-sm hover:bg-bg",
+                    "w-full rounded-xl border border-border/70 border-l-4 bg-surface-2/40 p-3 text-left text-sm hover:bg-bg",
                     c.flagged_source ? BORDER.danger : BORDER[status.tone],
                     index === selected && "bg-bg ring-1 ring-accent",
                   )}
@@ -80,7 +80,10 @@ export function ClaimsView({ claims, evidence }: { claims: Claim[]; evidence: Ev
             </summary>
             <ul className="mt-2 space-y-2">
               {removed.map((c, index) => (
-                <li key={`${index}-${c.text}`} className="rounded-md border border-border p-2">
+                <li
+                  key={`${index}-${c.text}`}
+                  className="rounded-xl border border-border/70 bg-surface-2/40 p-2"
+                >
                   <p className="line-through decoration-danger">{c.drafted_text}</p>
                   <p className="mt-1 text-xs text-muted">Reason: {c.reason ?? "not verified"}</p>
                 </li>
@@ -94,7 +97,7 @@ export function ClaimsView({ claims, evidence }: { claims: Claim[]; evidence: Ev
         tabIndex={-1}
         aria-live="polite"
         aria-label="Source passage"
-        className="rounded-md border border-border p-4 focus:outline-2"
+        className="rounded-xl border border-border/70 bg-surface-2/40 p-4 focus:outline-2 focus:outline-accent"
         data-testid="source-panel"
       >
         {claim ? (

@@ -17,6 +17,7 @@ from agentforge.api import (
     api_key_routes,
     auth_routes,
     knowledge_routes,
+    overview_routes,
     qa_routes,
     questionnaire_routes,
     review_routes,
@@ -178,6 +179,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(run_routes.router)
     app.include_router(questionnaire_routes.router)
     app.include_router(review_routes.router)
+    app.include_router(overview_routes.router)
     # /mcp: API keys with mcp:use only (checked by its gate, not by FastAPI dependencies).
     mcp = mount_mcp(app, settings)
     return app

@@ -99,7 +99,7 @@ export function ItemReview({
           evidence={item.evidence as unknown as Evidence[]}
         />
       ) : (
-        <div className="rounded-md border border-border border-l-4 border-l-warn p-4 text-sm">
+        <div className="rounded-xl border border-border/70 border-l-4 bg-surface-2/40 border-l-warn p-4 text-sm">
           <p className="font-medium">
             {item.status === "insufficient_evidence"
               ? "The documents do not answer this."
@@ -143,7 +143,7 @@ export function ItemReview({
               if (e.key === "Escape") onMode("view");
             }}
             aria-describedby="edit-hint"
-            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-border bg-surface-2/60 px-3 py-2 text-sm"
           />
           <p id="edit-hint" className="text-xs text-muted">
             Ctrl+Enter to save and approve, Escape to cancel.
@@ -172,7 +172,7 @@ export function ItemReview({
               if (e.key === "Escape") onMode("view");
             }}
             aria-describedby="reject-hint"
-            className="h-9 w-full rounded-md border border-border bg-surface px-3 text-sm"
+            className="h-9 w-full rounded-lg border border-border bg-surface-2/60 px-3 text-sm"
           />
           <p id="reject-hint" className="text-xs text-muted">
             Enter to reject, Escape to cancel. The cell is left empty in the file.
@@ -181,7 +181,7 @@ export function ItemReview({
             <Button
               type="submit"
               size="sm"
-              className="bg-danger"
+              className="bg-danger-fill bg-none shadow-none"
               disabled={pending || !reason.trim()}
             >
               Reject

@@ -155,10 +155,13 @@ def questionnaire_run(
             seconds = ts(step["finished_at"]) - ts(step["started_at"])
             by_node.setdefault(step["node_id"], []).append(seconds)
     calls: dict[str, list[float]] = {}
+    outcomes: dict[str, int] = {}
     tokens = {"prompt": 0, "completion": 0}
     for step in steps:
         for call in api.get(f"/v1/runs/{run['id']}/steps/{step['id']}/calls"):
             calls.setdefault(call["purpose"], []).append(call["latency_ms"] / 1000)
+            outcome = call["error_class"] or call["status"]
+            outcomes[outcome] = outcomes.get(outcome, 0) + 1
             tokens["prompt"] += call["prompt_tokens"] or 0
             tokens["completion"] += call["completion_tokens"] or 0
     items = api.get(f"/v1/runs/{run['id']}/items")
@@ -179,6 +182,7 @@ def questionnaire_run(
         "llm_calls": trace["llm_calls"],
         "tokens": trace["tokens"],
         "tokens_split": tokens,
+        "model_call_outcomes": outcomes,
         "step_seconds_by_node": {node: stats(v) for node, v in sorted(by_node.items())},
         "model_call_seconds_by_purpose": {p: stats(v) for p, v in sorted(calls.items())},
         "step_attempts": len(steps),
@@ -205,6 +209,16 @@ def smoke(api: Api, out: Path) -> None:
     result = {"part": "smoke", "indexing": indexing, "retrieval": retrieval(api, kb, marks, 1)}
     result["run_12"] = questionnaire_run(api, kb, DEMO12, "run_12", marks)
     (out / "smoke.json").write_text(json.dumps(result, indent=2) + "\n")
+
+
+def run12(api: Api, out: Path) -> None:
+    """Only the 12-question run on the real model: for comparing settings quickly."""
+    marks: list[dict[str, Any]] = []
+    kb, _ = index_corpus(api, marks)
+    result = questionnaire_run(api, kb, DEMO12, "run_12", marks)
+    name = f"run12-{datetime.now():%H%M%S}.json"
+    (out / name).write_text(json.dumps(result, indent=2) + "\n")
+    print(out / name)
 
 
 def fake(api: Api, out: Path, runs: int = 30) -> None:
@@ -349,7 +363,7 @@ def main() -> None:
         summary(out)
         return
     api = Api(os.environ["BENCH_EMAIL"], os.environ["BENCH_PASSWORD"])
-    {"real": real, "fake": fake, "smoke": smoke}[part](api, out)
+    {"real": real, "fake": fake, "smoke": smoke, "run12": run12}[part](api, out)
 
 
 if __name__ == "__main__":

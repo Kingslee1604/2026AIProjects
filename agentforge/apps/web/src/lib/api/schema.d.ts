@@ -339,6 +339,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Overview
+         * @description Counts for the dashboard: runs, reviews, verification, model use, documents, activity.
+         */
+        get: operations["overview_v1_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/questionnaires": {
         parameters: {
             query?: never;
@@ -729,6 +749,23 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActivityOut */
+        ActivityOut: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /** Title */
+            title: string;
+            /** Type */
+            type: string;
+        };
         /** AnswerOut */
         AnswerOut: {
             /** Agent Versions */
@@ -1145,6 +1182,21 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** ModelStatusOut */
+        ModelStatusOut: {
+            /** Chat Model */
+            chat_model: string;
+            /** Chat Model Installed */
+            chat_model_installed: boolean;
+            /** Embedding Model */
+            embedding_model: string;
+            /** Embedding Model Installed */
+            embedding_model_installed: boolean;
+            /** Provider */
+            provider: string;
+            /** Reachable */
+            reachable: boolean;
+        };
         /** NewApiKeyOut */
         NewApiKeyOut: {
             api_key: components["schemas"]["ApiKeyOut"];
@@ -1153,6 +1205,57 @@ export interface components {
              * @description The API key. Shown only in this response; store it now.
              */
             key: string;
+        };
+        /** OverviewOut */
+        OverviewOut: {
+            /** Activity */
+            activity: components["schemas"]["ActivityOut"][];
+            /**
+             * Answers To Review
+             * @description Undecided answers in open reviews.
+             */
+            answers_to_review: number;
+            /** Call Seconds P50 7D */
+            call_seconds_p50_7d: number | null;
+            /** Documents By Status */
+            documents_by_status: {
+                [key: string]: number;
+            };
+            /** Documents Flagged */
+            documents_flagged: number;
+            /** Knowledge Bases */
+            knowledge_bases: number;
+            model: components["schemas"]["ModelStatusOut"] | null;
+            /** Model Calls 7D */
+            model_calls_7d: number;
+            /** Model Timeouts 7D */
+            model_timeouts_7d: number;
+            /**
+             * Pipeline
+             * @description Questions of queued or running runs, by status (pending, answering, ...).
+             */
+            pipeline: {
+                [key: string]: number;
+            };
+            /** Questions 7D */
+            questions_7d: {
+                [key: string]: number;
+            };
+            /** Reviews Open */
+            reviews_open: number;
+            /** Runs By Status */
+            runs_by_status: {
+                [key: string]: number;
+            };
+            /**
+             * Sentences 30D
+             * @description Kept sentences of the last 30 days by proof: verified (exact quote), rescued (AI check), partial.
+             */
+            sentences_30d: {
+                [key: string]: number;
+            };
+            /** Tokens 7D */
+            tokens_7d: number;
         };
         /** QuestionnaireItemOut */
         QuestionnaireItemOut: {
@@ -2163,6 +2266,26 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    overview_v1_overview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverviewOut"];
                 };
             };
         };

@@ -48,7 +48,7 @@ export function ColumnsForm({
               id={`column-${field.key}`}
               value={choice[field.key] ?? ""}
               onChange={(e) => setChoice({ ...choice, [field.key]: e.target.value || null })}
-              className="h-9 rounded-md border border-border bg-surface px-2 text-sm"
+              className="h-9 rounded-lg border border-border bg-surface-2/60 px-2 text-sm"
             >
               {field.none !== null && <option value="">{field.none}</option>}
               {options.map((o) => (

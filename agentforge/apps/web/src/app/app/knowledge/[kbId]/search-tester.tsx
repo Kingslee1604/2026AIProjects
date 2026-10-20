@@ -50,7 +50,7 @@ export function SearchTester({ kbId }: { kbId: string }) {
           {search.data.map((hit, index) => (
             <li
               key={hit.chunk_id}
-              className="rounded-md border border-border p-3"
+              className="rounded-xl border border-border/70 bg-surface-2/40 p-3"
               data-testid="search-hit"
             >
               <div className="flex flex-wrap items-center gap-2 text-sm">

@@ -40,7 +40,7 @@ export default function NewRunPage() {
         <Link href="/app/runs" className="text-sm text-accent hover:underline">
           ← Questionnaires
         </Link>
-        <h1 className="mt-1 text-2xl font-semibold">New questionnaire</h1>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight">New questionnaire</h1>
         <p className="mt-1 text-sm text-muted">
           The answers are written into a copy of your file, next to each question. Your file itself
           is never changed.

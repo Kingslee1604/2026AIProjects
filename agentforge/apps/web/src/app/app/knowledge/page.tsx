@@ -25,7 +25,7 @@ export default function KnowledgePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Knowledge</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Knowledge</h1>
         <p className="mt-1 text-sm text-muted">
           A knowledge base is a set of documents that answers are drawn from: policies, reports, and
           previous questionnaires.

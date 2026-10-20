@@ -37,9 +37,31 @@ test("the first Tab offers to skip the navigation", async ({ page }) => {
   await expect(page.getByRole("navigation", { name: "Main" }).locator(":focus")).toHaveCount(0);
 });
 
-for (const colorScheme of ["light", "dark"] as const) {
-  test.describe(`${colorScheme} scheme`, () => {
-    test.use({ colorScheme });
+test("dark by default; the toggle switches to light and is remembered", async ({ page }) => {
+  await signIn(page);
+  const html = page.locator("html");
+  await expect(html).not.toHaveAttribute("data-theme", "light");
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await expect(html).toHaveAttribute("data-theme", "light");
+  await page.reload();
+  await expect(html).toHaveAttribute("data-theme", "light");
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  await expect(html).not.toHaveAttribute("data-theme", "light");
+});
+
+// The app's theme (dark by default; the toggle stores "light"), not the OS preference.
+for (const theme of ["light", "dark"] as const) {
+  test.describe(`${theme} theme`, () => {
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript((t) => localStorage.setItem("agentforge-theme", t), theme);
+    });
+
+    test("the page renders in this theme", async ({ page }) => {
+      await page.goto("/login");
+      const html = page.locator("html");
+      if (theme === "light") await expect(html).toHaveAttribute("data-theme", "light");
+      else await expect(html).not.toHaveAttribute("data-theme", "light");
+    });
 
     test("signed-out pages pass axe", async ({ page }) => {
       for (const path of SIGNED_OUT) await checkPage(page, path, /./);

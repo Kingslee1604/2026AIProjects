@@ -4,9 +4,9 @@ Settings are environment variables; every application setting starts with `AGENT
 full list, with types and limits, is `apps/server/src/agentforge/core/settings.py`.
 
 **Where to put them with Docker Compose.** `.env` (created by `make up`, git-ignored, readable
-only by you) holds the passwords and ports, plus three settings that Compose passes to the
-containers: `AGENTFORGE_LOG_LEVEL`, `AGENTFORGE_MODEL_PROVIDER`, and
-`AGENTFORGE_OLLAMA_BASE_URL`. **Any other setting goes in a `compose.override.yaml`** next to
+only by you) holds the passwords and ports, plus four settings that Compose passes to the
+containers: `AGENTFORGE_LOG_LEVEL`, `AGENTFORGE_MODEL_PROVIDER`,
+`AGENTFORGE_OLLAMA_BASE_URL`, and `AGENTFORGE_RUN_WORKER_CONCURRENCY`. **Any other setting goes in a `compose.override.yaml`** next to
 `compose.yaml`. Compose loads that file automatically, and it is git-ignored. Set it on both
 services, then run `make up`:
 
@@ -59,7 +59,7 @@ Outside Compose (`uv run agentforge api`), plain environment variables work.
 | Variable | Default | Meaning |
 |---|---|---|
 | `AGENTFORGE_RUN_ITEM_PARALLELISM` | 4 | Questions answered at once per run |
-| `AGENTFORGE_RUN_WORKER_CONCURRENCY` | 8 | Questions answered at once per worker across all runs |
+| `AGENTFORGE_RUN_WORKER_CONCURRENCY` | **1 in Compose** (8 outside it) | Questions answered at once per worker, across all runs. A CPU-only Ollama answers one request at a time, so more only makes calls queue and time out: on the reference laptop the 12-question run took 31.2 min at 8 (14 of 42 calls timed out), **14.9 min at 1**, and 13.8 min at 2 (no timeouts, but the slowest calls reached 155 of the 180 s limit). Raise it in `.env` with a GPU |
 | `AGENTFORGE_RUN_MAX_LLM_CALLS` / `AGENTFORGE_RUN_MAX_SECONDS` | 3000 / 21600 | Budget per run; a run that exceeds it fails visibly |
 
 ## Uploads and limits

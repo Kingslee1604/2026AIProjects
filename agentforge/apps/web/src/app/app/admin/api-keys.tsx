@@ -134,7 +134,7 @@ export function ApiKeys() {
             id="key-expiry"
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
-            className="h-9 rounded-md border border-border bg-surface px-2 text-sm"
+            className="h-9 rounded-lg border border-border bg-surface-2/60 px-2 text-sm"
           >
             {EXPIRY_DAYS.map((d) => (
               <option key={d} value={d}>

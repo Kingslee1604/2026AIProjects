@@ -275,7 +275,11 @@ function Retrievals({ item }: { item: RunItem }) {
   return (
     <ol className="space-y-2">
       {evidence.map((e) => (
-        <li key={e.id} className="rounded-md border border-border p-3" data-testid="retrieval">
+        <li
+          key={e.id}
+          className="rounded-xl border border-border/70 bg-surface-2/40 p-3"
+          data-testid="retrieval"
+        >
           <p className="font-medium">
             {e.filename}{" "}
             <span className="font-normal text-muted">{formatPages(e.page_start, e.page_end)}</span>

@@ -14,7 +14,7 @@ export default function ReviewsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Reviews</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Reviews</h1>
         <p className="mt-1 text-sm text-muted">
           Every AI answer is checked by a person before it goes into the customer&apos;s file.
           {entries.length > 0 &&

@@ -102,7 +102,7 @@ export default function ReviewPage() {
   if (review.data === null || run.data === null) {
     return (
       <div className="space-y-3">
-        <h1 className="text-2xl font-semibold">Review not found</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Review not found</h1>
         <Link href="/app/reviews" className="text-sm text-accent hover:underline">
           Back to reviews
         </Link>
@@ -123,7 +123,7 @@ export default function ReviewPage() {
         <Link href="/app/reviews" className="text-sm text-accent hover:underline">
           ← Reviews
         </Link>
-        <h1 className="mt-1 text-2xl font-semibold">{run.data.title}</h1>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight">{run.data.title}</h1>
         <p className="mt-1 text-sm text-muted" data-testid="review-counts">
           {undecided} to decide · {counts.approved} approved · {counts.edited} edited ·{" "}
           {counts.rejected} rejected

@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 
 import { RunStatusBadge } from "../run-status";
+import { AgentPipeline } from "./agent-pipeline";
 import { EventList } from "./event-list";
 import { Phases, type Selection } from "./phases";
 import { SidePanel } from "./side-panel";
@@ -47,7 +48,7 @@ export default function RunPage() {
   if (run.data === null) {
     return (
       <div className="space-y-3">
-        <h1 className="text-2xl font-semibold">Questionnaire not found</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Questionnaire not found</h1>
         <Link href="/app/runs" className="text-sm text-accent hover:underline">
           Back to questionnaires
         </Link>
@@ -72,7 +73,7 @@ export default function RunPage() {
           ← Questionnaires
         </Link>
         <div className="mt-1 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold">{r.title}</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">{r.title}</h1>
           <RunStatusBadge status={r.status} />
           <Badge tone={live.tone} data-testid="live-state" data-state={stream.state}>
             {live.label}
@@ -124,6 +125,10 @@ export default function RunPage() {
           </p>
         )}
       </div>
+
+      {trace.data && items.data && (
+        <AgentPipeline run={r} trace={trace.data} items={items.data} events={stream.events} />
+      )}
 
       {trace.data && <Budget trace={trace.data} />}
 
@@ -206,9 +211,9 @@ function Budget({ trace }: { trace: Trace }) {
         ["Tokens", trace.tokens.toLocaleString()],
         ["Time", `${formatDuration(trace.seconds)} of ${formatDuration(trace.max_seconds)}`],
       ].map(([label, value]) => (
-        <div key={label} className="rounded-lg border border-border bg-surface px-4 py-3">
-          <dt className="text-xs font-medium text-muted uppercase">{label}</dt>
-          <dd className="mt-1 text-lg font-semibold tabular-nums">{value}</dd>
+        <div key={label} className="panel px-4 py-3">
+          <dt className="text-xs font-medium tracking-wide text-muted uppercase">{label}</dt>
+          <dd className="mt-1 text-xl font-semibold tabular-nums">{value}</dd>
         </div>
       ))}
     </dl>

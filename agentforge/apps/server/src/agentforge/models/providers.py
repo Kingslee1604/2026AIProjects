@@ -79,6 +79,15 @@ class OllamaProvider:
         data: dict[str, Any] = response.json()
         return data
 
+    async def installed_models(self, timeout: float = 3.0) -> list[str] | None:
+        """Model names Ollama has pulled, or None when Ollama does not answer (status pages)."""
+        try:
+            response = await self._client.get(f"{self._base}/api/tags", timeout=timeout)
+            response.raise_for_status()
+            return [str(entry["name"]) for entry in response.json().get("models", [])]
+        except Exception:
+            return None
+
     async def _digest(self, model: str) -> str | None:
         if model not in self._digests:
             try:
