@@ -1,0 +1,27 @@
+{
+  "part": "fake",
+  "what": "30 runs of the 12-question questionnaire started back to back on the fake model; enqueue = run row created by POST /v1/runs",
+  "statuses": {
+    "succeeded": 0,
+    "waiting_review": 30,
+    "timed_out": 0,
+    "failed": 0,
+    "cancelled": 0
+  },
+  "seconds_enqueue_to_run_started": {
+    "n": 30,
+    "min": 0.259,
+    "p50": 1.222,
+    "p95": 1.8,
+    "max": 2.058,
+    "mean": 1.011
+  },
+  "seconds_enqueue_to_first_step": {
+    "n": 30,
+    "min": 0.596,
+    "p50": 2.677,
+    "p95": 3.344,
+    "max": 3.414,
+    "mean": 1.953
+  }
+}

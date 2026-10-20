@@ -59,7 +59,7 @@ Outside Compose (`uv run agentforge api`), plain environment variables work.
 | Variable | Default | Meaning |
 |---|---|---|
 | `AGENTFORGE_RUN_ITEM_PARALLELISM` | 4 | Questions answered at once per run |
-| `AGENTFORGE_RUN_WORKER_CONCURRENCY` | **1 in Compose** (8 outside it) | Questions answered at once per worker, across all runs. A CPU-only Ollama answers one request at a time, so more only makes calls queue and time out: on the reference laptop the 12-question run took 31.2 min at 8 (14 of 42 calls timed out), **14.9 min at 1**, and 13.8 min at 2 (no timeouts, but the slowest calls reached 155 of the 180 s limit). Raise it in `.env` with a GPU |
+| `AGENTFORGE_RUN_WORKER_CONCURRENCY` | **1 in Compose** (8 outside it) | Questions answered at once per worker, across all runs. A CPU-only Ollama answers one request at a time, so more only makes calls queue and time out: on the reference laptop the 12-question run took 31.2 min at 8 (14 of 42 calls timed out), **14.9 min at 1**, and 13.8 min at 2 (no timeouts, but the slowest calls reached 155 of the 180 s limit). The 40-question run took 36.6 min at 1, against 110 min before. Raise it in `.env` with a GPU |
 | `AGENTFORGE_RUN_MAX_LLM_CALLS` / `AGENTFORGE_RUN_MAX_SECONDS` | 3000 / 21600 | Budget per run; a run that exceeds it fails visibly |
 
 ## Uploads and limits
