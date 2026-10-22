@@ -64,7 +64,7 @@ Docker builds and file watching across the Windows boundary are slow and unrelia
 
 ```bash
 sudo apt-get update && sudo apt-get install -y make git python3
-git clone https://github.com/Kingslee1604/2026AIProjects.git ~/src/2026AIProjects   # add -b feature/dev until R1 is merged
+git clone https://github.com/Kingslee1604/2026AIProjects.git ~/src/2026AIProjects
 cd ~/src/2026AIProjects/agentforge
 make doctor                                          # checks Docker, memory, Ollama, models, ports
 make up                                              # builds and starts everything (see below)
