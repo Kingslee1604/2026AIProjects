@@ -37,6 +37,22 @@ test("the first Tab offers to skip the navigation", async ({ page }) => {
   await expect(page.getByRole("navigation", { name: "Main" }).locator(":focus")).toHaveCount(0);
 });
 
+test("file pickers have one Tab stop, with a clear focus ring", async ({ page }) => {
+  await signIn(page);
+  await page.goto("/app/runs/new");
+  await expect(page.getByRole("heading", { name: "New questionnaire" })).toBeVisible();
+  const choose = page.getByRole("button", { name: "Choose file" });
+  for (let i = 0; i < 20 && !(await choose.evaluate((el) => el === document.activeElement)); i++) {
+    await page.keyboard.press("Tab");
+  }
+  await expect(choose).toBeFocused();
+  await expect(choose).toHaveCSS("outline-width", "3px");
+  await page.keyboard.press("Tab");
+  // The hidden <input type=file> behind the button is not a second, invisible stop.
+  await expect(page.getByTestId("questionnaire-input")).not.toBeFocused();
+  await expect(page.getByTestId("questionnaire-input")).toHaveAttribute("tabindex", "-1");
+});
+
 test("dark by default; the toggle switches to light and is remembered", async ({ page }) => {
   await signIn(page);
   const html = page.locator("html");

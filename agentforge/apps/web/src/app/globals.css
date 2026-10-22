@@ -107,9 +107,12 @@ body {
     0 8px 30px -6px oklch(from var(--color-glow) l c h / 0.55);
 }
 
+/* Keyboard focus: a thick accent ring with a gap, the same on every element. It appears at once
+   (no colour transition), so it is easy to follow on the dark background. */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+  transition-property: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

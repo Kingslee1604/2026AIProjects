@@ -58,6 +58,9 @@ export function QuestionnaireDrop({ onUploaded }: { onUploaded: (q: Questionnair
           type="file"
           accept={QUESTIONNAIRE_FILES}
           className="sr-only"
+          // The "Choose file" button opens it; it is not a second, invisible Tab stop.
+          tabIndex={-1}
+          aria-hidden="true"
           aria-label="Upload questionnaire"
           data-testid="questionnaire-input"
           onChange={(e) => {

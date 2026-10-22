@@ -68,6 +68,9 @@ export function UploadZone({ kbId }: { kbId: string }) {
           multiple
           accept={ACCEPTED_FILES}
           className="sr-only"
+          // The "Choose files" button opens it; it is not a second, invisible Tab stop.
+          tabIndex={-1}
+          aria-hidden="true"
           aria-label="Upload documents"
           data-testid="file-input"
           onChange={(e) => {
