@@ -23,6 +23,11 @@ package = false
 # Supply-chain policy: only resolve releases that are at least ~2 weeks old.
 # Move this date forward deliberately when updating dependencies.
 exclude-newer = "2026-09-28T00:00:00Z"
+# Security fixes adopted before they are two weeks old, one package each, with the reason.
+# Remove an entry once the global date above passes it.
+[tool.uv.exclude-newer-package]
+# PYSEC-2026-4320 in certifi 2026.7.22, fixed in 2026.10.19 (found by pip-audit in CI, 2026-10-22).
+certifi = "2026-10-21T00:00:00Z"
 
 [tool.uv.workspace]
 members = ["apps/server"]
