@@ -18,7 +18,7 @@ import { Logo } from "@/components/brand/logo";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const REPO = "https://github.com/Kingslee1604/2026AIProjects/tree/feature/dev/agentforge";
+const REPO = "https://github.com/Kingslee1604/2026AIProjects/tree/main/agentforge";
 
 const POINTS = ["Every sentence quoted", "Runs on your laptop", "A person approves"];
 

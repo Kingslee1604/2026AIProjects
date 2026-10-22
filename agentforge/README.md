@@ -2,7 +2,7 @@
 
 **Self-hostable platform for evidence-grounded, human-supervised AI workflows over private documents.**
 
-> Status: **Release 1 (pre-release, `feature/dev`).** Everything below runs locally today.
+> Status: **Release 1 (pre-release, on `main`).** Everything below runs locally today.
 > "AgentForge" is a working name, pending a trademark check before any public launch.
 
 ## The problem
@@ -46,8 +46,7 @@ make up                                              # build and start; waits un
 make user-create EMAIL=you@example.com ROLE=admin    # asks for a password
 ```
 
-Until Release 1 is merged into `main`, clone with `-b feature/dev`. Open
-<http://127.0.0.1:3000>, sign in, create a knowledge base, upload a document, and ask.
+Open <http://127.0.0.1:3000>, sign in, create a knowledge base, upload a document, and ask.
 There is no Ollama yet? `AGENTFORGE_MODEL_PROVIDER=fake make up` runs with deterministic
 offline models so you can explore the interface.
 
