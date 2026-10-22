@@ -2,7 +2,7 @@
 
 **Self-hostable platform for evidence-grounded, human-supervised AI workflows over private documents.**
 
-> Status: **Release 1 (pre-release, on `main`).** Everything below runs locally today.
+> Status: **Release 1, [v0.1.0](CHANGELOG.md).** Everything below runs locally today.
 > "AgentForge" is a working name, pending a trademark check before any public launch.
 
 ## The problem
@@ -33,6 +33,18 @@ shown on the right.*
    download the completed spreadsheet.
 3. **Let AI assistants use it.** A read-only [MCP server](docs/mcp/README.md) lets Claude, or any
    MCP client with an API key, search your documents and get cited answers.
+
+## Screenshots
+
+Captured on the CPU-only laptop with the real model (qwen3:4b) and the fictional Northwind demo
+documents.
+
+| | |
+|---|---|
+| ![Overview dashboard with runs, answers to review, the share of sentences proven word for word, and the questionnaire pipeline](docs/images/dashboard.png) | ![A questionnaire run while it is answering: Planner, Drafter, Verifier, and Reviewer cards with live progress](docs/images/run-live.png) |
+| **Overview:** real numbers only, and the live pipeline | **A run, live:** the agents at work, step by step |
+| ![Reviewing answers one by one: the answer, its quotes, and approve, edit or reject](docs/images/review.png) | ![The same dashboard in the light theme](docs/images/dashboard-light.png) |
+| **Review:** approve, edit or reject with the keyboard | **Light theme:** dark is the default |
 
 ## Quickstart
 
@@ -115,7 +127,7 @@ See also the [threat model](docs/security/threat-model.md). Report vulnerabiliti
   [full design](docs/design/ARCHITECTURE_DESIGN.md)
 - Quality: [evaluation](docs/evaluation/README.md), [benchmarks](bench/README.md),
   [accessibility](docs/accessibility/keyboard-checklist.md)
-- Project: [Release 1 plan](docs/design/RELEASE_1_PLAN.md), [contributing](CONTRIBUTING.md),
+- Project: [changelog](CHANGELOG.md), [Release 1 plan](docs/design/RELEASE_1_PLAN.md), [contributing](CONTRIBUTING.md),
   [code of conduct](CODE_OF_CONDUCT.md)
 
 ## Roadmap
