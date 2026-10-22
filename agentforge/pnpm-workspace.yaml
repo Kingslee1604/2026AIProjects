@@ -7,23 +7,25 @@ minimumReleaseAge: 20160
 # Exceptions: security fixes may be adopted before they are 14 days old. Exact versions only,
 # each with its reason. Remove an entry once the version is older than the window.
 minimumReleaseAgeExclude:
-  # CVE-2026-94483 (HIGH, SSRF in image optimization), fixed in 16.3.8. Published 2026-09-30,
-  # adopted 2026-10-13 after review; found by the Trivy image scan. The release spans the
-  # next, @next/*, and eslint-config-next packages, all at exactly 16.3.8.
-  - next@16.3.8
-  - eslint-config-next@16.3.8
-  - "@next/env@16.3.8"
-  - "@next/eslint-plugin-next@16.3.8"
-  - "@next/swc-darwin-arm64@16.3.8"
-  - "@next/swc-darwin-x64@16.3.8"
-  - "@next/swc-linux-arm64-gnu@16.3.8"
-  - "@next/swc-linux-arm64-musl@16.3.8"
-  - "@next/swc-linux-x64-gnu@16.3.8"
-  - "@next/swc-linux-x64-musl@16.3.8"
-  - "@next/swc-win32-arm64-msvc@16.3.8"
-  - "@next/swc-win32-x64-msvc@16.3.8"
-  # GHSA-68fv-2mgg-jv7q (HIGH), fixed in 1.2.2, published 2026-09-30; found by OSV-Scanner.
-  - source-map-js@1.2.2
+  # GHSA-2464-fhr4-w9xw and GHSA-673q-mjm6-r5xr (CRITICAL, RCE) and GHSA-p3m5-59mp-jv5r (HIGH,
+  # DoS), fixed in 16.4.1. Published 2026-10-14, adopted 2026-10-22; found by OSV-Scanner. Low
+  # exposure here (image optimization is off; no `use cache`, no Server Actions), but critical.
+  # The release spans the next, @next/*, and eslint-config-next packages, all at exactly 16.4.1.
+  - next@16.4.1
+  - eslint-config-next@16.4.1
+  - "@next/env@16.4.1"
+  - "@next/eslint-plugin-next@16.4.1"
+  - "@next/swc-darwin-arm64@16.4.1"
+  - "@next/swc-darwin-x64@16.4.1"
+  - "@next/swc-linux-arm64-gnu@16.4.1"
+  - "@next/swc-linux-arm64-musl@16.4.1"
+  - "@next/swc-linux-x64-gnu@16.4.1"
+  - "@next/swc-linux-x64-musl@16.4.1"
+  - "@next/swc-win32-arm64-msvc@16.4.1"
+  - "@next/swc-win32-x64-msvc@16.4.1"
+  # GHSA-cg2g-xh64-v4q7 (CRITICAL) and two more in dompurify, fixed in 3.4.17 (2026-10-12);
+  # reached only through mermaid (docs diagram checks, never shipped); found by OSV-Scanner.
+  - dompurify@3.4.17
 
 # Optional dependencies we deliberately do not install.
 ignoredOptionalDependencies:
@@ -35,6 +37,7 @@ overrides:
   lodash-es: ">=4.18.1" # GHSA-f23m-r3pf-42rh, GHSA-r5fr-rjxr-66jc (via mermaid, docs tooling)
   katex: ">=0.18.2" # GHSA-238p-pmpm-9mq7 (via mermaid, docs tooling)
   source-map-js: ">=1.2.2" # GHSA-68fv-2mgg-jv7q (via postcss)
+  dompurify: ">=3.4.17" # GHSA-cg2g-xh64-v4q7 and others (via mermaid, docs tooling)
 
 # Dependency install scripts are blocked unless listed here as true (pnpm default).
 allowBuilds:

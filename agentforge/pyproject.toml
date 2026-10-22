@@ -28,6 +28,11 @@ exclude-newer = "2026-09-28T00:00:00Z"
 [tool.uv.exclude-newer-package]
 # PYSEC-2026-4320 in certifi 2026.7.22, fixed in 2026.10.19 (found by pip-audit in CI, 2026-10-22).
 certifi = "2026-10-21T00:00:00Z"
+# CVE-2026-114603 in opentelemetry-api 1.45.0, fixed in 1.45.1 (2026-10-06; found by pip-audit
+# in CI, 2026-10-22). The SDK pins the exact API version, so the three move together.
+opentelemetry-api = "2026-10-07T00:00:00Z"
+opentelemetry-sdk = "2026-10-07T00:00:00Z"
+opentelemetry-semantic-conventions = "2026-10-07T00:00:00Z"
 
 [tool.uv.workspace]
 members = ["apps/server"]
