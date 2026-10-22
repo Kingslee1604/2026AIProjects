@@ -1,0 +1,232 @@
+{
+  "part": "real",
+  "indexing": {
+    "documents": 12,
+    "failed": [],
+    "chunks": 53,
+    "seconds_upload_to_all_ready": 16.7
+  },
+  "retrieval": {
+    "what": "POST /v1/knowledge/search, k=8, client-side wall time: query embedding (Ollama) + vector and keyword search + fusion, through HTTP",
+    "questions": 40,
+    "rounds": 3,
+    "ms": {
+      "n": 120,
+      "min": 116.77,
+      "p50": 150.195,
+      "p95": 248.191,
+      "max": 343.55,
+      "mean": 162.154
+    }
+  },
+  "run_12": {
+    "run_id": "e70ff4cf-9ea3-498c-b4b2-12a587b7233e",
+    "status": "waiting_review",
+    "questions": 12,
+    "answered": 12,
+    "confidence": {
+      "high": 10,
+      "medium": 0,
+      "low": 1
+    },
+    "insufficient_evidence": 1,
+    "seconds_end_to_end": 891.9,
+    "seconds_observed_by_client": 892.4,
+    "seconds_enqueue_to_start": 0.824,
+    "llm_calls": 25,
+    "tokens": 16400,
+    "tokens_split": {
+      "prompt": 13602,
+      "completion": 2798
+    },
+    "model_call_outcomes": {
+      "ok": 25
+    },
+    "step_seconds_by_node": {
+      "answer": {
+        "n": 12,
+        "min": 52.554,
+        "p50": 60.831,
+        "p95": 100.12,
+        "max": 100.12,
+        "mean": 65.225
+      },
+      "plan": {
+        "n": 2,
+        "min": 30.891,
+        "p50": 73.114,
+        "p95": 73.114,
+        "max": 73.114,
+        "mean": 52.002
+      }
+    },
+    "model_call_seconds_by_purpose": {
+      "draft": {
+        "n": 12,
+        "min": 39.175,
+        "p50": 49.024,
+        "p95": 102.358,
+        "max": 102.358,
+        "mean": 53.139
+      },
+      "plan": {
+        "n": 2,
+        "min": 31.786,
+        "p50": 74.709,
+        "p95": 74.709,
+        "max": 74.709,
+        "mean": 53.247
+      },
+      "relevance": {
+        "n": 11,
+        "min": 9.741,
+        "p50": 14.636,
+        "p95": 24.428,
+        "max": 24.428,
+        "mean": 14.762
+      }
+    },
+    "step_attempts": 14
+  },
+  "run_40": {
+    "run_id": "1e5fe547-1bab-485a-8400-49711fb9e5ef",
+    "status": "waiting_review",
+    "questions": 40,
+    "answered": 40,
+    "confidence": {
+      "high": 34,
+      "medium": 0,
+      "low": 2
+    },
+    "insufficient_evidence": 4,
+    "seconds_end_to_end": 2197.1,
+    "seconds_observed_by_client": 2201.3,
+    "seconds_enqueue_to_start": -0.106,
+    "llm_calls": 85,
+    "tokens": 55479,
+    "tokens_split": {
+      "prompt": 46546,
+      "completion": 8933
+    },
+    "model_call_outcomes": {
+      "ok": 85
+    },
+    "step_seconds_by_node": {
+      "answer": {
+        "n": 40,
+        "min": 23.194,
+        "p50": 46.961,
+        "p95": 62.472,
+        "max": 66.546,
+        "mean": 48.515
+      },
+      "plan": {
+        "n": 5,
+        "min": 43.919,
+        "p50": 48.296,
+        "p95": 52.304,
+        "max": 52.304,
+        "mean": 48.467
+      }
+    },
+    "model_call_seconds_by_purpose": {
+      "draft": {
+        "n": 40,
+        "min": 15.495,
+        "p50": 37.08,
+        "p95": 51.273,
+        "max": 56.335,
+        "mean": 38.066
+      },
+      "plan": {
+        "n": 5,
+        "min": 44.755,
+        "p50": 49.978,
+        "p95": 53.345,
+        "max": 53.345,
+        "mean": 49.806
+      },
+      "relevance": {
+        "n": 38,
+        "min": 7.284,
+        "p50": 11.278,
+        "p95": 15.551,
+        "max": 18.834,
+        "mean": 11.456
+      },
+      "verify": {
+        "n": 2,
+        "min": 8.522,
+        "p50": 13.41,
+        "p95": 13.41,
+        "max": 13.41,
+        "mean": 10.966
+      }
+    },
+    "step_attempts": 45
+  },
+  "marks": [
+    {
+      "phase": "indexing",
+      "event": "start",
+      "t": 1792475640.982335
+    },
+    {
+      "phase": "indexing",
+      "event": "end",
+      "t": 1792475657.7415369
+    },
+    {
+      "phase": "retrieval",
+      "event": "start",
+      "t": 1792475657.7419975
+    },
+    {
+      "phase": "retrieval",
+      "event": "end",
+      "t": 1792475676.3589838
+    },
+    {
+      "phase": "run_12",
+      "event": "start",
+      "t": 1792475676.7431555
+    },
+    {
+      "phase": "run_12",
+      "event": "end",
+      "t": 1792476569.7416945
+    },
+    {
+      "phase": "run_40",
+      "event": "start",
+      "t": 1792476570.0659542
+    },
+    {
+      "phase": "run_40",
+      "event": "end",
+      "t": 1792478771.4344518
+    }
+  ],
+  "memory_peak_mb": {
+    "indexing": {
+      "vmmem_mb": 1945.0,
+      "ollama_mb": 338.0,
+      "wsl_used_mb": 1460.0
+    },
+    "retrieval": {
+      "vmmem_mb": 1957.0,
+      "ollama_mb": 339.0,
+      "wsl_used_mb": 1470.0
+    },
+    "run_12": {
+      "vmmem_mb": 1973.0,
+      "ollama_mb": 3847.0,
+      "wsl_used_mb": 1509.0
+    },
+    "run_40": {
+      "vmmem_mb": 1134.0,
+      "ollama_mb": 4387.0,
+      "wsl_used_mb": 1527.0
+    }
+  }
+}

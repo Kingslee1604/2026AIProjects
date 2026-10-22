@@ -1,0 +1,151 @@
+# AgentForge CI (Release 1 task R1-09). Runs the same gates as `make check`, plus dependency,
+# image, and history scans with SBOMs, and browser tests against the full Compose stack.
+# Actions are pinned to commit SHAs; tools are installed by checksum-verified scripts.
+name: agentforge CI
+
+on:
+  push:
+    branches: [main, "feature/**"]
+    paths:
+      - "agentforge/**"
+      - ".github/workflows/agentforge-ci.yml"
+      - ".gitleaks.toml"
+      - ".gitleaks.worktree.toml"
+      - ".pre-commit-config.yaml"
+  pull_request:
+    paths:
+      - "agentforge/**"
+      - ".github/workflows/agentforge-ci.yml"
+      - ".gitleaks.toml"
+      - ".gitleaks.worktree.toml"
+      - ".pre-commit-config.yaml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agentforge-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+    working-directory: agentforge
+
+env:
+  TESTCONTAINERS_RYUK_DISABLED: "true"
+  UV_CACHE_DIR: /home/runner/.cache/uv
+
+jobs:
+  checks:
+    name: lint, types, tests, docs, secrets, licenses
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.local/bin
+            ~/.local/opt
+            ~/.local/share/uv
+            ~/.cache/uv
+            ~/.cache/node/corepack
+            ~/.local/share/pnpm/store
+          key: tools-${{ runner.os }}-${{ hashFiles('agentforge/scripts/install-*.sh', 'agentforge/uv.lock', 'agentforge/pnpm-lock.yaml') }}
+      - name: Install pinned tools
+        run: ./scripts/install-dev-tools.sh && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Install dependencies from lockfiles
+        run: uv sync --frozen && pnpm install --frozen-lockfile
+      - name: make check (includes integration tests on real Postgres)
+        run: make check
+
+  engine:
+    name: run-engine hard gates H1-H8 (DBOS, ADR-0002)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.local/bin
+            ~/.local/opt
+            ~/.local/share/uv
+            ~/.cache/uv
+          key: engine-${{ runner.os }}-${{ hashFiles('agentforge/scripts/install-*.sh', 'agentforge/uv.lock') }}
+      - name: Install pinned tools
+        run: ./scripts/install-dev-tools.sh && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Install dependencies from the lockfile
+        run: uv sync --frozen
+      - name: Conformance suite (kill -9 chaos, review waits, fan-out, cancel, idempotent export)
+        run: make engine-conformance
+      - name: Durability (50 runs, worker killed at random, 10% model faults)
+        run: make durability DURABILITY_RESULTS=build/durability
+      - name: Gate results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: engine-conformance
+          path: |
+            agentforge/build/engine-conformance/
+            agentforge/build/durability/
+          if-no-files-found: warn
+
+  security:
+    name: dependency and history scans
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install pinned tools and scanners
+        run: |
+          ./scripts/install-dev-tools.sh
+          ./scripts/install-ci-tools.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: pip-audit and OSV-Scanner
+        run: ./scripts/security-scan.sh deps
+      - name: gitleaks over full history
+        run: ./scripts/security-scan.sh history
+
+  stack:
+    name: images, SBOMs, and browser tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned tools and scanners
+        run: |
+          ./scripts/install-dev-tools.sh
+          ./scripts/install-ci-tools.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Build images
+        run: ./scripts/ensure-env.sh && docker compose build
+      - name: Trivy image scan and Syft SBOMs
+        run: ./scripts/security-scan.sh images
+      - name: Upload SBOMs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sbom
+          path: agentforge/build/sbom/
+          if-no-files-found: error
+      - name: Start the stack with fake models (CI has no Ollama)
+        env:
+          AGENTFORGE_MODEL_PROVIDER: fake
+        run: make up
+      - name: Browser tests (Playwright)
+        run: pnpm install --frozen-lockfile && make e2e
+      - name: Stack logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail 200

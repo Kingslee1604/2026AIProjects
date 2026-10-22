@@ -1,0 +1,10 @@
+# OSV-Scanner exceptions. Each one needs a reason and an expiry; when it expires the scan
+# fails again and the decision must be reviewed.
+
+[[IgnoredVulns]]
+id = "GHSA-vfj7-8cjw-p6xm"
+ignoreUntil = 2027-01-13T00:00:00Z
+reason = """braces <=3.0.3: stack-exhaustion DoS from deeply nested patterns; no fixed version \
+exists yet (3.0.3 is the latest). Reached only through build and lint tooling (micromatch), \
+never with untrusted input; not present in the runtime images (Trivy scan is clean). \
+Accepted 2026-10-13; review when a fix is released or at expiry."""

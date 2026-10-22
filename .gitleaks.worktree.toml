@@ -1,0 +1,11 @@
+# Working-tree scan (`make secrets-scan`): the same rules as .gitleaks.toml, but local .env files
+# are skipped. They are git-ignored and legitimately hold generated development secrets.
+# The pre-commit hook keeps using .gitleaks.toml, so a staged .env is still blocked.
+title = "Working-tree scan"
+
+[extend]
+path = ".gitleaks.toml"
+
+[[allowlists]]
+description = "Local, git-ignored environment files"
+paths = ['''(^|/)\.env$''']

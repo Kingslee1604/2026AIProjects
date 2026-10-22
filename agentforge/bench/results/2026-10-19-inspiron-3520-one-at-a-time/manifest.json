@@ -1,0 +1,33 @@
+{
+  "date_utc": "2026-10-20T05:53:57Z",
+  "commit": "5d70f88",
+  "windows": {
+    "on_mains_power": false,
+    "cores": 10,
+    "threads": 12,
+    "ram_gb": 15.7,
+    "model": "Inspiron 15 3520",
+    "os": "Microsoft Windows 11 Home 26200",
+    "cpu": "12th Gen Intel(R) Core(TM) i7-1255U"
+  },
+  "wsl": {
+    "kernel": "5.15.133.1-microsoft-standard-WSL2",
+    "memory_total_mb": 3919,
+    "cpus": 12
+  },
+  "docker": "24.0.7",
+  "ollama": {
+    "version": "0.40.6",
+    "models": {
+      "nomic-embed-text:v1.5": "0a109f422b47",
+      "qwen3:4b": "359d7dd4bcda",
+      "qwen2.5:7b": "845dbda0ea48",
+      "llama3.2:latest": "a80c4f17acd5"
+    }
+  },
+  "settings": {
+    "model_provider": "auto (real part), fake (enqueue part)",
+    "chat_model": "default (ollama:qwen3:4b)",
+    "embedding_model": "default"
+  }
+}

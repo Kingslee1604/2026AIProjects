@@ -1,6 +1,6 @@
 {
-  "include": ["apps/server/src", "apps/server/tests"],
-  "strict": ["apps/server/src"],
+  "include": ["apps/server/src", "apps/server/tests", "tools"],
+  "strict": ["apps/server/src", "tools/license_check.py"],
   "venvPath": ".",
   "venv": ".venv",
   "pythonVersion": "3.12",

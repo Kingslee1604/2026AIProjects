@@ -1,0 +1,147 @@
+# AgentForge local stack. Start with `make up` (creates .env with random database passwords).
+# Every published port is bound to 127.0.0.1 only (security baseline S1).
+# Ollama runs on the host by default; `--profile ollama` runs it in a container instead.
+#
+# Database roles (deploy/postgres/initdb/10-roles.sh, architecture §13.2):
+#   agentforge_owner  - runs migrations only (`migrate` service)
+#   agentforge_app    - used by api and worker; row level security applies to it
+#   agentforge_engine - reserved for the durable run engine (milestone M3)
+name: agentforge
+
+x-hardening: &hardening
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+
+x-server: &server
+  <<: *hardening
+  image: agentforge-server:dev
+  build:
+    context: .
+    dockerfile: deploy/docker/server.Dockerfile
+  environment:
+    AGENTFORGE_ENV: development
+    AGENTFORGE_LOG_LEVEL: ${AGENTFORGE_LOG_LEVEL:-INFO}
+    AGENTFORGE_MODEL_PROVIDER: ${AGENTFORGE_MODEL_PROVIDER:-auto}
+    AGENTFORGE_OLLAMA_BASE_URL: ${AGENTFORGE_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+    # Questions answered at once by the worker. 1 suits a CPU-only Ollama, which answers one
+    # request at a time (measured: bench/results/2026-10-19-inspiron-3520); raise it with a GPU.
+    AGENTFORGE_RUN_WORKER_CONCURRENCY: ${AGENTFORGE_RUN_WORKER_CONCURRENCY:-1}
+    AGENTFORGE_DATABASE_URL: postgresql://agentforge_app:${AGENTFORGE_APP_DB_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
+    AGENTFORGE_ENGINE_DATABASE_URL: postgresql://agentforge_engine:${AGENTFORGE_ENGINE_DB_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  volumes:
+    - blobs:/data/blobs # uploaded documents: written by api, read by worker
+  depends_on:
+    postgres:
+      condition: service_healthy
+    migrate:
+      condition: service_completed_successfully
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg18-trixie@sha256:9d9c930220cb9bf2f956d10a8f909cf9973d9672ca0278aef2c1e6facccad2e0
+    environment:
+      POSTGRES_DB: agentforge
+      POSTGRES_USER: agentforge_owner
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run "make up", which creates .env}
+      AGENTFORGE_APP_DB_PASSWORD: ${AGENTFORGE_APP_DB_PASSWORD:?run "make up", which creates .env}
+      AGENTFORGE_ENGINE_DB_PASSWORD: ${AGENTFORGE_ENGINE_DB_PASSWORD:?run "make up", which creates .env}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./deploy/postgres/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # Checks the app role can log in, so it only passes after the init script has run.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U agentforge_app -d agentforge"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  migrate:
+    <<: *hardening
+    image: agentforge-server:dev
+    build:
+      context: .
+      dockerfile: deploy/docker/server.Dockerfile
+    command: ["migrate"]
+    environment:
+      AGENTFORGE_MIGRATION_DATABASE_URL: postgresql://agentforge_owner:${POSTGRES_PASSWORD:?run "make up", which creates .env}@postgres:5432/agentforge
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    <<: *server
+    command: ["api"]
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "agentforge", "healthcheck", "api"]
+      interval: 15s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+
+  worker:
+    <<: *server
+    command: ["worker"]
+    healthcheck:
+      test: ["CMD", "agentforge", "healthcheck", "worker"]
+      interval: 15s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+
+  web:
+    <<: *hardening
+    image: agentforge-web:dev
+    build:
+      context: .
+      dockerfile: deploy/docker/web.Dockerfile
+      args:
+        AGENTFORGE_API_ORIGIN: http://api:8000
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+    tmpfs:
+      - /tmp
+      - /app/apps/web/.next/cache:uid=1000,gid=1000
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/login').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+    restart: unless-stopped
+
+  ollama:
+    profiles: [ollama]
+    image: ollama/ollama:0.40.3@sha256:adca95a12c2b386a8f9a995e7fa0600e187e3323b5e5522f5a6c3b1ec73eff99
+    # Port 11435 on the host avoids clashing with a host-native Ollama on 11434.
+    # Point the stack at it with AGENTFORGE_OLLAMA_BASE_URL=http://ollama:11434 in .env.
+    ports:
+      - "127.0.0.1:11435:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  blobs:
+  ollama:

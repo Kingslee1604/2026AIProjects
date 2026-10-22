@@ -1,0 +1,30 @@
+/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/langgraph/pregel/_executor.py:181: RuntimeWarning: coroutine 'arun_with_retry' was never awaited
+  self.tasks.pop(task)
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+Task exception was never retrieved
+future: <Task finished name='Task-12' coro=<LangGraphEngine._execute() done, defined at /home/kingslee/src/2026AIProjects/agentforge/spikes/engine/adapters/langgraph_engine.py:248> exception=RunGoneError('33b7ca56-af9a-4534-9c2b-0ba6764b0c8c')>
+Traceback (most recent call last):
+  File "/home/kingslee/src/2026AIProjects/agentforge/spikes/engine/adapters/langgraph_engine.py", line 278, in _execute
+    await run_graph.ainvoke(payload, config, durability="sync")
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 4090, in ainvoke
+    async for chunk in self.astream(
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py", line 3440, in astream
+    async for _ in runner.atick(
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/langgraph/pregel/_runner.py", line 396, in atick
+    await arun_with_retry(
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/langgraph/pregel/_retry.py", line 744, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 756, in ainvoke
+    input = await asyncio.create_task(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/.venv/lib/python3.12/site-packages/langgraph/_internal/_runnable.py", line 522, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/spikes/engine/adapters/langgraph_engine.py", line 57, in plan
+    return {"count": await steps.plan(UUID(state["org"]), UUID(state["run"]))}
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kingslee/src/2026AIProjects/agentforge/spikes/engine/harness/steps.py", line 105, in plan
+    raise RunGoneError(str(run_id))
+spikes.engine.harness.steps.RunGoneError: 33b7ca56-af9a-4534-9c2b-0ba6764b0c8c
+During task with name 'plan' and id '4da15ca5-8362-02bd-e31b-666ccfa29a58'

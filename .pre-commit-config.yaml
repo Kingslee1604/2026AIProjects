@@ -9,6 +9,11 @@ repos:
         entry: gitleaks git --pre-commit --staged --redact --no-banner --config .gitleaks.toml
         language: system
         pass_filenames: false
+      - id: no-large-files
+        name: block files larger than 5 MB (datasets, binaries)
+        entry: bash -c 'status=0; for f in "$@"; do size=$(wc -c < "$f"); if [ "$size" -gt 5242880 ]; then echo "$f is $((size / 1048576)) MB (limit 5 MB)"; status=1; fi; done; exit $status' --
+        language: system
+        types: [file]
       - id: agentforge-ruff
         name: agentforge ruff (lint + format)
         entry: bash -c 'cd agentforge && uv run --frozen ruff check . && uv run --frozen ruff format .'
