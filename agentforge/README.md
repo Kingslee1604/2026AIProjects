@@ -17,10 +17,10 @@ sentence, says **"insufficient evidence"** instead of guessing, and puts **a per
 of what gets sent. Everything runs on your own machine with open-weight models: no paid API, and
 no document leaves the laptop.
 
-![An answer in AgentForge: each sentence is marked Verified and the cited passage is highlighted in its source document](docs/images/ask.png)
+![AgentForge in action: the dashboard, a 12-question run with the Planner, Drafter, Verifier and Reviewer agents working, a verified answer with its highlighted source, and the review screen](docs/images/agentforge-demo.gif)
 
-*A real answer from the CPU-only reference laptop: each sentence is verified against the quote
-shown on the right.*
+*Recorded on the CPU-only laptop with the real model (qwen3:4b) and the fictional Northwind
+documents. The run is shown as a **time-lapse**: about 15 minutes in 8 seconds.*
 
 ## What it does
 
