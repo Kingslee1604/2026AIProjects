@@ -12,7 +12,9 @@ your own documents**. Every sentence carries the quote that proves it, unproven 
 "insufficient evidence", and a person approves what goes out. It runs on a CPU-only laptop with
 open-weight models.
 
-[![The AgentForge dashboard: runs, answers to review, the share of sentences proven word for word, and a live questionnaire pipeline](agentforge/docs/images/dashboard.png)](agentforge/)
+[![AgentForge in action: the dashboard, agents answering a 12-question questionnaire, a verified answer with its source, and the review screen](agentforge/docs/images/agentforge-demo.gif)](agentforge/)
+
+*A real run on a CPU-only laptop, shown as a time-lapse (about 15 minutes in 8 seconds).*
 
 - **Grounded answers:** hybrid retrieval in Postgres; every claim is checked against a verbatim
   quote, and anything unproven is dropped.
