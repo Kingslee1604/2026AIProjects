@@ -26,6 +26,9 @@ minimumReleaseAgeExclude:
   # GHSA-cg2g-xh64-v4q7 (CRITICAL) and two more in dompurify, fixed in 3.4.17 (2026-10-12);
   # reached only through mermaid (docs diagram checks, never shipped); found by OSV-Scanner.
   - dompurify@3.4.17
+  # GHSA-mrhx-c7xc-m3w5 (HIGH) in zod 4.6.5, fixed in 4.6.6 (2026-10-11); reached only through
+  # eslint-plugin-react-hooks (lint tooling, never shipped); found by OSV-Scanner, 2026-10-23.
+  - zod@4.6.6
 
 # Optional dependencies we deliberately do not install.
 ignoredOptionalDependencies:
@@ -38,6 +41,7 @@ overrides:
   katex: ">=0.18.2" # GHSA-238p-pmpm-9mq7 (via mermaid, docs tooling)
   source-map-js: ">=1.2.2" # GHSA-68fv-2mgg-jv7q (via postcss)
   dompurify: ">=3.4.17" # GHSA-cg2g-xh64-v4q7 and others (via mermaid, docs tooling)
+  zod: ">=4.6.6 <5" # GHSA-mrhx-c7xc-m3w5 (via eslint-plugin-react-hooks, lint tooling)
 
 # Dependency install scripts are blocked unless listed here as true (pnpm default).
 allowBuilds:
