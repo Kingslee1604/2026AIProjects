@@ -1,3 +1,14 @@
+![AgentForge: answers your auditors can verify. Self-hosted AI agents with verified citations, durable runs, and human review.](docs/images/banner.svg)
+
+<p>
+  <a href="https://github.com/Kingslee1604/2026AIProjects/actions/workflows/agentforge-ci.yml"><img alt="CI" src="https://github.com/Kingslee1604/2026AIProjects/actions/workflows/agentforge-ci.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/Kingslee1604/2026AIProjects/releases/tag/agentforge-v0.1.0"><img alt="Release v0.1.0" src="https://img.shields.io/badge/release-v0.1.0-7c3aed"></a>
+  <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue"></a>
+  <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3776ab?logo=python&amp;logoColor=white">
+  <img alt="TypeScript" src="https://img.shields.io/badge/typescript-Next.js-3178c6?logo=typescript&amp;logoColor=white">
+  <img alt="PostgreSQL with pgvector" src="https://img.shields.io/badge/postgres-pgvector-4169e1?logo=postgresql&amp;logoColor=white">
+</p>
+
 # AgentForge AI
 
 **Self-hostable platform for evidence-grounded, human-supervised AI workflows over private documents.**

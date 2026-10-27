@@ -1,11 +1,20 @@
+[![AgentForge: answers your auditors can verify. Self-hosted AI agents with verified citations, durable runs, and human review.](agentforge/docs/images/banner.svg)](agentforge/)
+
+<p>
+  <a href="https://github.com/Kingslee1604/2026AIProjects/actions/workflows/agentforge-ci.yml"><img alt="CI" src="https://github.com/Kingslee1604/2026AIProjects/actions/workflows/agentforge-ci.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/Kingslee1604/2026AIProjects/releases/tag/agentforge-v0.1.0"><img alt="Release v0.1.0" src="https://img.shields.io/badge/release-v0.1.0-7c3aed"></a>
+  <a href="agentforge/LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue"></a>
+  <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3776ab?logo=python&amp;logoColor=white">
+  <img alt="TypeScript" src="https://img.shields.io/badge/typescript-Next.js-3178c6?logo=typescript&amp;logoColor=white">
+  <img alt="PostgreSQL with pgvector" src="https://img.shields.io/badge/postgres-pgvector-4169e1?logo=postgresql&amp;logoColor=white">
+</p>
+
 # 2026 AI Projects
 
 AI engineering projects built in 2026. Each project lives in its own folder with its own
 README, license, and tooling.
 
 ## ⭐ AgentForge: answers your auditors can verify
-
-[![agentforge CI](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/agentforge-ci.yml/badge.svg?branch=main)](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/agentforge-ci.yml)
 
 A self-hosted platform that answers security questionnaires and policy questions **only from
 your own documents**. Every sentence carries the quote that proves it, unproven answers say
@@ -42,7 +51,8 @@ open-weight models.
 | [agentforge](agentforge/) | Self-hostable platform for evidence-grounded, human-supervised AI workflows over private documents | **Release 1 (v0.1.0)**: complete, tested in CI |
 | [production-rag](production-rag/) | "Ask My Cardiology Docs": CPU-only RAG with hybrid retrieval, reranking, verified citations, and a CI eval gate | Working prototype with measured fixture-set results |
 
-## Repository conventions
+<details>
+<summary><b>For contributors: repository conventions</b></summary>
 
 - Repository-wide hygiene lives at the root: `.gitignore`, `.gitattributes`, `.editorconfig`,
   `.gitleaks.toml` (secret scanning), and `.pre-commit-config.yaml`.
@@ -51,3 +61,5 @@ open-weight models.
   `.github/workflows/<project>-*.yml` and run with that project folder as the working directory.
 - Clone into the Linux filesystem when using WSL2 (for example `~/src/2026AIProjects`), not under
   `/mnt/c` or a OneDrive folder.
+
+</details>

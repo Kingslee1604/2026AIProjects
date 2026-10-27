@@ -29,6 +29,9 @@ minimumReleaseAgeExclude:
   # GHSA-mrhx-c7xc-m3w5 (HIGH) in zod 4.6.5, fixed in 4.6.6 (2026-10-11); reached only through
   # eslint-plugin-react-hooks (lint tooling, never shipped); found by OSV-Scanner, 2026-10-23.
   - zod@4.6.6
+  # GHSA-xjj6-f33q-929c (HIGH) and two more in undici 8.11.2, fixed in 8.12.2 (2026-10-15);
+  # reached only through jsdom (unit tests, never shipped); found by OSV-Scanner, 2026-10-27.
+  - undici@8.12.2
 
 # Optional dependencies we deliberately do not install.
 ignoredOptionalDependencies:
@@ -42,6 +45,7 @@ overrides:
   source-map-js: ">=1.2.2" # GHSA-68fv-2mgg-jv7q (via postcss)
   dompurify: ">=3.4.17" # GHSA-cg2g-xh64-v4q7 and others (via mermaid, docs tooling)
   zod: ">=4.6.6 <5" # GHSA-mrhx-c7xc-m3w5 (via eslint-plugin-react-hooks, lint tooling)
+  undici: ">=8.12.2 <9" # GHSA-xjj6-f33q-929c and others (via jsdom, unit tests)
 
 # Dependency install scripts are blocked unless listed here as true (pnpm default).
 allowBuilds:
