@@ -1,0 +1,63 @@
+[project]
+name = "eventplat"
+version = "0.0.0"
+description = "Real-time AI usage metering and budget enforcement on Kafka"
+requires-python = ">=3.12,<3.14"
+license = "Apache-2.0"
+dependencies = [
+    "confluent-kafka",
+    "fastapi",
+    "pg8000",
+    "pydantic",
+    "uvicorn",
+]
+
+[project.scripts]
+eventplat-ledger = "eventplat.ledger:main"
+eventplat-totals = "eventplat.totals:main"
+
+[dependency-groups]
+dev = [
+    "httpx2",
+    "pyright",
+    "pytest",
+    "ruff",
+]
+# Candidates tested for ADR-0001 (Kafka client). Never installed in the images.
+spikes = ["aiokafka"]
+
+[build-system]
+requires = ["uv_build>=0.12,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv]
+# Supply-chain policy: only resolve releases that are at least ~2 weeks old.
+# Move this date forward deliberately when updating dependencies.
+exclude-newer = "2026-10-13T00:00:00Z"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "S", "C4", "SIM", "RUF", "PT"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+# ADR prototypes: test-style asserts, fixed `docker` commands, kept as the ADR record.
+"spikes/**" = ["S101", "S603", "S607", "E501", "SIM115"]
+# Benchmarks drive containers with fixed `docker` commands.
+"bench/**" = ["S101", "S603", "S607"]
+
+[tool.pyright]
+include = ["src", "tests", "bench"]
+strict = ["src"]
+pythonVersion = "3.12"
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config -m 'not e2e'"
+markers = ["e2e: needs the running stack (make up)"]

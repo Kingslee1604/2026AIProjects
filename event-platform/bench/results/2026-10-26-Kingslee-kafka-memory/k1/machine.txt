@@ -1,0 +1,7 @@
+date: 2026-10-26T23:51:16-07:00
+host: Kingslee
+cpu: 12th Gen Intel(R) Core(TM) i7-1255U
+wsl_mem_total_mib: 3919
+docker: 24.0.7
+image: apache/kafka:4.3.1
+nodes: 1  records: 2000000  record_size: 200

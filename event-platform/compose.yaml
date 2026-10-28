@@ -1,0 +1,84 @@
+# Local stack: one Kafka node, Postgres, the gateway, the ledger writer and the totals service.
+# Dev-only credentials; nothing here is exposed beyond 127.0.0.1.
+name: eventplat
+
+x-app: &app
+  build: .
+  restart: unless-stopped
+  mem_limit: 256m
+  environment:
+    KAFKA_BOOTSTRAP: kafka-1:9092
+    USAGE_TOPIC: usage.events
+    DEAD_LETTER_TOPIC: usage.dlq
+    TOTALS_TOPIC: usage.totals
+    DATABASE_URL: postgresql://eventplat:${POSTGRES_PASSWORD:-eventplat-dev}@postgres:5432/eventplat
+  depends_on:
+    kafka-init:
+      condition: service_completed_successfully
+    postgres:
+      condition: service_healthy
+
+services:
+  kafka-1:
+    extends:
+      file: deploy/kafka/compose.kafka-1.yaml
+      service: kafka-1
+    healthcheck:  # port check only: a CLI health probe would start a JVM inside the broker
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/9092'"]
+      interval: 5s
+      retries: 30
+
+  kafka-init:
+    image: apache/kafka:4.3.1
+    depends_on:
+      kafka-1:
+        condition: service_healthy
+    environment:
+      KAFKA_HEAP_OPTS: "-Xms128m -Xmx128m"
+    entrypoint: ["bash", "-ec"]
+    command:
+      - |
+        create() { /opt/kafka/bin/kafka-topics.sh --bootstrap-server=kafka-1:9092 \
+          --create --if-not-exists --replication-factor=1 --topic="$$1" --partitions="$$2" "$${@:3}"; }
+        create usage.events 6
+        create usage.dlq 1
+        # Same partition count as usage.events: totals for input partition p live in partition p.
+        create usage.totals 6 --config=cleanup.policy=compact
+
+  postgres:
+    image: postgres:18.4-alpine
+    mem_limit: 256m
+    command: ["postgres", "-c", "shared_buffers=64MB"]
+    environment:
+      POSTGRES_USER: eventplat
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eventplat-dev}
+      POSTGRES_DB: eventplat
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "eventplat", "-d", "eventplat"]
+      interval: 3s
+      retries: 30
+
+  gateway:
+    <<: *app
+    command: ["uvicorn", "--factory", "eventplat.gateway:create_app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "127.0.0.1:8100:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 5s
+      retries: 20
+
+  ledger:
+    <<: *app
+    command: ["eventplat-ledger"]
+
+  totals:
+    <<: *app
+    command: ["eventplat-totals"]
+
+volumes:
+  pgdata:
