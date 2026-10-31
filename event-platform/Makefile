@@ -2,7 +2,7 @@ SHELL := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 .DEFAULT_GOAL := help
 
-.PHONY: help setup lint format typecheck test up down logs ps e2e check bench-memory
+.PHONY: help setup lint format typecheck test up down logs ps e2e check bench-memory chaos-up chaos-down bench-budget
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -26,12 +26,18 @@ test: ## Unit tests (no services needed)
 
 check: lint typecheck test ## Everything that runs without the stack
 
-up: ## Start Kafka, Postgres, gateway and ledger, and wait until healthy
+up: ## Start the stack (Kafka, Postgres and the services) and wait until healthy
 	docker compose up --detach --build --wait --wait-timeout 300
-	@echo "Gateway: http://127.0.0.1:8100/docs"
+	@echo "Gateway: http://127.0.0.1:8100/docs   Budget service: http://127.0.0.1:8110/docs"
 
 down: ## Stop the stack (data volumes are kept)
-	docker compose down
+	docker compose --profile chaos down
+
+chaos-up: ## Start two extra gateways (ports 8101, 8102) for the crash tests
+	docker compose --profile chaos up --detach --build --wait --wait-timeout 300
+
+chaos-down: ## Stop the extra gateways
+	docker compose --profile chaos rm --stop --force gateway-2 gateway-3
 
 logs: ## Follow logs from all services
 	docker compose logs --follow --tail 100
@@ -44,3 +50,6 @@ e2e: ## End-to-end test against the running stack (make up first)
 
 bench-memory: ## Kafka RAM at idle and under load: make bench-memory NODES=1|3
 	./bench/kafka-memory.sh $(or $(NODES),1)
+
+bench-budget: ## Budget limits under gateway SIGKILLs (needs make chaos-up)
+	uv run --frozen python bench/budget_chaos.py

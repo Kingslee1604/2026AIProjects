@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-27",
+  "gateways": 3,
+  "allowance_tokens": 10000,
+  "limit": 3000000,
+  "clients": 24,
+  "seconds": 74.7,
+  "sigkills": 8,
+  "failovers": 48,
+  "approved_calls": 1956,
+  "used_tokens": 2975245,
+  "within_limit": true,
+  "granted_tokens": 3000000,
+  "granted_within_limit": true,
+  "stranded_tokens": 24755,
+  "stranded_pct": 0.83,
+  "ledger": {
+    "rows": 1956,
+    "tokens": 2975245,
+    "exact": true
+  }
+}

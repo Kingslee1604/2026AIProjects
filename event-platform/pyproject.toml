@@ -23,8 +23,13 @@ dev = [
     "pytest",
     "ruff",
 ]
-# Candidates tested for ADR-0001 (Kafka client). Never installed in the images.
-spikes = ["aiokafka"]
+# Candidates tested for ADR-0001 (Kafka client) and ADR-0003 (record format). Never installed
+# in the images.
+spikes = [
+    "aiokafka",
+    "fastavro",
+    "protobuf",
+]
 
 [build-system]
 requires = ["uv_build>=0.12,<0.13"]
@@ -44,7 +49,7 @@ src = ["src", "tests"]
 select = ["E", "W", "F", "I", "B", "UP", "S", "C4", "SIM", "RUF", "PT"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101"]
+"tests/**" = ["S101", "S311"]  # asserts; seeded random test data
 # ADR prototypes: test-style asserts, fixed `docker` commands, kept as the ADR record.
 "spikes/**" = ["S101", "S603", "S607", "E501", "SIM115"]
 # Benchmarks drive containers with fixed `docker` commands.

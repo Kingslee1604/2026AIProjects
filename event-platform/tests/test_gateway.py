@@ -1,3 +1,5 @@
+import json
+import pathlib
 import uuid
 
 import pytest
@@ -75,3 +77,19 @@ def test_record_round_trips_through_bytes() -> None:
     event = UsageEvent.model_validate(body())
     assert UsageEvent.from_bytes(event.to_bytes()) == event
     assert event.key == b"acme"
+
+
+def test_readers_ignore_fields_added_by_newer_producers() -> None:
+    record = body()
+    newer = {**record, "cached_tokens": 42}
+    assert UsageEvent.model_validate(newer) == UsageEvent.model_validate(record)
+
+
+def test_schema_change_is_deliberate() -> None:
+    """Changing UsageEvent means updating schemas/usage-event.json in the same change.
+
+    Safe: add a field with a default. Breaking: remove, rename or retype a field, or add one
+    without a default; that needs a new topic (ADR-0003).
+    """
+    snapshot = pathlib.Path(__file__).parents[1] / "schemas" / "usage-event.json"
+    assert UsageEvent.model_json_schema() == json.loads(snapshot.read_text())

@@ -32,6 +32,8 @@ class Settings:
     dead_letter_topic: str
     totals_topic: str
     database_url: str
+    budget_url: str
+    allowance_tokens: int
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -43,6 +45,8 @@ class Settings:
             database_url=os.environ.get(
                 "DATABASE_URL", "postgresql://eventplat:eventplat-dev@localhost:55432/eventplat"
             ),
+            budget_url=os.environ.get("BUDGET_URL", "http://localhost:8110"),
+            allowance_tokens=int(os.environ.get("ALLOWANCE_TOKENS", "10000")),
         )
 
     @property

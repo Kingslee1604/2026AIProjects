@@ -1,4 +1,5 @@
-# Local stack: one Kafka node, Postgres, the gateway, the ledger writer and the totals service.
+# Local stack: one Kafka node, Postgres, the gateway, the budget service, the ledger writer and
+# the totals service.
 # Dev-only credentials; nothing here is exposed beyond 127.0.0.1.
 name: eventplat
 
@@ -12,6 +13,8 @@ x-app: &app
     DEAD_LETTER_TOPIC: usage.dlq
     TOTALS_TOPIC: usage.totals
     DATABASE_URL: postgresql://eventplat:${POSTGRES_PASSWORD:-eventplat-dev}@postgres:5432/eventplat
+    BUDGET_URL: http://budget:8000
+    ALLOWANCE_TOKENS: ${ALLOWANCE_TOKENS:-10000}
   depends_on:
     kafka-init:
       condition: service_completed_successfully
@@ -62,11 +65,34 @@ services:
       interval: 3s
       retries: 30
 
-  gateway:
+  gateway: &gateway
     <<: *app
     command: ["uvicorn", "--factory", "eventplat.gateway:create_app", "--host", "0.0.0.0", "--port", "8000"]
     ports:
       - "127.0.0.1:8100:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 5s
+      retries: 20
+
+  # Two more gateways for the crash tests, on fixed ports: make chaos-up / chaos-down.
+  gateway-2:
+    <<: *gateway
+    profiles: ["chaos"]
+    ports:
+      - "127.0.0.1:8101:8000"
+
+  gateway-3:
+    <<: *gateway
+    profiles: ["chaos"]
+    ports:
+      - "127.0.0.1:8102:8000"
+
+  budget:
+    <<: *app
+    command: ["uvicorn", "--factory", "eventplat.budget:create_app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "127.0.0.1:8110:8000"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
       interval: 5s
