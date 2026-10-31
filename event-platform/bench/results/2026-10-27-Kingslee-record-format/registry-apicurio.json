@@ -1,0 +1,16 @@
+{
+  "image": "apicurio/apicurio-registry:3.3.3",
+  "image_mib": 648,
+  "license": "Apache-2.0",
+  "mem_limit": "512m",
+  "ready_s": 16.0,
+  "set_backward_compatibility": 200,
+  "register_v1": 200,
+  "register_safe_change": 200,
+  "register_breaking_change": 409,
+  "breaking_change_blocked": true,
+  "breaking_change_message": "{'message': 'io.apicurio.registry.rules.violation.RuleViolationException: Incompatible artifact: usage.events-value [AVRO], num of incompatible diffs: {1}, list of diff types: [region at /fields/6]', ",
+  "idle_mib": 256.0,
+  "after_lookups_mib": 297.2,
+  "lookups_per_s": 142
+}
