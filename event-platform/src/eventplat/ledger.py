@@ -27,7 +27,6 @@ from eventplat.events import UsageEvent
 log = logging.getLogger("eventplat.ledger")
 
 BATCH_SIZE = 500
-CONSUMER_GROUP = "ledger"
 
 SCHEMA = (
     """
@@ -115,7 +114,7 @@ def run(settings: Settings, stop: threading.Event) -> None:
     consumer = Consumer(
         {
             "bootstrap.servers": settings.kafka_bootstrap,
-            "group.id": CONSUMER_GROUP,
+            "group.id": settings.ledger_group,
             # Static membership: a restarted ledger rejoins as itself and resumes at once.
             "group.instance.id": socket.gethostname(),
             "enable.auto.commit": False,

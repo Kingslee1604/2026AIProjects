@@ -1,0 +1,98 @@
+# Crash-test stack: compose.yaml on three Kafka nodes, as its own project (eventplat-crash) with
+# its own database volume, so crash runs never touch the dev stack's data. The stack is
+# throwaway: Kafka keeps no volume, so crash-stack-down drops the database too, and the replay
+# check always compares a ledger with the whole log it came from.
+#
+#   make crash-stack-up      # stops the dev stack first: both use the same host ports
+#   make bench-crash
+#   make crash-stack-down
+#
+# Every topic has three replicas and needs two in sync to accept a write (acks=all), so any one
+# node can die without losing an acknowledged record or refusing new ones.
+
+x-k3-env: &k3-env
+  KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:9093,2@kafka-2:9093,3@kafka-3:9093
+  KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+  KAFKA_MIN_INSYNC_REPLICAS: 2
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+  # How fast the controllers declare a silent node dead and move its partition leaders away.
+  # Kafka's defaults are 9000 / 2000 ms. With them, writes to a killed node's partitions waited
+  # up to 13.9 s; with 3000 / 1000 ms, up to 6.0 s (bench/results/*-broker-session-*).
+  KAFKA_BROKER_SESSION_TIMEOUT_MS: ${BROKER_SESSION_TIMEOUT_MS:-3000}
+  KAFKA_BROKER_HEARTBEAT_INTERVAL_MS: ${BROKER_HEARTBEAT_INTERVAL_MS:-1000}
+
+x-k3-node: &k3-node
+  image: apache/kafka:4.3.1
+  mem_limit: 640m
+  healthcheck:
+    test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/9092'"]
+    interval: 5s
+    retries: 30
+
+x-k3-node-env: &k3-node-env
+  <<: *k3-env
+  CLUSTER_ID: "Sd4yoPY5T1mmYn3u0c0Zcg"
+  KAFKA_PROCESS_ROLES: broker,controller
+  KAFKA_LISTENERS: INTERNAL://:9092,CONTROLLER://:9093,HOST://:29092
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,HOST:PLAINTEXT
+  KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
+
+x-k3-app-env: &k3-app-env
+  KAFKA_BOOTSTRAP: kafka-1:9092,kafka-2:9092,kafka-3:9092
+
+name: eventplat-crash
+
+services:
+  kafka-1:
+    mem_limit: 640m
+    environment: *k3-env
+
+  kafka-2:
+    <<: *k3-node
+    hostname: kafka-2
+    ports: ["29093:29092"]
+    environment:
+      <<: *k3-node-env
+      KAFKA_NODE_ID: 2
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-2:9092,HOST://localhost:29093
+
+  kafka-3:
+    <<: *k3-node
+    hostname: kafka-3
+    ports: ["29094:29092"]
+    environment:
+      <<: *k3-node-env
+      KAFKA_NODE_ID: 3
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-3:9092,HOST://localhost:29094
+
+  kafka-init:
+    depends_on:
+      kafka-2:
+        condition: service_healthy
+      kafka-3:
+        condition: service_healthy
+    command:
+      - |
+        create() { /opt/kafka/bin/kafka-topics.sh --bootstrap-server=kafka-1:9092 \
+          --create --if-not-exists --replication-factor=3 --topic="$$1" --partitions="$$2" "$${@:3}"; }
+        create usage.events 6
+        create usage.dlq 1
+        create usage.totals 6 --config=cleanup.policy=compact
+
+  gateway:
+    environment: *k3-app-env
+  gateway-2:
+    environment: *k3-app-env
+  gateway-3:
+    environment: *k3-app-env
+  budget:
+    environment: *k3-app-env
+  ledger:
+    environment: *k3-app-env
+  totals:
+    environment: *k3-app-env

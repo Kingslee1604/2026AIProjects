@@ -34,6 +34,8 @@ class Settings:
     database_url: str
     budget_url: str
     allowance_tokens: int
+    # Another group (and database) rebuilds a second ledger from the start of the log.
+    ledger_group: str
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -47,6 +49,7 @@ class Settings:
             ),
             budget_url=os.environ.get("BUDGET_URL", "http://localhost:8110"),
             allowance_tokens=int(os.environ.get("ALLOWANCE_TOKENS", "10000")),
+            ledger_group=os.environ.get("LEDGER_GROUP", "ledger"),
         )
 
     @property
