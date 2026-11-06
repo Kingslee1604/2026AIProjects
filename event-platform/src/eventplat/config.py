@@ -36,6 +36,11 @@ class Settings:
     allowance_tokens: int
     # Another group (and database) rebuilds a second ledger from the start of the log.
     ledger_group: str
+    # How long a silent consumer keeps its partitions; a crashed one that restarts within it
+    # keeps them. Kafka's default (45 s) stays: in the crash runs, 10 s gave the same ~11 s
+    # stall after a scale-down on a quiet machine (bench/results/*-consumer-session-*), and a
+    # shorter timeout only makes a slow moment more likely to cost a rebalance.
+    consumer_session_timeout_ms: int
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -50,6 +55,7 @@ class Settings:
             budget_url=os.environ.get("BUDGET_URL", "http://localhost:8110"),
             allowance_tokens=int(os.environ.get("ALLOWANCE_TOKENS", "10000")),
             ledger_group=os.environ.get("LEDGER_GROUP", "ledger"),
+            consumer_session_timeout_ms=int(os.environ.get("CONSUMER_SESSION_TIMEOUT_MS", "45000")),
         )
 
     @property

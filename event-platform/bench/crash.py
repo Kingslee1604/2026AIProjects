@@ -79,7 +79,8 @@ CONVERGE_TIMEOUT_S = 300
 STALL_WINDOW_S = 15.0
 
 BROKER_KILL_EVERY_S, BROKER_DOWN_S, IN_SYNC_TIMEOUT_S = 8.0, 5.0, 120.0
-CONSUMER_KILL_EVERY_S, SCALE_DOWN_AT_S = 6.0, 40.0
+CONSUMER_KILL_EVERY_S, KILLS_UNTIL_S, SCALE_DOWN_AT_S = 6.0, 30.0, 40.0
+LOAD_S_FOR = {"consumers": 100.0}  # 60 s of load after the scale-down
 MIXED_KILL_EVERY_S = 5.0
 THROTTLE_AT_S, THROTTLE_FOR_S, THROTTLE_CPUS = 15.0, 30.0, "0.05"
 REPLAY_TIMEOUT_S = 600
@@ -216,6 +217,70 @@ class StackMemory:
         return round(self.peak_mib)
 
 
+class ConsumerProgress:
+    """Per consumer group, the longest time one partition of usage.events had records waiting
+    while the group's committed offset for it did not move: the cost of a consumer crash or a
+    rebalance, measured where it happens rather than after the load stops."""
+
+    GROUPS = ("totals", "ledger")
+    EVERY_S = 0.5
+
+    def __init__(self, t0: float) -> None:
+        self._t0 = t0
+        self.stalls: dict[str, dict[str, float]] = {g: {"longest_s": 0.0} for g in self.GROUPS}
+        self.peak_lag: dict[str, int] = dict.fromkeys(self.GROUPS, 0)
+        self._stop = threading.Event()
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
+
+    def _run(self) -> None:
+        topic = SETTINGS.usage_topic
+        # Never subscribed, so these only read the groups' committed offsets; they never join.
+        readers = {
+            g: Consumer({"bootstrap.servers": SETTINGS.kafka_bootstrap, "group.id": g})
+            for g in self.GROUPS
+        }
+        partitions = [
+            TopicPartition(topic, p)
+            for p in readers["totals"].list_topics(topic, timeout=10).topics[topic].partitions
+        ]
+        last: dict[tuple[str, int], tuple[int, float]] = {}  # (offset, since when it is stuck)
+        try:
+            while not self._stop.wait(self.EVERY_S):
+                try:
+                    ends = {
+                        tp.partition: readers["totals"].get_watermark_offsets(tp, timeout=5)[1]
+                        for tp in partitions
+                    }
+                    now = time.perf_counter()
+                    for g, reader in readers.items():
+                        lag = 0
+                        for tp in reader.committed(partitions, timeout=5):
+                            behind = ends[tp.partition] - max(tp.offset, 0)
+                            lag += behind
+                            offset, since = last.get((g, tp.partition), (tp.offset, now))
+                            if behind <= 0 or tp.offset != offset:
+                                since = now
+                            last[(g, tp.partition)] = (tp.offset, since)
+                            if now - since > self.stalls[g]["longest_s"]:
+                                self.stalls[g] = {
+                                    "longest_s": round(now - since, 1),
+                                    "from_s": round(since - self._t0, 1),
+                                    "partition": tp.partition,
+                                }
+                        self.peak_lag[g] = max(self.peak_lag[g], lag)
+                except Exception:  # noqa: S110 - a broker is down: sample again
+                    pass
+        finally:
+            for reader in readers.values():
+                reader.close()
+
+    def stop(self) -> dict[str, Any]:
+        self._stop.set()
+        self._thread.join()
+        return {g: {**self.stalls[g], "peak_lag": self.peak_lag[g]} for g in self.GROUPS}
+
+
 def wait_in_sync(timeout: float = IN_SYNC_TIMEOUT_S) -> float | None:
     """Seconds until all three nodes are registered and every partition of every topic has a
     leader and all its replicas in sync.
@@ -280,11 +345,14 @@ def scale_consumers(instances: int, t0: float, log: list[dict[str, Any]]) -> Non
 
 
 def break_consumers(stop: threading.Event, t0: float, log: list[dict[str, Any]]) -> None:
+    """Kills until KILLS_UNTIL_S, then a scale-down at SCALE_DOWN_AT_S, with load to spare after
+    it, so the cost of the scale-down is not mixed up with the kills or cut off by the end."""
     scale_consumers(2, t0, log)
     n = 0
     while not stop.wait(CONSUMER_KILL_EVERY_S):
-        if time.perf_counter() - t0 >= SCALE_DOWN_AT_S:
-            scale_consumers(1, t0, log)
+        if time.perf_counter() - t0 >= KILLS_UNTIL_S:
+            if not stop.wait(max(0.0, t0 + SCALE_DOWN_AT_S - time.perf_counter())):
+                scale_consumers(1, t0, log)
             return
         targets = [("totals", c) for c in containers("totals")]
         targets += [("ledger", c) for c in containers("ledger")]
@@ -365,6 +433,7 @@ def order_violations(clients: list[Client], rows: dict[str, tuple[str, int, int]
 
 def scenario(name: str, breaker: Breaker) -> dict[str, Any]:
     print(f"--- {name}", flush=True)
+    load_s = LOAD_S_FOR.get(name, LOAD_S)
     run_id = uuid.uuid4().hex[:8]
     stop = threading.Event()
     clients = [Client(n, run_id, stop) for n in range(CLIENTS)]
@@ -375,11 +444,12 @@ def scenario(name: str, breaker: Breaker) -> dict[str, Any]:
     breaker_stop = threading.Event()
 
     t0 = time.perf_counter()
+    progress = ConsumerProgress(t0)
     breaker_thread = threading.Thread(target=breaker, args=(breaker_stop, t0, log))
     breaker_thread.start()
     for c in clients:
         c.start()
-    time.sleep(LOAD_S)
+    time.sleep(load_s)
     stop.set()
     for c in clients:
         c.join()
@@ -394,6 +464,7 @@ def scenario(name: str, breaker: Breaker) -> dict[str, Any]:
         },
         timeout=CONVERGE_TIMEOUT_S,
     )
+    consumer_stalls = progress.stop()
     rows = ledger_rows(tenants)
     tail.close()
     acked_ids = {r["event_id"] for c in clients for r in c.sent}
@@ -406,11 +477,11 @@ def scenario(name: str, breaker: Breaker) -> dict[str, Any]:
             waits = [s for at, s in acks if lo <= at < lo + STALL_WINDOW_S]
             b["longest_ack_ms"] = round(max(waits) * 1000) if waits else None
     result: dict[str, Any] = {
-        **broker_settings(),
-        "load_s": LOAD_S,
+        **stack_settings(),
+        "load_s": load_s,
         "clients": CLIENTS,
         "target_rate_per_s": RATE,
-        "acked_per_s": round(len(acks) / LOAD_S),
+        "acked_per_s": round(len(acks) / load_s),
         "records_acked": len(acked_ids),
         "resends_acked": sum(c.resends for c in clients),
         "failovers": sum(c.failovers for c in clients),
@@ -433,6 +504,7 @@ def scenario(name: str, breaker: Breaker) -> dict[str, Any]:
         result["ack_latency_ms_otherwise"] = percentiles_ms(
             [s for at, s in acks if not lo <= at < hi]
         )
+    result["consumer_stalls"] = consumer_stalls
     result["stack_peak_mib"] = memory.stop()
     result["passed"] = (
         result["lost"] == result["extra"] == result["unacked"] == result["order_violations"] == 0
@@ -544,19 +616,24 @@ def machine() -> dict[str, Any]:
     }
 
 
-def broker_settings() -> dict[str, int]:
-    """The failure-detection settings the running Kafka nodes were started with."""
-    [container] = containers("kafka-1")
-    env = dict(
-        line.split("=", 1)
-        for line in run(
-            "docker", "inspect", "--format", "{{range .Config.Env}}{{println .}}{{end}}", container
+def stack_settings() -> dict[str, int]:
+    """The failure-detection settings the running stack was started with."""
+
+    def env(service: str) -> dict[str, str]:
+        lines = run(
+            "docker",
+            "inspect",
+            "--format",
+            "{{range .Config.Env}}{{println .}}{{end}}",
+            containers(service)[0],
         ).splitlines()
-        if "=" in line
-    )
+        return dict(line.split("=", 1) for line in lines if "=" in line)
+
+    kafka, totals = env("kafka-1"), env("totals")
     return {
-        "broker_session_timeout_ms": int(env["KAFKA_BROKER_SESSION_TIMEOUT_MS"]),
-        "broker_heartbeat_interval_ms": int(env["KAFKA_BROKER_HEARTBEAT_INTERVAL_MS"]),
+        "broker_session_timeout_ms": int(kafka["KAFKA_BROKER_SESSION_TIMEOUT_MS"]),
+        "broker_heartbeat_interval_ms": int(kafka["KAFKA_BROKER_HEARTBEAT_INTERVAL_MS"]),
+        "consumer_session_timeout_ms": int(totals["CONSUMER_SESSION_TIMEOUT_MS"]),
     }
 
 

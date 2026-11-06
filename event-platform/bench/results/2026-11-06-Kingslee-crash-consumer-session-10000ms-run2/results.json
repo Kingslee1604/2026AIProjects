@@ -1,0 +1,90 @@
+{
+  "date": "2026-11-06",
+  "machine": {
+    "host": "Kingslee",
+    "cpu": "12th Gen Intel(R) Core(TM) i7-1255U",
+    "wsl_mem_mib": 3919,
+    "kafka": "apache/kafka:4.3.1, 3 nodes, replication factor 3, min in-sync replicas 2"
+  },
+  "scenarios": {
+    "consumers": {
+      "broker_session_timeout_ms": 3000,
+      "broker_heartbeat_interval_ms": 1000,
+      "consumer_session_timeout_ms": 10000,
+      "load_s": 100.0,
+      "clients": 24,
+      "target_rate_per_s": 600,
+      "acked_per_s": 269,
+      "records_acked": 24240,
+      "resends_acked": 2624,
+      "failovers": 0,
+      "unacked": 0,
+      "breaks": [
+        {
+          "at_s": 1.8,
+          "scaled_to": 2
+        },
+        {
+          "at_s": 9.4,
+          "sigkill": "totals",
+          "longest_ack_ms": 382
+        },
+        {
+          "at_s": 18.7,
+          "sigkill": "totals",
+          "longest_ack_ms": 382
+        },
+        {
+          "at_s": 27.7,
+          "sigkill": "ledger",
+          "longest_ack_ms": 442
+        },
+        {
+          "at_s": 42.2,
+          "scaled_to": 1
+        }
+      ],
+      "lost": 0,
+      "extra": 0,
+      "order_violations": 0,
+      "tenants_on_more_than_one_partition": 0,
+      "kafka": {
+        "exact": true,
+        "converge_s": 0.6,
+        "keys_wrong": 0,
+        "tokens_expected": 13647584,
+        "tokens_counted": 13647584,
+        "events_counted": 24240
+      },
+      "database": {
+        "exact": true,
+        "converge_s": 0.6,
+        "keys_wrong": 0,
+        "tokens_expected": 13647584,
+        "tokens_counted": 13647584,
+        "events_counted": 24240
+      },
+      "ack_latency_ms": {
+        "p50": 66.9,
+        "p99": 282.8,
+        "max": 496.7
+      },
+      "consumer_stalls": {
+        "totals": {
+          "longest_s": 12.5,
+          "from_s": 41.9,
+          "partition": 0,
+          "peak_lag": 2096
+        },
+        "ledger": {
+          "longest_s": 11.9,
+          "from_s": 41.3,
+          "partition": 2,
+          "peak_lag": 1687
+        }
+      },
+      "stack_peak_mib": 1576,
+      "passed": true
+    }
+  }
+}

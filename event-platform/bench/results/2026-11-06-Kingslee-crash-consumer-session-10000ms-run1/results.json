@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-06",
+  "machine": {
+    "host": "Kingslee",
+    "cpu": "12th Gen Intel(R) Core(TM) i7-1255U",
+    "wsl_mem_mib": 3919,
+    "kafka": "apache/kafka:4.3.1, 3 nodes, replication factor 3, min in-sync replicas 2"
+  },
+  "scenarios": {
+    "consumers": {
+      "broker_session_timeout_ms": 3000,
+      "broker_heartbeat_interval_ms": 1000,
+      "consumer_session_timeout_ms": 10000,
+      "load_s": 100.0,
+      "clients": 24,
+      "target_rate_per_s": 600,
+      "acked_per_s": 246,
+      "records_acked": 22241,
+      "resends_acked": 2401,
+      "failovers": 0,
+      "unacked": 0,
+      "breaks": [
+        {
+          "at_s": 3.2,
+          "scaled_to": 2
+        },
+        {
+          "at_s": 12.4,
+          "sigkill": "totals",
+          "longest_ack_ms": 580
+        },
+        {
+          "at_s": 21.9,
+          "sigkill": "totals",
+          "longest_ack_ms": 580
+        },
+        {
+          "at_s": 42.6,
+          "scaled_to": 1
+        }
+      ],
+      "lost": 0,
+      "extra": 0,
+      "order_violations": 0,
+      "tenants_on_more_than_one_partition": 0,
+      "kafka": {
+        "exact": true,
+        "converge_s": 0.6,
+        "keys_wrong": 0,
+        "tokens_expected": 12494240,
+        "tokens_counted": 12494240,
+        "events_counted": 22241
+      },
+      "database": {
+        "exact": true,
+        "converge_s": 1.2,
+        "keys_wrong": 0,
+        "tokens_expected": 12494240,
+        "tokens_counted": 12494240,
+        "events_counted": 22241
+      },
+      "ack_latency_ms": {
+        "p50": 71.3,
+        "p99": 345.0,
+        "max": 1155.6
+      },
+      "consumer_stalls": {
+        "totals": {
+          "longest_s": 10.0,
+          "from_s": 41.0,
+          "partition": 0,
+          "peak_lag": 1981
+        },
+        "ledger": {
+          "longest_s": 11.3,
+          "from_s": 41.0,
+          "partition": 5,
+          "peak_lag": 770
+        }
+      },
+      "stack_peak_mib": 1586,
+      "passed": true
+    }
+  }
+}

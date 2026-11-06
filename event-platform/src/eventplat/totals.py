@@ -28,6 +28,7 @@ import threading
 import uuid
 from collections import deque
 from collections.abc import Iterator
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field
 from datetime import UTC
 from itertools import batched
@@ -189,6 +190,11 @@ class TotalsService:
                 # Static membership: a restarted instance rejoins as itself and gets its
                 # partitions back at once, instead of waiting out the dead member's session.
                 "group.instance.id": instance_id,
+                "session.timeout.ms": settings.consumer_session_timeout_ms,
+                # Cooperative rebalancing: only partitions that move are revoked and restored.
+                # The default (eager) revoked all of them, so a surviving instance rebuilt state
+                # it already had.
+                "partition.assignment.strategy": "cooperative-sticky",
                 "enable.auto.commit": False,
                 "auto.offset.reset": "earliest",
                 "isolation.level": "read_committed",
@@ -207,12 +213,20 @@ class TotalsService:
         self._producer.init_transactions(TX_TIMEOUT_S)
         self._states: dict[int, PartitionState] = {}
 
-    def restore(self, partition: int) -> PartitionState:
+    def restore_all(self, partitions: list[int]) -> dict[int, PartitionState]:
+        """Rebuild the given partitions side by side. Each restore waits about a second for its
+        end-of-partition signal even when there is little to read, so one after another, a
+        rebalance that moves six partitions stood still for six of those seconds."""
         s = self._settings
-        [tp] = self._consumer.committed(
-            [TopicPartition(s.usage_topic, partition)], timeout=TX_TIMEOUT_S
+        committed = self._consumer.committed(
+            [TopicPartition(s.usage_topic, p) for p in partitions], timeout=TX_TIMEOUT_S
         )
-        committed = max(tp.offset, 0)
+        with ThreadPoolExecutor(max_workers=max(1, len(partitions))) as pool:
+            states = pool.map(self.restore, partitions, [max(tp.offset, 0) for tp in committed])
+            return dict(zip(partitions, states, strict=True))
+
+    def restore(self, partition: int, committed: int) -> PartitionState:
+        s = self._settings
         state = PartitionState(DedupeWindow(DEDUPE_WINDOW))
         for msg in read_partition(s.kafka_bootstrap, s.totals_topic, partition, OFFSET_BEGINNING):
             total = Total.from_bytes(msg.value() or b"{}")
@@ -232,9 +246,11 @@ class TotalsService:
         )
         return state
 
+    # With cooperative assignment these get only the partitions that change hands; the client
+    # applies the incremental assignment itself once the callback returns.
     def _on_assign(self, _consumer: Consumer, partitions: list[TopicPartition]) -> None:
-        for tp in partitions:
-            self._states[tp.partition] = self.restore(tp.partition)
+        if partitions:
+            self._states.update(self.restore_all([tp.partition for tp in partitions]))
 
     def _on_revoke(self, _consumer: Consumer, partitions: list[TopicPartition]) -> None:
         for tp in partitions:

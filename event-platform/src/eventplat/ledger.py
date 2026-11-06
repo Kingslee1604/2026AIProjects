@@ -117,6 +117,7 @@ def run(settings: Settings, stop: threading.Event) -> None:
             "group.id": settings.ledger_group,
             # Static membership: a restarted ledger rejoins as itself and resumes at once.
             "group.instance.id": socket.gethostname(),
+            "session.timeout.ms": settings.consumer_session_timeout_ms,
             "enable.auto.commit": False,
             "auto.offset.reset": "earliest",
         }
