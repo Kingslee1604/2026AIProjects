@@ -17,9 +17,11 @@ dropped if it arrives within DEDUPE_WINDOW records of the original. Older retrie
 caught here (ADR-0002).
 
 Crash-only: any Kafka error aborts the open transaction and exits. The restart rebuilds state
-from Kafka, so there is no in-process recovery path to get wrong.
+from Kafka, so there is no in-process recovery path to get wrong. A watchdog turns a blocked
+main loop into the same crash.
 """
 
+import faulthandler
 import json
 import logging
 import signal
@@ -48,6 +50,7 @@ from confluent_kafka import (
 from eventplat.config import Settings
 from eventplat.deadletter import decode
 from eventplat.events import UsageEvent
+from eventplat.progress import StallGuard
 
 log = logging.getLogger("eventplat.totals")
 
@@ -55,6 +58,11 @@ BATCH_SIZE = 500
 CONSUMER_GROUP = "totals"
 DEDUPE_WINDOW = 50_000  # input records per partition
 TX_TIMEOUT_S = 30.0
+# Longest a healthy pass of the main loop takes: a 1 s poll, partition restores (seconds), and
+# a transaction whose calls time out after TX_TIMEOUT_S each.
+WATCHDOG_S = 120
+# Records waiting but none consumed for this long means the consumer is stuck (eventplat.progress).
+STUCK_AFTER_S = 60.0
 # librdkafka pre-fetches up to 64 MiB per consumer by default; a few MiB keeps up just as well.
 PREFETCH_KIB = 8_192
 
@@ -213,17 +221,14 @@ class TotalsService:
         self._producer.init_transactions(TX_TIMEOUT_S)
         self._states: dict[int, PartitionState] = {}
 
-    def restore_all(self, partitions: list[int]) -> dict[int, PartitionState]:
-        """Rebuild the given partitions side by side. Each restore waits about a second for its
-        end-of-partition signal even when there is little to read, so one after another, a
-        rebalance that moves six partitions stood still for six of those seconds."""
-        s = self._settings
-        committed = self._consumer.committed(
-            [TopicPartition(s.usage_topic, p) for p in partitions], timeout=TX_TIMEOUT_S
-        )
-        with ThreadPoolExecutor(max_workers=max(1, len(partitions))) as pool:
-            states = pool.map(self.restore, partitions, [max(tp.offset, 0) for tp in committed])
-            return dict(zip(partitions, states, strict=True))
+    def restore_all(self, committed: dict[int, int]) -> dict[int, PartitionState]:
+        """Rebuild the given partitions (partition -> committed offset) side by side. Each
+        restore waits about a second for its end-of-partition signal even when there is little
+        to read, so one after another, a rebalance that moves six partitions stood still for
+        six of those seconds."""
+        with ThreadPoolExecutor(max_workers=max(1, len(committed))) as pool:
+            states = pool.map(self.restore, committed.keys(), committed.values())
+            return dict(zip(committed.keys(), states, strict=True))
 
     def restore(self, partition: int, committed: int) -> PartitionState:
         s = self._settings
@@ -246,11 +251,22 @@ class TotalsService:
         )
         return state
 
-    # With cooperative assignment these get only the partitions that change hands; the client
-    # applies the incremental assignment itself once the callback returns.
-    def _on_assign(self, _consumer: Consumer, partitions: list[TopicPartition]) -> None:
-        if partitions:
-            self._states.update(self.restore_all([tp.partition for tp in partitions]))
+    # With cooperative assignment these get only the partitions that change hands.
+    def _on_assign(self, consumer: Consumer, partitions: list[TopicPartition]) -> None:
+        if not partitions:
+            return
+        committed = {
+            tp.partition: max(tp.offset, 0)
+            for tp in consumer.committed(partitions, timeout=TX_TIMEOUT_S)
+        }
+        self._states.update(self.restore_all(committed))
+        # Start each partition at the offset its state was restored at. Left to itself, the
+        # client looks the committed offsets up a second time; when that lookup hit a group
+        # coordinator that had just died, it failed once (NOT_COORDINATOR), was never retried,
+        # and the partitions were never fetched: five minutes without progress, in crash runs.
+        consumer.incremental_assign(
+            [TopicPartition(tp.topic, tp.partition, committed[tp.partition]) for tp in partitions]
+        )
 
     def _on_revoke(self, _consumer: Consumer, partitions: list[TopicPartition]) -> None:
         for tp in partitions:
@@ -300,12 +316,19 @@ class TotalsService:
             on_lost=self._on_revoke,
         )
         log.info("totals consuming %s", self._settings.usage_topic)
+        guard = StallGuard(self._consumer, STUCK_AFTER_S)
         try:
             while not stop.is_set():
+                # Watchdog, re-armed every pass: if one pass (a poll, the restores it triggers
+                # and a transaction) takes longer than WATCHDOG_S, print every thread's stack
+                # and exit, so the container restarts now and not when Kafka gives up on us.
+                faulthandler.dump_traceback_later(WATCHDOG_S, exit=True)
                 messages = self._consumer.consume(num_messages=BATCH_SIZE, timeout=1.0)
                 if messages:
                     self.process(messages)
+                guard.check(sum(1 for m in messages if m.error() is None))
         finally:
+            faulthandler.cancel_dump_traceback_later()
             self._consumer.close()
 
 

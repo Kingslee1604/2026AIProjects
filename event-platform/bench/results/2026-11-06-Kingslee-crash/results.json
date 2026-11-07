@@ -1,0 +1,330 @@
+{
+  "date": "2026-11-06",
+  "machine": {
+    "host": "Kingslee",
+    "cpu": "12th Gen Intel(R) Core(TM) i7-1255U",
+    "wsl_mem_mib": 3919,
+    "kafka": "apache/kafka:4.3.1, 3 nodes, replication factor 3, min in-sync replicas 2"
+  },
+  "scenarios": {
+    "brokers": {
+      "broker_session_timeout_ms": 3000,
+      "broker_heartbeat_interval_ms": 1000,
+      "consumer_session_timeout_ms": 45000,
+      "load_s": 60.0,
+      "clients": 24,
+      "target_rate_per_s": 600,
+      "acked_per_s": 351,
+      "records_acked": 19029,
+      "resends_acked": 2046,
+      "failovers": 0,
+      "unacked": 0,
+      "breaks": [
+        {
+          "at_s": 8.4,
+          "sigkill": "kafka-1",
+          "down_s": 5.0,
+          "healthy_after_restart_s": 10.7,
+          "longest_ack_ms": 3402
+        },
+        {
+          "at_s": 33.7,
+          "sigkill": "kafka-2",
+          "down_s": 5.0,
+          "healthy_after_restart_s": 12.3,
+          "longest_ack_ms": 2928
+        },
+        {
+          "at_s": 60.4,
+          "sigkill": "kafka-3",
+          "down_s": 5.0,
+          "healthy_after_restart_s": 0.1,
+          "longest_ack_ms": null
+        }
+      ],
+      "lost": 0,
+      "extra": 0,
+      "order_violations": 0,
+      "tenants_on_more_than_one_partition": 0,
+      "kafka": {
+        "exact": true,
+        "converge_s": 4.0,
+        "keys_wrong": 0,
+        "tokens_expected": 10711440,
+        "tokens_counted": 10711440,
+        "events_counted": 19029
+      },
+      "database": {
+        "exact": true,
+        "converge_s": 0.0,
+        "keys_wrong": 0,
+        "tokens_expected": 10711440,
+        "tokens_counted": 10711440,
+        "events_counted": 19029
+      },
+      "ack_latency_ms": {
+        "p50": 47.9,
+        "p99": 200.6,
+        "max": 3401.9
+      },
+      "consumer_stalls": {
+        "totals": {
+          "longest_s": 8.0,
+          "from_s": 60.1,
+          "partition": 5,
+          "peak_lag": 1700
+        },
+        "ledger": {
+          "longest_s": 4.9,
+          "from_s": 12.6,
+          "partition": 5,
+          "peak_lag": 496
+        }
+      },
+      "stack_peak_mib": 1479,
+      "passed": true
+    },
+    "consumers": {
+      "broker_session_timeout_ms": 3000,
+      "broker_heartbeat_interval_ms": 1000,
+      "consumer_session_timeout_ms": 45000,
+      "load_s": 100.0,
+      "clients": 24,
+      "target_rate_per_s": 600,
+      "acked_per_s": 329,
+      "records_acked": 29655,
+      "resends_acked": 3229,
+      "failovers": 0,
+      "unacked": 0,
+      "breaks": [
+        {
+          "at_s": 1.3,
+          "scaled_to": 2
+        },
+        {
+          "at_s": 8.4,
+          "sigkill": "totals",
+          "longest_ack_ms": 401
+        },
+        {
+          "at_s": 17.2,
+          "sigkill": "totals",
+          "longest_ack_ms": 400
+        },
+        {
+          "at_s": 25.8,
+          "sigkill": "ledger",
+          "longest_ack_ms": 358
+        },
+        {
+          "at_s": 41.4,
+          "scaled_to": 1
+        }
+      ],
+      "lost": 0,
+      "extra": 0,
+      "order_violations": 0,
+      "tenants_on_more_than_one_partition": 0,
+      "kafka": {
+        "exact": true,
+        "converge_s": 1.1,
+        "keys_wrong": 0,
+        "tokens_expected": 16802058,
+        "tokens_counted": 16802058,
+        "events_counted": 29655
+      },
+      "database": {
+        "exact": true,
+        "converge_s": 1.1,
+        "keys_wrong": 0,
+        "tokens_expected": 16802058,
+        "tokens_counted": 16802058,
+        "events_counted": 29655
+      },
+      "ack_latency_ms": {
+        "p50": 51.1,
+        "p99": 252.5,
+        "max": 400.6
+      },
+      "consumer_stalls": {
+        "totals": {
+          "longest_s": 47.2,
+          "from_s": 40.9,
+          "partition": 0,
+          "peak_lag": 10248
+        },
+        "ledger": {
+          "longest_s": 46.0,
+          "from_s": 40.9,
+          "partition": 4,
+          "peak_lag": 6156
+        }
+      },
+      "stack_peak_mib": 1590,
+      "passed": true
+    },
+    "mixed": {
+      "broker_session_timeout_ms": 3000,
+      "broker_heartbeat_interval_ms": 1000,
+      "consumer_session_timeout_ms": 45000,
+      "load_s": 60.0,
+      "clients": 24,
+      "target_rate_per_s": 600,
+      "acked_per_s": 255,
+      "records_acked": 13805,
+      "resends_acked": 1467,
+      "failovers": 8,
+      "unacked": 0,
+      "breaks": [
+        {
+          "at_s": 5.0,
+          "sigkill": "gateway-3",
+          "longest_ack_ms": 4497
+        },
+        {
+          "at_s": 11.8,
+          "sigkill": "totals",
+          "longest_ack_ms": 4497
+        },
+        {
+          "at_s": 19.1,
+          "sigkill": "kafka-2",
+          "down_s": 5.0,
+          "healthy_after_restart_s": 16.1,
+          "longest_ack_ms": 4497
+        },
+        {
+          "at_s": 47.7,
+          "sigkill": "kafka-2",
+          "down_s": 5.0,
+          "healthy_after_restart_s": 9.3,
+          "longest_ack_ms": 3413
+        }
+      ],
+      "lost": 0,
+      "extra": 0,
+      "order_violations": 0,
+      "tenants_on_more_than_one_partition": 0,
+      "kafka": {
+        "exact": false,
+        "converge_s": null,
+        "keys_wrong": 24,
+        "tokens_expected": 7645040,
+        "tokens_counted": 2141678,
+        "events_counted": 4103
+      },
+      "database": {
+        "exact": true,
+        "converge_s": 0.0,
+        "keys_wrong": 0,
+        "tokens_expected": 7645040,
+        "tokens_counted": 7645040,
+        "events_counted": 13805
+      },
+      "ack_latency_ms": {
+        "p50": 61.9,
+        "p99": 288.6,
+        "max": 4497.2
+      },
+      "consumer_stalls": {
+        "totals": {
+          "longest_s": 351.6,
+          "from_s": 11.6,
+          "partition": 5,
+          "peak_lag": 10783
+        },
+        "ledger": {
+          "longest_s": 2.9,
+          "from_s": 49.0,
+          "partition": 0,
+          "peak_lag": 1016
+        }
+      },
+      "stack_peak_mib": 1539,
+      "passed": false
+    },
+    "db-freeze": {
+      "broker_session_timeout_ms": 3000,
+      "broker_heartbeat_interval_ms": 1000,
+      "consumer_session_timeout_ms": 45000,
+      "load_s": 60.0,
+      "clients": 24,
+      "target_rate_per_s": 600,
+      "acked_per_s": 382,
+      "records_acked": 20710,
+      "resends_acked": 2232,
+      "failovers": 0,
+      "unacked": 0,
+      "breaks": [
+        {
+          "db_frozen_from_s": 15.7,
+          "db_frozen_to_s": 46.0,
+          "ledger_caught_up_after_s": 1.7
+        }
+      ],
+      "lost": 0,
+      "extra": 0,
+      "order_violations": 0,
+      "tenants_on_more_than_one_partition": 0,
+      "kafka": {
+        "exact": true,
+        "converge_s": 218.8,
+        "keys_wrong": 0,
+        "tokens_expected": 11595568,
+        "tokens_counted": 11595568,
+        "events_counted": 20710
+      },
+      "database": {
+        "exact": true,
+        "converge_s": 0.6,
+        "keys_wrong": 0,
+        "tokens_expected": 11595568,
+        "tokens_counted": 11595568,
+        "events_counted": 20710
+      },
+      "ack_latency_ms": {
+        "p50": 46.1,
+        "p99": 176.9,
+        "max": 366.4
+      },
+      "ack_latency_ms_while_db_frozen": {
+        "p50": 44.0,
+        "p99": 159.7,
+        "max": 256.9
+      },
+      "ack_latency_ms_otherwise": {
+        "p50": 48.9,
+        "p99": 194.3,
+        "max": 366.4
+      },
+      "consumer_stalls": {
+        "totals": {
+          "longest_s": 273.9,
+          "from_s": 0.7,
+          "partition": 2,
+          "peak_lag": 33725
+        },
+        "ledger": {
+          "longest_s": 30.4,
+          "from_s": 15.5,
+          "partition": 0,
+          "peak_lag": 12444
+        }
+      },
+      "stack_peak_mib": 1619,
+      "passed": true
+    },
+    "replay": {
+      "log_records": 92174,
+      "ledger_rows": 83199,
+      "tenant_days": 96,
+      "identical": true,
+      "seconds": 10.6,
+      "startup_s": 2.3,
+      "records_per_s": 8696,
+      "records_per_s_after_startup": 11105,
+      "stack_peak_mib": 1672,
+      "passed": true
+    }
+  }
+}

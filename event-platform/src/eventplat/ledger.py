@@ -17,16 +17,19 @@ import threading
 from dataclasses import dataclass
 from types import FrameType
 
-from confluent_kafka import Consumer, Message
+from confluent_kafka import OFFSET_BEGINNING, Consumer, Message, TopicPartition
 
 from eventplat.config import Settings
 from eventplat.db import Database
 from eventplat.deadletter import DeadLetters, decode
 from eventplat.events import UsageEvent
+from eventplat.progress import StallGuard
 
 log = logging.getLogger("eventplat.ledger")
 
 BATCH_SIZE = 500
+COMMITTED_TIMEOUT_S = 30.0
+STUCK_AFTER_S = 60.0  # eventplat.progress
 
 SCHEMA = (
     """
@@ -122,11 +125,29 @@ def run(settings: Settings, stop: threading.Event) -> None:
             "auto.offset.reset": "earliest",
         }
     )
-    consumer.subscribe([settings.usage_topic])
+
+    def on_assign(c: Consumer, partitions: list[TopicPartition]) -> None:
+        # Look the committed offsets up here, where a failure raises (and the restart retries),
+        # and assign with them. Left to itself, the client looks them up after the callback, and
+        # in a crash run that lookup failed once against a dead coordinator, was never retried,
+        # and left the partitions unfetched (the same fault was seen in eventplat.totals).
+        committed = c.committed(partitions, timeout=COMMITTED_TIMEOUT_S)
+        c.assign(
+            [
+                TopicPartition(
+                    tp.topic, tp.partition, tp.offset if tp.offset >= 0 else OFFSET_BEGINNING
+                )
+                for tp in committed
+            ]
+        )
+
+    consumer.subscribe([settings.usage_topic], on_assign=on_assign)
     log.info("ledger consuming %s", settings.usage_topic)
+    guard = StallGuard(consumer, STUCK_AFTER_S)
     try:
         while not stop.is_set():
             messages = consumer.consume(num_messages=BATCH_SIZE, timeout=1.0)
+            guard.check(sum(1 for m in messages if m.error() is None))
             if not messages:
                 continue
             good, rejected = decode(messages)

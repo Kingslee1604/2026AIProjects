@@ -39,7 +39,9 @@ def decode(messages: list[Message]) -> tuple[list[tuple[Message, UsageEvent]], l
     for msg in messages:
         err = msg.error()
         if err is not None:
-            if err.fatal():
+            # A fenced static consumer reports code _FATAL with fatal() False. Logged as a
+            # warning, it left the client dead and the service polling it for five minutes.
+            if err.fatal() or err.code() == KafkaError._FATAL:
                 raise KafkaException(err)
             log.warning("kafka: %s", err)
             continue

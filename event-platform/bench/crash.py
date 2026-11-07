@@ -15,8 +15,12 @@ something breaks:
              SIGKILL the instances in turn, then scale back to one each (another rebalance).
 - mixed:     SIGKILL a random part every few seconds: a Kafka node, a gateway, a totals or a
              ledger instance.
-- slow-db:   throttle Postgres to 5% of one CPU for 30 s. The gateways write only to Kafka, so
-             they should not notice; the ledger falls behind and has to catch up.
+- restart-race: SIGKILL the totals service and, 3 s later while it is still starting up, a
+             Kafka node; repeat.
+- db-freeze: freeze Postgres for 30 s (docker pause). The gateways write only to Kafka, so
+             they should not notice; the ledger waits, falls behind, and has to catch up.
+             (Throttling Postgres to 5% of one CPU instead was barely noticed: the ledger was
+             exact 1.7 s after the load stopped.)
 - replay:    rebuild a second ledger from offset 0 of usage.events, into its own database, and
              compare it with the live ledger row for row. Runs after the others, with no load.
 
@@ -80,9 +84,13 @@ STALL_WINDOW_S = 15.0
 
 BROKER_KILL_EVERY_S, BROKER_DOWN_S, IN_SYNC_TIMEOUT_S = 8.0, 5.0, 120.0
 CONSUMER_KILL_EVERY_S, KILLS_UNTIL_S, SCALE_DOWN_AT_S = 6.0, 30.0, 40.0
-LOAD_S_FOR = {"consumers": 100.0}  # 60 s of load after the scale-down
+LOAD_S_FOR = {
+    "consumers": 100.0,  # 60 s of load after the scale-down
+    "restart-race": 90.0,  # room for four or five rounds
+}
 MIXED_KILL_EVERY_S = 5.0
-THROTTLE_AT_S, THROTTLE_FOR_S, THROTTLE_CPUS = 15.0, 30.0, "0.05"
+RESTART_RACE_EVERY_S, RESTART_RACE_S = 4.0, 3.0
+FREEZE_AT_S, FREEZE_FOR_S = 15.0, 30.0
 REPLAY_TIMEOUT_S = 600
 
 
@@ -374,19 +382,70 @@ def break_anything(stop: threading.Event, t0: float, log: list[dict[str, Any]]) 
         sigkill(rng.choice(containers(service)))
 
 
-def slow_database(stop: threading.Event, t0: float, log: list[dict[str, Any]]) -> None:
-    if stop.wait(THROTTLE_AT_S):
+def break_restarting_totals(stop: threading.Event, t0: float, log: list[dict[str, Any]]) -> None:
+    """SIGKILL the totals service, then a Kafka node RESTART_RACE_S later, while the restarted
+    service is still rejoining, restoring and opening its first transaction. In the first full
+    run, that sequence (by chance, in mixed) left it stuck for five minutes."""
+    n = 0
+    while not stop.wait(RESTART_RACE_EVERY_S):
+        [totals] = containers("totals")
+        log.append({"at_s": round(time.perf_counter() - t0, 1), "sigkill": "totals"})
+        sigkill(totals)
+        time.sleep(RESTART_RACE_S)
+        kill_broker(BROKERS[n % len(BROKERS)], t0, log)
+        n += 1
+
+
+def catch_up(
+    group: str, timeout: float = CONVERGE_TIMEOUT_S, since: float | None = None
+) -> dict[str, float | None]:
+    """Seconds (from `since`, or from now) until a consumer group first commits progress, and
+    until its committed offsets reach where usage.events ended when this was called."""
+    topic = SETTINGS.usage_topic
+    reader = Consumer({"bootstrap.servers": SETTINGS.kafka_bootstrap, "group.id": group})
+    try:  # never subscribed: reads the group's committed offsets without joining it
+        partitions = [
+            TopicPartition(topic, p)
+            for p in reader.list_topics(topic, timeout=10).topics[topic].partitions
+        ]
+        target = {
+            tp.partition: reader.get_watermark_offsets(tp, timeout=10)[1] for tp in partitions
+        }
+        started = since if since is not None else time.perf_counter()
+        before = sum(max(tp.offset, 0) for tp in reader.committed(partitions, timeout=10))
+        times: dict[str, float | None] = {"first_commit_s": None, "caught_up_s": None}
+        while time.perf_counter() - started < timeout:
+            committed = reader.committed(partitions, timeout=10)
+            now = round(time.perf_counter() - started, 1)
+            if times["first_commit_s"] is None and sum(max(tp.offset, 0) for tp in committed) > (
+                before
+            ):
+                times["first_commit_s"] = now
+            if all(tp.offset >= target[tp.partition] for tp in committed):
+                times["caught_up_s"] = now
+                break
+            time.sleep(0.25)
+        return times
+    finally:
+        reader.close()
+
+
+def freeze_database(stop: threading.Event, t0: float, log: list[dict[str, Any]]) -> None:
+    """Freeze Postgres outright (docker pause: every process stopped, connections left open),
+    the way a stuck disk or a long lock would, then let it go and time the ledger's catch-up."""
+    if stop.wait(FREEZE_AT_S):
         return
     [postgres] = containers("postgres")
-    run("docker", "update", "--cpus", THROTTLE_CPUS, postgres)
+    run("docker", "pause", postgres)
     started = time.perf_counter() - t0
-    time.sleep(THROTTLE_FOR_S)
-    run("docker", "update", "--cpus", "0", postgres)  # 0 removes the limit
+    time.sleep(FREEZE_FOR_S)
+    run("docker", "unpause", postgres)
+    ended = time.perf_counter() - t0
     log.append(
         {
-            "throttle_from_s": round(started, 1),
-            "throttle_to_s": round(time.perf_counter() - t0, 1),
-            "cpus": float(THROTTLE_CPUS),
+            "db_frozen_from_s": round(started, 1),
+            "db_frozen_to_s": round(ended, 1),
+            "ledger_caught_up_after_s": catch_up("ledger")["caught_up_s"],
         }
     )
 
@@ -395,7 +454,8 @@ SCENARIOS: dict[str, Breaker] = {
     "brokers": break_brokers,
     "consumers": break_consumers,
     "mixed": break_anything,
-    "slow-db": slow_database,
+    "restart-race": break_restarting_totals,
+    "db-freeze": freeze_database,
 }
 
 
@@ -495,10 +555,10 @@ def scenario(name: str, breaker: Breaker) -> dict[str, Any]:
         "database": verdict(expected, database_view(tenants), times["database"]),
         "ack_latency_ms": percentiles_ms([s for _, s in acks]),
     }
-    throttles = [b for b in log if "throttle_from_s" in b]
-    if throttles:
-        lo, hi = t0 + throttles[0]["throttle_from_s"], t0 + throttles[0]["throttle_to_s"]
-        result["ack_latency_ms_while_throttled"] = percentiles_ms(
+    freezes = [b for b in log if "db_frozen_from_s" in b]
+    if freezes:
+        lo, hi = t0 + freezes[0]["db_frozen_from_s"], t0 + freezes[0]["db_frozen_to_s"]
+        result["ack_latency_ms_while_db_frozen"] = percentiles_ms(
             [s for at, s in acks if lo <= at < hi]
         )
         result["ack_latency_ms_otherwise"] = percentiles_ms(
@@ -558,6 +618,7 @@ def replay() -> dict[str, Any]:
     live = ledger_fingerprint(SETTINGS.postgres.database)
     records = log_records()
     pg = SETTINGS.postgres
+    group = f"replay-{uuid.uuid4().hex[:8]}"
     started = time.perf_counter()
     container = compose(
         "run",
@@ -566,30 +627,28 @@ def replay() -> dict[str, Any]:
         "--env",
         f"DATABASE_URL=postgresql://{pg.user}:{pg.password}@postgres:5432/replay",
         "--env",
-        f"LEDGER_GROUP=replay-{uuid.uuid4().hex[:8]}",
+        f"LEDGER_GROUP={group}",
         "ledger",
     ).strip()
     memory = StackMemory()
     try:
-        seconds: float | None = None
-        while time.perf_counter() - started < REPLAY_TIMEOUT_S:
-            try:
-                if ledger_fingerprint("replay") == live:
-                    seconds = round(time.perf_counter() - started, 1)
-                    break
-            except Exception:  # noqa: S110 - schema not created yet
-                pass
-            time.sleep(1)
+        # Done is the replay group's committed offsets at the end of the log: cheap to watch.
+        # (Checksumming the replay table every second instead competed with the replay.)
+        times = catch_up(group, REPLAY_TIMEOUT_S, since=started)
+        seconds = times["caught_up_s"]
     finally:
         run("docker", "rm", "--force", container)
     replayed = ledger_fingerprint("replay")
+    copying = seconds - times["first_commit_s"] if seconds and times["first_commit_s"] else None
     result = {
         "log_records": records,
         "ledger_rows": live[0],
         "tenant_days": live[2],
         "identical": replayed == live,
-        "seconds": seconds,
+        "seconds": seconds,  # from `docker compose run` to the last offset committed
+        "startup_s": times["first_commit_s"],
         "records_per_s": round(records / seconds) if seconds else None,
+        "records_per_s_after_startup": round(records / copying) if copying else None,
         "stack_peak_mib": memory.stop(),
         "passed": replayed == live,
     }

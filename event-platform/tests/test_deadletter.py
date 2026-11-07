@@ -46,3 +46,11 @@ def test_decode_raises_on_fatal_error() -> None:
     fatal = KafkaError(KafkaError._FATAL, fatal=True)
     with pytest.raises(KafkaException):
         decode([message(None, error=fatal)])
+
+
+def test_decode_raises_on_fatal_code_without_fatal_flag() -> None:
+    # How a fenced static consumer reported it in a crash run: code _FATAL, fatal() False.
+    fenced = KafkaError(KafkaError._FATAL, "Static consumer fenced by other consumer")
+    assert not fenced.fatal()
+    with pytest.raises(KafkaException):
+        decode([message(None, error=fenced)])

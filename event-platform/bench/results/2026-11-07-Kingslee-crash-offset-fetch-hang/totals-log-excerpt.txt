@@ -1,0 +1,52 @@
+# totals service log, restart-race reproduction 4 of 4 before the fix (2026-11-07).
+# Kafka node kafka-1 was SIGKILLed at 15:22:32, right after the restarted service restored
+# its six partitions. The client's own committed-offset lookup then failed once
+# (NOT_COORDINATOR) and was not retried, and no partition was fetched again: the totals
+# stalled for 324 s. librdkafka connection-retry lines are left out.
+
+2026-11-07T15:21:16.900495009Z 2026-11-07 15:21:16,899 INFO eventplat.totals totals consuming usage.events
+2026-11-07T15:21:20.283988358Z 2026-11-07 15:21:20,283 INFO eventplat.totals partition 0 restored at offset 0: 0 totals, 0 ids in window
+2026-11-07T15:21:20.291921038Z 2026-11-07 15:21:20,291 INFO eventplat.totals partition 1 restored at offset 0: 0 totals, 0 ids in window
+2026-11-07T15:21:20.314397930Z 2026-11-07 15:21:20,313 INFO eventplat.totals partition 2 restored at offset 0: 0 totals, 0 ids in window
+2026-11-07T15:21:20.399091713Z 2026-11-07 15:21:20,398 INFO eventplat.totals partition 3 restored at offset 0: 0 totals, 0 ids in window
+2026-11-07T15:21:20.406165375Z 2026-11-07 15:21:20,405 INFO eventplat.totals partition 4 restored at offset 0: 0 totals, 0 ids in window
+2026-11-07T15:21:20.421924923Z 2026-11-07 15:21:20,421 INFO eventplat.totals partition 5 restored at offset 0: 0 totals, 0 ids in window
+2026-11-07T15:21:31.584705729Z 2026-11-07 15:21:31,583 INFO eventplat.totals totals consuming usage.events
+2026-11-07T15:21:32.793819304Z 2026-11-07 15:21:32,793 INFO eventplat.totals partition 2 restored at offset 76: 4 totals, 76 ids in window
+2026-11-07T15:21:40.319568513Z 2026-11-07 15:21:40,318 INFO eventplat.totals partition 3 restored at offset 75: 3 totals, 75 ids in window
+2026-11-07T15:21:40.767836508Z 2026-11-07 15:21:40,767 INFO eventplat.totals partition 1 restored at offset 100: 5 totals, 100 ids in window
+2026-11-07T15:21:40.785068487Z 2026-11-07 15:21:40,784 INFO eventplat.totals partition 0 restored at offset 92: 6 totals, 92 ids in window
+2026-11-07T15:21:40.798343726Z 2026-11-07 15:21:40,797 INFO eventplat.totals partition 5 restored at offset 36: 2 totals, 36 ids in window
+2026-11-07T15:21:41.944193766Z 2026-11-07 15:21:41,942 INFO eventplat.totals partition 4 restored at offset 52: 4 totals, 52 ids in window
+2026-11-07T15:21:48.373449872Z 2026-11-07 15:21:48,363 INFO eventplat.totals totals consuming usage.events
+2026-11-07T15:21:49.613550653Z 2026-11-07 15:21:49,605 INFO eventplat.totals partition 0 restored at offset 119: 6 totals, 119 ids in window
+2026-11-07T15:21:49.653610627Z 2026-11-07 15:21:49,652 INFO eventplat.totals partition 1 restored at offset 542: 5 totals, 502 ids in window
+2026-11-07T15:21:49.696334644Z 2026-11-07 15:21:49,695 INFO eventplat.totals partition 2 restored at offset 555: 4 totals, 509 ids in window
+2026-11-07T15:21:49.722939991Z 2026-11-07 15:21:49,722 INFO eventplat.totals partition 3 restored at offset 461: 3 totals, 423 ids in window
+2026-11-07T15:22:00.710904226Z 2026-11-07 15:22:00,707 INFO eventplat.totals partition 4 restored at offset 52: 4 totals, 52 ids in window
+2026-11-07T15:22:01.472433477Z 2026-11-07 15:22:01,471 INFO eventplat.totals partition 5 restored at offset 202: 2 totals, 187 ids in window
+2026-11-07T15:22:14.618192497Z 2026-11-07 15:22:14,617 INFO eventplat.totals totals consuming usage.events
+2026-11-07T15:22:15.875421612Z 2026-11-07 15:22:15,870 INFO eventplat.totals partition 0 restored at offset 1435: 6 totals, 1308 ids in window
+2026-11-07T15:22:15.905034916Z 2026-11-07 15:22:15,904 INFO eventplat.totals partition 2 restored at offset 1281: 4 totals, 1163 ids in window
+2026-11-07T15:22:15.909878137Z 2026-11-07 15:22:15,909 INFO eventplat.totals partition 1 restored at offset 1300: 5 totals, 1184 ids in window
+2026-11-07T15:22:16.045131840Z 2026-11-07 15:22:16,044 INFO eventplat.totals partition 5 restored at offset 461: 2 totals, 418 ids in window
+2026-11-07T15:22:16.067323300Z 2026-11-07 15:22:16,066 INFO eventplat.totals partition 4 restored at offset 761: 4 totals, 691 ids in window
+2026-11-07T15:22:16.077542646Z 2026-11-07 15:22:16,076 INFO eventplat.totals partition 3 restored at offset 1040: 3 totals, 943 ids in window
+2026-11-07T15:22:31.135164042Z 2026-11-07 15:22:31,134 INFO eventplat.totals totals consuming usage.events
+2026-11-07T15:22:32.588705194Z 2026-11-07 15:22:32,588 INFO eventplat.totals partition 5 restored at offset 608: 2 totals, 550 ids in window
+2026-11-07T15:22:32.686809373Z 2026-11-07 15:22:32,686 INFO eventplat.totals partition 3 restored at offset 1272: 3 totals, 1152 ids in window
+2026-11-07T15:22:32.698604834Z 2026-11-07 15:22:32,697 INFO eventplat.totals partition 0 restored at offset 1848: 6 totals, 1679 ids in window
+2026-11-07T15:22:32.734257013Z 2026-11-07 15:22:32,720 INFO eventplat.totals partition 4 restored at offset 1002: 4 totals, 908 ids in window
+2026-11-07T15:22:32.734857537Z 2026-11-07 15:22:32,727 INFO eventplat.totals partition 2 restored at offset 1573: 4 totals, 1426 ids in window
+2026-11-07T15:22:32.735336981Z 2026-11-07 15:22:32,733 INFO eventplat.totals partition 1 restored at offset 1730: 5 totals, 1569 ids in window
+2026-11-07T15:22:38.743925037Z 2026-11-07 15:22:38,742 WARNING eventplat.deadletter kafka: KafkaError{code=NOT_COORDINATOR,val=16,str="Failed to fetch committed offsets for 0 partition(s) in group "totals": Broker: Not coordinator"}
+
+# kafka-consumer-groups.sh --describe --group totals, minutes later: the member owns all six
+# partitions, every one has lag, and the committed offsets equal the restored offsets.
+GROUP   TOPIC         PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG
+totals  usage.events  0          1848            2909            1061
+totals  usage.events  1          1730            2848            1118
+totals  usage.events  2          1573            2333            760
+totals  usage.events  3          1272            1850            578
+totals  usage.events  4          1002            1611            609
+totals  usage.events  5          608             1008            400

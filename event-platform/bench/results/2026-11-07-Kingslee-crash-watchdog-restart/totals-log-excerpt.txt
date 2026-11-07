@@ -1,0 +1,22 @@
+# totals service log, restart-race run on 2026-11-07 after both fixes. While Kafka nodes
+# were being killed, send_offsets_to_transaction(..., 30 s) blocked for more than 120 s;
+# the watchdog printed the main thread's stack and exited, and the restarted service
+# restored its partitions and caught up. The run passed: nothing lost, both totals exact,
+# longest totals stall 124.6 s. librdkafka connection-retry lines are left out.
+
+2026-11-07T18:28:00.144514876Z 2026-11-07 18:28:00,143 INFO eventplat.totals partition 4 restored at offset 2657: 4 totals, 2402 ids in window
+2026-11-07T18:28:00.174026661Z 2026-11-07 18:28:00,173 INFO eventplat.totals partition 0 restored at offset 4236: 6 totals, 3827 ids in window
+2026-11-07T18:28:00.215858511Z 2026-11-07 18:28:00,215 INFO eventplat.totals partition 5 restored at offset 3957: 5 totals, 3574 ids in window
+2026-11-07T19:41:18.199019836Z Timeout (0:02:00)!
+2026-11-07T19:41:18.199075452Z Thread 0x00007f1946468340 (most recent call first):
+2026-11-07T19:41:18.199084006Z   File "/app/src/eventplat/totals.py", line 299 in process
+2026-11-07T19:41:18.199089644Z   File "/app/src/eventplat/totals.py", line 328 in run
+2026-11-07T19:41:18.199094355Z   File "/app/src/eventplat/totals.py", line 344 in main
+2026-11-07T19:41:18.199098709Z   File "/app/.venv/bin/eventplat-totals", line 10 in <module>
+2026-11-07T19:41:20.395759254Z 2026-11-07 19:41:20,395 INFO eventplat.totals totals consuming usage.events
+2026-11-07T19:41:21.901100626Z 2026-11-07 19:41:21,899 INFO eventplat.totals partition 1 restored at offset 2667: 3 totals, 2408 ids in window
+2026-11-07T19:41:22.542508233Z 2026-11-07 19:41:22,541 INFO eventplat.totals partition 2 restored at offset 1663: 2 totals, 1502 ids in window
+2026-11-07T19:41:22.653323483Z 2026-11-07 19:41:22,652 INFO eventplat.totals partition 0 restored at offset 4734: 6 totals, 4276 ids in window
+2026-11-07T19:41:22.693135218Z 2026-11-07 19:41:22,692 INFO eventplat.totals partition 4 restored at offset 2990: 4 totals, 2702 ids in window
+2026-11-07T19:41:22.750917997Z 2026-11-07 19:41:22,750 INFO eventplat.totals partition 3 restored at offset 3375: 4 totals, 3047 ids in window
+2026-11-07T19:41:22.779622541Z 2026-11-07 19:41:22,779 INFO eventplat.totals partition 5 restored at offset 4377: 5 totals, 3953 ids in window

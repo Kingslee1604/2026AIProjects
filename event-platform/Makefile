@@ -65,5 +65,5 @@ crash-stack-up: ## Crash-test stack: 3 Kafka nodes, 3 gateways (stops the dev st
 crash-stack-down: ## Remove the crash-test stack and its data (Kafka keeps none either)
 	$(CRASH) down --volumes
 
-bench-crash: ## Crash harness: broker, worker and gateway kills, slow DB, replay (crash stack)
+bench-crash: ## Crash harness: broker, worker and gateway kills, frozen DB, replay (crash stack)
 	KAFKA_BOOTSTRAP=$(CRASH_BOOTSTRAP) uv run --frozen python bench/crash.py $(SCENARIOS)
