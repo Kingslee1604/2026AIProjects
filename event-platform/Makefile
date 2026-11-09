@@ -2,7 +2,7 @@ SHELL := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 .DEFAULT_GOAL := help
 
-.PHONY: help setup lint format typecheck test up down logs ps e2e check bench-memory chaos-up chaos-down bench-budget \
+.PHONY: help setup lint format typecheck test up down logs ps e2e check bench-memory chaos-up chaos-down bench-budget bench-load \
 	crash-stack-up crash-stack-down bench-crash
 
 CRASH := docker compose -f compose.yaml -f compose.crash.yaml --profile chaos
@@ -54,6 +54,9 @@ e2e: ## End-to-end test against the running stack (make up first)
 
 bench-memory: ## Kafka RAM at idle and under load: make bench-memory NODES=1|3
 	./bench/kafka-memory.sh $(or $(NODES),1)
+
+bench-load: ## Throughput, latency and memory of the dev stack (needs make up)
+	uv run --frozen python bench/load.py
 
 bench-budget: ## Budget limits under gateway SIGKILLs (needs make chaos-up)
 	uv run --frozen python bench/budget_chaos.py

@@ -47,6 +47,7 @@ from confluent_kafka import (
     TopicPartition,
 )
 
+from eventplat.batching import next_batch
 from eventplat.config import Settings
 from eventplat.deadletter import decode
 from eventplat.events import UsageEvent
@@ -65,6 +66,10 @@ WATCHDOG_S = 120
 STUCK_AFTER_S = 60.0
 # librdkafka pre-fetches up to 64 MiB per consumer by default; a few MiB keeps up just as well.
 PREFETCH_KIB = 8_192
+# Partitions restored at the same time. All six at once held the service at its 256 MiB limit
+# for ~10 s after a restart, with full duplicate windows, and was no faster; two at a time
+# peaked at ~210 MiB and took ~12 s (ADR-0005).
+RESTORE_THREADS = 2
 
 
 @dataclass
@@ -226,7 +231,7 @@ class TotalsService:
         restore waits about a second for its end-of-partition signal even when there is little
         to read, so one after another, a rebalance that moves six partitions stood still for
         six of those seconds."""
-        with ThreadPoolExecutor(max_workers=max(1, len(committed))) as pool:
+        with ThreadPoolExecutor(max_workers=max(1, min(len(committed), RESTORE_THREADS))) as pool:
             states = pool.map(self.restore, committed.keys(), committed.values())
             return dict(zip(committed.keys(), states, strict=True))
 
@@ -323,7 +328,7 @@ class TotalsService:
                 # and a transaction) takes longer than WATCHDOG_S, print every thread's stack
                 # and exit, so the container restarts now and not when Kafka gives up on us.
                 faulthandler.dump_traceback_later(WATCHDOG_S, exit=True)
-                messages = self._consumer.consume(num_messages=BATCH_SIZE, timeout=1.0)
+                messages = next_batch(self._consumer, BATCH_SIZE, wait_s=1.0)
                 if messages:
                     self.process(messages)
                 guard.check(sum(1 for m in messages if m.error() is None))

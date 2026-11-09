@@ -19,6 +19,7 @@ from types import FrameType
 
 from confluent_kafka import OFFSET_BEGINNING, Consumer, Message, TopicPartition
 
+from eventplat.batching import next_batch
 from eventplat.config import Settings
 from eventplat.db import Database
 from eventplat.deadletter import DeadLetters, decode
@@ -146,7 +147,7 @@ def run(settings: Settings, stop: threading.Event) -> None:
     guard = StallGuard(consumer, STUCK_AFTER_S)
     try:
         while not stop.is_set():
-            messages = consumer.consume(num_messages=BATCH_SIZE, timeout=1.0)
+            messages = next_batch(consumer, BATCH_SIZE, wait_s=1.0)
             guard.check(sum(1 for m in messages if m.error() is None))
             if not messages:
                 continue

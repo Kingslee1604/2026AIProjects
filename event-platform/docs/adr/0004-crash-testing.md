@@ -160,7 +160,8 @@ After both fixes, 3 of 3 passed, one of them by way of the watchdog restart (fau
 1. Keep the crash harness and the three-node crash stack as the standing test for these
    promises; run it before changing consumer, producer or transaction code.
 2. Use a 3 s broker session (crash stack) and a 10 s consumer session (both workers), with
-   cooperative-sticky assignment and parallel restores in the totals service.
+   cooperative-sticky assignment and parallel restores in the totals service (capped at two
+   at a time by [ADR-0005](0005-benchmarks-and-tuning.md), for memory).
 3. Assign partitions with explicitly looked-up offsets, treat code `_FATAL` as fatal, and keep
    the stall guard and the watchdog.
 

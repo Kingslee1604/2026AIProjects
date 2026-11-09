@@ -1,6 +1,6 @@
 # ADR-0003: JSON records, checked in CI, with no schema registry for now
 
-- **Status:** Accepted
+- **Status:** Accepted; decision 4 (zstd) reversed by [ADR-0005](0005-benchmarks-and-tuning.md)
 - **Date:** 2026-10-27
 - **Evidence:** [`spikes/record_format/formats.py`](../../spikes/record_format/formats.py), raw
   results in
@@ -112,7 +112,8 @@ elected itself leader, so "ready" here means "accepted a write".
    - Breaking: remove, rename or retype a field, or add one without a default. A breaking
      change gets a new topic, such as `usage.events.v2`.
 4. **Set producer compression to zstd** when the gateway is tuned (step 5). The size result
-   above depends on it.
+   above depends on it. *Measured in step 5 and not adopted: the gateway's batches are too
+   small for it to pay off, and it halved throughput ([ADR-0005](0005-benchmarks-and-tuning.md)).*
 
 ## Consequences
 
