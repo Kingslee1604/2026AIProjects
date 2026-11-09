@@ -2,7 +2,7 @@ SHELL := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 .DEFAULT_GOAL := help
 
-.PHONY: help setup lint format typecheck test up down logs ps e2e check bench-memory chaos-up chaos-down bench-budget bench-load \
+.PHONY: help setup lint format typecheck test tools security up down logs ps e2e check bench-memory chaos-up chaos-down bench-budget bench-load \
 	crash-stack-up crash-stack-down bench-crash
 
 CRASH := docker compose -f compose.yaml -f compose.crash.yaml --profile chaos
@@ -29,6 +29,12 @@ test: ## Unit tests (no services needed)
 	uv run --frozen pytest
 
 check: lint typecheck test ## Everything that runs without the stack
+
+tools: ## Install pinned, checksum-verified tools into ~/.local/bin (uv, gitleaks, scanners)
+	./scripts/install-tools.sh
+
+security: ## Dependency, image and history scans, plus an SBOM (make up builds the image)
+	./scripts/security-scan.sh
 
 up: ## Start the stack (Kafka, Postgres and the services) and wait until healthy
 	docker compose up --detach --build --wait --wait-timeout 300

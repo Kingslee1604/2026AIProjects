@@ -49,6 +49,7 @@ open-weight models.
 | Project | Description | Status |
 |---|---|---|
 | [agentforge](agentforge/) | Self-hostable platform for evidence-grounded, human-supervised AI workflows over private documents | **Release 1 (v0.1.0)**: complete, tested in CI |
+| [event-platform](event-platform/) | AI usage metering and budget limits on Kafka: billed exactly once, tested by killing every part of it while it runs | Milestones 1-6: measured and crash-tested, CI with security scans |
 | [production-rag](production-rag/) | "Ask My Cardiology Docs": CPU-only RAG with hybrid retrieval, reranking, verified citations, and a CI eval gate | Working prototype with measured fixture-set results |
 
 <details>

@@ -1,5 +1,10 @@
 # Event Platform: AI usage metering and budget limits on Kafka
 
+[![CI](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml/badge.svg?branch=feature/dev)](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml)
+![Python 3.12](https://img.shields.io/badge/python-3.12-3776ab?logo=python&logoColor=white)
+![Kafka 4.3](https://img.shields.io/badge/kafka-4.3%20KRaft-231f20?logo=apachekafka&logoColor=white)
+![PostgreSQL 18](https://img.shields.io/badge/postgres-18-4169e1?logo=postgresql&logoColor=white)
+
 Every AI model call a tenant makes is metered, billed exactly once, and checked against the
 tenant's daily token budget before it runs. Built on Kafka, Postgres and Python, and tested by
 killing every part of it while it works.
@@ -105,6 +110,8 @@ Needs Docker (with about 2 GB free), [uv](https://docs.astral.sh/uv/) and `make`
 make setup      # Python dependencies from the lockfile
 make up         # Kafka, Postgres and the services; waits until healthy
 make check      # lint, types, unit tests (no services needed)
+make tools      # pinned, checksum-verified scanners into ~/.local/bin
+make security   # pip-audit, OSV-Scanner, Trivy image scan + SBOM, gitleaks history
 make e2e        # end-to-end tests against the running stack
 make down       # stop (data is kept)
 ```
@@ -140,6 +147,26 @@ make crash-stack-up && make bench-crash # crash harness on 3 Kafka nodes
 make crash-stack-down
 ```
 
+## CI
+
+Every push that touches this project runs
+[`event-platform-ci.yml`](../.github/workflows/event-platform-ci.yml):
+
+- **Checks:** ruff, pyright (strict on `src/`) and the unit tests.
+- **Security:** pip-audit and OSV-Scanner over `uv.lock`, and gitleaks over the full git
+  history.
+- **Stack:** builds the image, scans it with Trivy (fails on HIGH or CRITICAL with a fix),
+  uploads its SBOM, starts the whole stack with Kafka and Postgres, and runs the end-to-end
+  tests.
+
+Actions are pinned to commit SHAs, tools are installed by a checksum-verified script, base
+images are pinned by digest, and dependencies resolve only to releases at least two weeks old.
+The image runs as a non-root user and holds only the Python environment (no uv, no build
+cache, no source tree).
+
+The crash harness and benchmarks are not in CI: they take 30+ minutes, and shared runners
+would make their timings meaningless. They run on the laptop (see Run it).
+
 ## Design decisions
 
 | ADR | Decision |
@@ -155,5 +182,4 @@ make crash-stack-down
 - **Budget alerts** (for example at 80% of a budget), and anything that reads the live
   `usage.totals` feed: budgets are enforced at the gateway instead.
 - **Request metrics** for the gateway, which no longer writes a log line per request.
-- **CI** (lint, types, tests, security scans) is the next step.
 - **Authentication:** the services listen only on `127.0.0.1` and trust their callers.

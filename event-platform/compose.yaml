@@ -5,6 +5,7 @@ name: eventplat
 
 x-app: &app
   build: .
+  image: eventplat:dev  # one image for every service; scanned by scripts/security-scan.sh
   restart: unless-stopped
   mem_limit: 256m
   environment:
