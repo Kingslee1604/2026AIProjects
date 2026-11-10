@@ -1,6 +1,6 @@
 # Event Platform: AI usage metering and budget limits on Kafka
 
-[![CI](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml/badge.svg?branch=feature/dev)](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml)
+[![CI](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml/badge.svg?branch=main)](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml)
 ![Python 3.12](https://img.shields.io/badge/python-3.12-3776ab?logo=python&logoColor=white)
 ![Kafka 4.3](https://img.shields.io/badge/kafka-4.3%20KRaft-231f20?logo=apachekafka&logoColor=white)
 ![PostgreSQL 18](https://img.shields.io/badge/postgres-18-4169e1?logo=postgresql&logoColor=white)
@@ -109,6 +109,7 @@ Needs Docker (with about 2 GB free), [uv](https://docs.astral.sh/uv/) and `make`
 ```bash
 make setup      # Python dependencies from the lockfile
 make up         # Kafka, Postgres and the services; waits until healthy
+                #   (first run writes .env with a random database password)
 make check      # lint, types, unit tests (no services needed)
 make tools      # pinned, checksum-verified scanners into ~/.local/bin
 make security   # pip-audit, OSV-Scanner, Trivy image scan + SBOM, gitleaks history

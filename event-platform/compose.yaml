@@ -13,7 +13,7 @@ x-app: &app
     USAGE_TOPIC: usage.events
     DEAD_LETTER_TOPIC: usage.dlq
     TOTALS_TOPIC: usage.totals
-    DATABASE_URL: postgresql://eventplat:${POSTGRES_PASSWORD:-eventplat-dev}@postgres:5432/eventplat
+    DATABASE_URL: postgresql://eventplat:${POSTGRES_PASSWORD:?run make up, which creates .env}@postgres:5432/eventplat
     BUDGET_URL: http://budget:8000
     ALLOWANCE_TOKENS: ${ALLOWANCE_TOKENS:-10000}
     CONSUMER_SESSION_TIMEOUT_MS: ${CONSUMER_SESSION_TIMEOUT_MS:-10000}
@@ -56,7 +56,7 @@ services:
     command: ["postgres", "-c", "shared_buffers=64MB"]
     environment:
       POSTGRES_USER: eventplat
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eventplat-dev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run make up, which creates .env}
       POSTGRES_DB: eventplat
     ports:
       - "127.0.0.1:55432:5432"

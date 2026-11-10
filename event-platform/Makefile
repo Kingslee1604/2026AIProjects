@@ -2,14 +2,21 @@ SHELL := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
 .DEFAULT_GOAL := help
 
-.PHONY: help setup lint format typecheck test tools security up down logs ps e2e check bench-memory chaos-up chaos-down bench-budget bench-load \
+.PHONY: help env setup lint format typecheck test tools security up down logs ps e2e check bench-memory chaos-up chaos-down bench-budget bench-load \
 	crash-stack-up crash-stack-down bench-crash
+
+# The database password lives in .env (git-ignored), created by `make env`.
+-include .env
+export POSTGRES_PASSWORD
 
 CRASH := docker compose -f compose.yaml -f compose.crash.yaml --profile chaos
 CRASH_BOOTSTRAP := localhost:29092,localhost:29093,localhost:29094
 
 help: ## Show available targets
-	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
+	@grep -hE '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
+
+env: ## Create .env with a random database password (kept if it exists)
+	./scripts/ensure-env.sh
 
 setup: ## Install project dependencies from the lockfile
 	uv sync --frozen
@@ -36,23 +43,23 @@ tools: ## Install pinned, checksum-verified tools into ~/.local/bin (uv, gitleak
 security: ## Dependency, image and history scans, plus an SBOM (make up builds the image)
 	./scripts/security-scan.sh
 
-up: ## Start the stack (Kafka, Postgres and the services) and wait until healthy
+up: env ## Start the stack (Kafka, Postgres and the services) and wait until healthy
 	docker compose up --detach --build --wait --wait-timeout 300
 	@echo "Gateway: http://127.0.0.1:8100/docs   Budget service: http://127.0.0.1:8110/docs"
 
-down: ## Stop the stack (data volumes are kept)
+down: env ## Stop the stack (data volumes are kept)
 	docker compose --profile chaos down
 
-chaos-up: ## Start two extra gateways (ports 8101, 8102) for the crash tests
+chaos-up: env ## Start two extra gateways (ports 8101, 8102) for the crash tests
 	docker compose --profile chaos up --detach --build --wait --wait-timeout 300
 
-chaos-down: ## Stop the extra gateways
+chaos-down: env ## Stop the extra gateways
 	docker compose --profile chaos rm --stop --force gateway-2 gateway-3
 
-logs: ## Follow logs from all services
+logs: env ## Follow logs from all services
 	docker compose logs --follow --tail 100
 
-ps: ## Show service status and health
+ps: env ## Show service status and health
 	docker compose ps
 
 e2e: ## End-to-end test against the running stack (make up first)
@@ -67,11 +74,11 @@ bench-load: ## Throughput, latency and memory of the dev stack (needs make up)
 bench-budget: ## Budget limits under gateway SIGKILLs (needs make chaos-up)
 	uv run --frozen python bench/budget_chaos.py
 
-crash-stack-up: ## Crash-test stack: 3 Kafka nodes, 3 gateways (stops the dev stack first)
+crash-stack-up: env ## Crash-test stack: 3 Kafka nodes, 3 gateways (stops the dev stack first)
 	docker compose --profile chaos stop
 	$(CRASH) up --detach --build --wait --wait-timeout 300
 
-crash-stack-down: ## Remove the crash-test stack and its data (Kafka keeps none either)
+crash-stack-down: env ## Remove the crash-test stack and its data (Kafka keeps none either)
 	$(CRASH) down --volumes
 
 bench-crash: ## Crash harness: broker, worker and gateway kills, frozen DB, replay (crash stack)

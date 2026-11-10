@@ -2,7 +2,7 @@
 
 import os
 from dataclasses import dataclass
-from urllib.parse import unquote, urlsplit
+from urllib.parse import quote, unquote, urlsplit
 
 
 @dataclass(frozen=True)
@@ -50,8 +50,10 @@ class Settings:
             usage_topic=os.environ.get("USAGE_TOPIC", "usage.events"),
             dead_letter_topic=os.environ.get("DEAD_LETTER_TOPIC", "usage.dlq"),
             totals_topic=os.environ.get("TOTALS_TOPIC", "usage.totals"),
-            database_url=os.environ.get(
-                "DATABASE_URL", "postgresql://eventplat:eventplat-dev@localhost:55432/eventplat"
+            # The password comes from .env (created by `make up`; the Makefile exports it).
+            database_url=os.environ.get("DATABASE_URL")
+            or "postgresql://eventplat:{}@localhost:55432/eventplat".format(
+                quote(os.environ.get("POSTGRES_PASSWORD", ""), safe="")
             ),
             budget_url=os.environ.get("BUDGET_URL", "http://localhost:8110"),
             allowance_tokens=int(os.environ.get("ALLOWANCE_TOKENS", "10000")),
