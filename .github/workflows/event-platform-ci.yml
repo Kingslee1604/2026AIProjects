@@ -82,8 +82,8 @@ jobs:
           persist-credentials: false
       - name: Install pinned tools and scanners
         run: ./scripts/install-tools.sh && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-      - name: Build the image
-        run: docker compose build gateway
+      - name: Build the image (make env first: compose needs the generated database password)
+        run: make env && docker compose build gateway
       - name: Trivy image scan and Syft SBOM
         run: ./scripts/security-scan.sh images
       - name: Upload SBOM
