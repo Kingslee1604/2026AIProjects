@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="300" viewBox="0 0 1280 300" role="img" aria-label="Event Platform: every AI call metered and billed exactly once. Kafka, Postgres, per-tenant budgets, crash-tested.">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#06141a"/>
+      <stop offset="1" stop-color="#0a2229"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="0.85" cy="0.1" r="0.6">
+      <stop offset="0" stop-color="#14b8a6" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#14b8a6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.05" cy="1" r="0.5">
+      <stop offset="0" stop-color="#0284c7" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#0284c7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0ea5e9"/>
+      <stop offset="1" stop-color="#14b8a6"/>
+    </linearGradient>
+    <linearGradient id="brandText" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7dd3fc"/>
+      <stop offset="1" stop-color="#5eead4"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#ffffff" stroke-opacity="0.035"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="300" rx="20" fill="url(#bg)"/>
+  <rect width="1280" height="300" rx="20" fill="url(#grid)"/>
+  <rect width="1280" height="300" rx="20" fill="url(#glow1)"/>
+  <rect width="1280" height="300" rx="20" fill="url(#glow2)"/>
+
+  <!-- Logo mark: a rounded tile holding three partition logs of records -->
+  <g transform="translate(80 76)">
+    <rect width="147" height="147" rx="32" fill="url(#brand)" stroke="#ffffff" stroke-opacity="0.25"/>
+    <g fill="#ffffff">
+      <rect x="26" y="36" width="20" height="18" rx="4"/>
+      <rect x="52" y="36" width="20" height="18" rx="4"/>
+      <rect x="78" y="36" width="20" height="18" rx="4" fill-opacity="0.55"/>
+      <rect x="26" y="64" width="20" height="18" rx="4"/>
+      <rect x="52" y="64" width="20" height="18" rx="4"/>
+      <rect x="78" y="64" width="20" height="18" rx="4"/>
+      <rect x="104" y="64" width="20" height="18" rx="4" fill-opacity="0.55"/>
+      <rect x="26" y="92" width="20" height="18" rx="4"/>
+      <rect x="52" y="92" width="20" height="18" rx="4" fill-opacity="0.55"/>
+    </g>
+  </g>
+
+  <g font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+    <text x="262" y="128" font-size="64" font-weight="700" fill="#f0fdfa">Event <tspan fill="url(#brandText)">Platform</tspan></text>
+    <text x="264" y="178" font-size="30" font-weight="500" fill="#cdeef0">Every AI call metered. Billed exactly once.</text>
+    <text x="264" y="222" font-size="20" fill="#93c5c9">Kafka · Postgres · per-tenant budgets · crash-tested · measured on a laptop</text>
+  </g>
+
+  <!-- "Exactly once" badge, as checked by the crash harness -->
+  <g transform="translate(1020 92)">
+    <rect width="180" height="40" rx="20" fill="#16a34a" fill-opacity="0.14" stroke="#4ade80" stroke-opacity="0.6"/>
+    <circle cx="26" cy="20" r="8" fill="none" stroke="#4ade80" stroke-width="2"/>
+    <path d="M22 20.5l3 3 5-6" fill="none" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="44" y="27" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#86efac">Exactly once</text>
+  </g>
+</svg>

@@ -12,7 +12,7 @@
 # 2026 AI Projects
 
 AI engineering projects built in 2026. Each project lives in its own folder with its own
-README, license, and tooling.
+README and tooling, and has its own CI workflow.
 
 ## ⭐ AgentForge: answers your auditors can verify
 
@@ -43,6 +43,47 @@ open-weight models.
 [architecture](agentforge/docs/architecture/README.md) ·
 [decision records](agentforge/docs/adr/README.md) ·
 [release notes](agentforge/CHANGELOG.md)
+
+## ⭐ Event Platform: every AI call billed exactly once
+
+[![Event Platform: every AI call metered and billed exactly once. Kafka, Postgres, per-tenant budgets, crash-tested.](event-platform/docs/images/banner.svg)](event-platform/)
+
+<p>
+  <a href="https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml"><img alt="CI" src="https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml/badge.svg?branch=main"></a>
+  <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3776ab?logo=python&amp;logoColor=white">
+  <img alt="Kafka 4.3 KRaft" src="https://img.shields.io/badge/kafka-4.3%20KRaft-231f20?logo=apachekafka&amp;logoColor=white">
+  <img alt="PostgreSQL 18" src="https://img.shields.io/badge/postgres-18-4169e1?logo=postgresql&amp;logoColor=white">
+</p>
+
+Usage metering and budget limits for AI model calls, built on Kafka. Every call a tenant makes is
+recorded **once**: never lost and never billed twice, even when clients retry and servers crash.
+A call that would go over the tenant's daily token budget is refused **before** it runs.
+
+```mermaid
+flowchart LR
+    app([AI app]) -- "authorize, then record usage" --> gw["Gateways<br/>(any number)"]
+    gw -- "budget slices" --> budget[Budget service] --> pg[(Postgres)]
+    gw -- "acks=all, idempotent" --> kafka[["Kafka<br/>usage.events"]]
+    kafka --> ledger["Ledger writer<br/>(billing)"] --> pg
+    kafka --> totals["Totals service<br/>(Kafka transactions)"] --> live[["Kafka<br/>live totals"]]
+```
+
+- **Tested by breaking it:** a crash harness kills Kafka brokers, gateways and workers, forces
+  rebalances and freezes the database. Across 101,000+ records: **0 lost, 0 counted twice, 0 out
+  of order**.
+- **Budgets that hold:** 3 gateways, 24 clients and 8 gateway kills against a 3M-token limit:
+  2,975,245 tokens used, never over.
+- **Measured, not claimed:** 613-718 records/s per gateway with `acks=all`, and 115 ms from the
+  API to the billing ledger at p50 (220 ms at p99), on a laptop.
+- **Bugs found and fixed:** the tests found failure modes in the Kafka client and in the
+  services. Each is written up with its evidence in the decision records.
+- **CI with supply-chain checks:** dependency, image and secret scans, an SBOM, and end-to-end
+  tests against the full stack on every push.
+
+**Start here:** [Event Platform README](event-platform/) ·
+[crash testing](event-platform/docs/adr/0004-crash-testing.md) ·
+[benchmarks](event-platform/docs/adr/0005-benchmarks-and-tuning.md) ·
+[raw results](event-platform/bench/results/)
 
 ## All projects
 

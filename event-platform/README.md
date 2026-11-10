@@ -1,3 +1,5 @@
+![Event Platform: every AI call metered and billed exactly once. Kafka, Postgres, per-tenant budgets, crash-tested.](docs/images/banner.svg)
+
 # Event Platform: AI usage metering and budget limits on Kafka
 
 [![CI](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml/badge.svg?branch=main)](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml)
