@@ -1,0 +1,281 @@
+{
+  "run_id": "776b4608",
+  "machine": {
+    "host": "Kingslee",
+    "cpu": "12th Gen Intel(R) Core(TM) i7-1255U",
+    "wsl_cpus": 12,
+    "wsl_mem_mib": 3919,
+    "stack": "1 Kafka node (apache/kafka:4.3.1), 1 gateway (1 uvicorn process with uvloop and httptools, no access log), budget, ledger, totals, postgres:18.4; each app container capped at 256 MB",
+    "load": "4 client processes on the same laptop"
+  },
+  "settings": {
+    "allowance_slice_tokens": 10000,
+    "consumer_session_timeout_ms": 10000,
+    "producer": "acks=all, idempotent, linger.ms=5, no compression",
+    "consumer_batch": "up to 500 records, 0.2 s linger after the first"
+  },
+  "clock": {
+    "offset_ms": -0.07,
+    "uncertainty_ms": 0.5
+  },
+  "memory_mib": {
+    "idle_total": 986,
+    "idle_by_container": {
+      "eventplat-budget-1": 39,
+      "eventplat-gateway-1": 43,
+      "eventplat-kafka-1-1": 495,
+      "eventplat-ledger-1": 29,
+      "eventplat-postgres-1": 131,
+      "eventplat-totals-1": 248
+    },
+    "peak_total_under_load": 998
+  },
+  "saturation": [
+    {
+      "clients": 8,
+      "requests": 5202,
+      "statuses": {
+        "202": 5202
+      },
+      "per_s": 259,
+      "latency_ms": {
+        "p50": 27.8,
+        "p90": 40.7,
+        "p99": 74.5,
+        "max": 283.4
+      },
+      "client_cpu_cores": 0.61,
+      "laptop_cpu_busy_pct": 33
+    },
+    {
+      "clients": 16,
+      "requests": 8399,
+      "statuses": {
+        "202": 8399
+      },
+      "per_s": 413,
+      "latency_ms": {
+        "p50": 35.5,
+        "p90": 53.5,
+        "p99": 87.1,
+        "max": 200.9
+      },
+      "client_cpu_cores": 0.87,
+      "laptop_cpu_busy_pct": 31
+    },
+    {
+      "clients": 32,
+      "requests": 10831,
+      "statuses": {
+        "202": 10831
+      },
+      "per_s": 573,
+      "latency_ms": {
+        "p50": 54.5,
+        "p90": 78.2,
+        "p99": 129.3,
+        "max": 202.9
+      },
+      "client_cpu_cores": 1.13,
+      "laptop_cpu_busy_pct": 33
+    },
+    {
+      "clients": 64,
+      "requests": 14491,
+      "statuses": {
+        "202": 14491
+      },
+      "per_s": 718,
+      "latency_ms": {
+        "p50": 88.3,
+        "p90": 118.9,
+        "p99": 176.9,
+        "max": 245.9
+      },
+      "client_cpu_cores": 1.21,
+      "laptop_cpu_busy_pct": 33
+    },
+    {
+      "clients": 128,
+      "requests": 13387,
+      "statuses": {
+        "202": 13387
+      },
+      "per_s": 646,
+      "latency_ms": {
+        "p50": 189.3,
+        "p90": 244.8,
+        "p99": 298.0,
+        "max": 351.0
+      },
+      "client_cpu_cores": 1.21,
+      "laptop_cpu_busy_pct": 34
+    }
+  ],
+  "max_per_s": 718,
+  "steady": [
+    {
+      "target_per_s": 180,
+      "share_of_max": 0.25,
+      "gateway": {
+        "requests": 5400,
+        "statuses": {
+          "202": 5400
+        },
+        "per_s": 178,
+        "latency_ms": {
+          "p50": 8.3,
+          "p90": 10.0,
+          "p99": 30.9,
+          "max": 90.5
+        }
+      },
+      "ledger": {
+        "in_ledger": 5400,
+        "acked": 5400,
+        "latency_ms": {
+          "p50": 114.6,
+          "p90": 198.0,
+          "p99": 216.8,
+          "max": 292.8
+        }
+      },
+      "client_cpu_cores": 0.16,
+      "laptop_cpu_busy_pct": 10
+    },
+    {
+      "target_per_s": 360,
+      "share_of_max": 0.5,
+      "gateway": {
+        "requests": 10807,
+        "statuses": {
+          "202": 10807
+        },
+        "per_s": 360,
+        "latency_ms": {
+          "p50": 8.7,
+          "p90": 12.6,
+          "p99": 83.2,
+          "max": 148.9
+        }
+      },
+      "ledger": {
+        "in_ledger": 10807,
+        "acked": 10807,
+        "latency_ms": {
+          "p50": 117.9,
+          "p90": 202.7,
+          "p99": 229.9,
+          "max": 340.9
+        }
+      },
+      "client_cpu_cores": 0.37,
+      "laptop_cpu_busy_pct": 17
+    },
+    {
+      "target_per_s": 570,
+      "share_of_max": 0.8,
+      "gateway": {
+        "requests": 16289,
+        "statuses": {
+          "202": 16289
+        },
+        "per_s": 543,
+        "latency_ms": {
+          "p50": 104.0,
+          "p90": 156.3,
+          "p99": 266.8,
+          "max": 389.4
+        }
+      },
+      "ledger": {
+        "in_ledger": 16289,
+        "acked": 16289,
+        "latency_ms": {
+          "p50": 165.9,
+          "p90": 265.3,
+          "p99": 363.7,
+          "max": 471.5
+        }
+      },
+      "client_cpu_cores": 1.14,
+      "laptop_cpu_busy_pct": 34
+    }
+  ],
+  "authorize": [
+    {
+      "path": "local allowance",
+      "max_tokens": 100,
+      "clients": 1,
+      "requests": 4270,
+      "statuses": {
+        "200": 4270
+      },
+      "per_s": 229,
+      "latency_ms": {
+        "p50": 4.3,
+        "p90": 6.0,
+        "p99": 10.7,
+        "max": 23.1
+      },
+      "client_cpu_cores": 0.31,
+      "laptop_cpu_busy_pct": 13
+    },
+    {
+      "path": "local allowance",
+      "max_tokens": 100,
+      "clients": 16,
+      "requests": 8324,
+      "statuses": {
+        "200": 8324
+      },
+      "per_s": 546,
+      "latency_ms": {
+        "p50": 27.5,
+        "p90": 44.6,
+        "p99": 68.7,
+        "max": 121.8
+      },
+      "client_cpu_cores": 1.19,
+      "laptop_cpu_busy_pct": 30
+    },
+    {
+      "path": "top-up every call",
+      "max_tokens": 10000,
+      "clients": 1,
+      "requests": 890,
+      "statuses": {
+        "200": 890
+      },
+      "per_s": 56,
+      "latency_ms": {
+        "p50": 17.7,
+        "p90": 22.3,
+        "p99": 31.3,
+        "max": 39.7
+      },
+      "client_cpu_cores": 0.09,
+      "laptop_cpu_busy_pct": 13
+    },
+    {
+      "path": "top-up every call",
+      "max_tokens": 10000,
+      "clients": 16,
+      "requests": 2542,
+      "statuses": {
+        "200": 2542
+      },
+      "per_s": 187,
+      "latency_ms": {
+        "p50": 84.7,
+        "p90": 128.2,
+        "p99": 186.1,
+        "max": 256.1
+      },
+      "client_cpu_cores": 0.41,
+      "laptop_cpu_busy_pct": 38
+    }
+  ],
+  "three_gateways": [],
+  "three_gateways_max_per_s": null
+}

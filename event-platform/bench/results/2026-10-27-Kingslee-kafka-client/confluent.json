@@ -1,0 +1,38 @@
+{
+  "client": "confluent-kafka",
+  "version": "2.16.0",
+  "g1_kafka4_round_trip": {
+    "passed": true,
+    "seconds": 0.62
+  },
+  "g2_no_duplicates_across_broker_kill": {
+    "passed": true,
+    "sent": 50000,
+    "acked": 50000,
+    "reported_failed": 0,
+    "acked_but_missing": 0,
+    "duplicates": 0,
+    "broker_down_s": 16.0
+  },
+  "g3_transactions": {
+    "passed": true,
+    "visible_read_committed": 100,
+    "aborted_visible": 0,
+    "physically_written": 200,
+    "input_offset_committed_in_tx": 100,
+    "fencing": "group metadata (KIP-447)"
+  },
+  "g4_speed": {
+    "records": 200000,
+    "record_bytes": 200,
+    "produce_per_s": 168281,
+    "consume_per_s": 354063
+  },
+  "peak_rss_mib": 95,
+  "machine": {
+    "host": "Kingslee",
+    "cpu": "12th Gen Intel(R) Core(TM) i7-1255U",
+    "python": "3.12.3",
+    "kafka_image": "apache/kafka:4.3.1 (1 node)"
+  }
+}

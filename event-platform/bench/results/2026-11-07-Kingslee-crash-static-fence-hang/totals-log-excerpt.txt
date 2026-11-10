@@ -1,0 +1,31 @@
+# totals service log, full crash suite on 2026-11-07 (restart-race), after the offset-fetch
+# fix. The restarted service restored its partitions; a Kafka node died during the rejoin;
+# the broker fenced the service as a duplicate of itself (same group.instance.id). The client
+# reported that as code _FATAL with fatal() False, so decode() logged a warning and the
+# service kept polling a dead consumer: the group had no active members for 329 s.
+# librdkafka connection-retry lines are left out.
+
+2026-11-07T16:53:05.884988561Z 2026-11-07 16:53:05,884 INFO eventplat.totals partition 3 restored at offset 18621: 15 totals, 16798 ids in window
+2026-11-07T16:53:05.951681741Z 2026-11-07 16:53:05,951 INFO eventplat.totals partition 2 restored at offset 16360: 15 totals, 14762 ids in window
+2026-11-07T16:53:06.103646454Z 2026-11-07 16:53:06,102 INFO eventplat.totals partition 1 restored at offset 19593: 18 totals, 17680 ids in window
+2026-11-07T16:53:06.125772751Z 2026-11-07 16:53:06,123 INFO eventplat.totals partition 5 restored at offset 17147: 17 totals, 15475 ids in window
+2026-11-07T16:53:06.185777838Z 2026-11-07 16:53:06,185 INFO eventplat.totals partition 4 restored at offset 20832: 22 totals, 18803 ids in window
+2026-11-07T16:53:19.214784693Z 2026-11-07 16:53:19,214 INFO eventplat.totals totals consuming usage.events
+2026-11-07T16:53:23.326845579Z 2026-11-07 16:53:23,326 INFO eventplat.totals partition 0 restored at offset 11201: 9 totals, 10105 ids in window
+2026-11-07T16:53:25.110983646Z 2026-11-07 16:53:25,110 INFO eventplat.totals partition 3 restored at offset 19940: 15 totals, 17984 ids in window
+2026-11-07T16:53:25.226628249Z 2026-11-07 16:53:25,226 INFO eventplat.totals partition 5 restored at offset 18623: 17 totals, 16804 ids in window
+2026-11-07T16:53:25.257297188Z 2026-11-07 16:53:25,256 INFO eventplat.totals partition 2 restored at offset 17873: 15 totals, 16124 ids in window
+2026-11-07T16:53:25.351350783Z 2026-11-07 16:53:25,350 INFO eventplat.totals partition 1 restored at offset 21093: 18 totals, 19031 ids in window
+2026-11-07T16:53:25.352546495Z 2026-11-07 16:53:25,352 INFO eventplat.totals partition 4 restored at offset 22527: 22 totals, 20326 ids in window
+2026-11-07T16:53:30.075343822Z %0|1794070410.075|FATAL|rdkafka#consumer-1| [thrd:main]: Fatal error: Broker: Static consumer fenced by other consumer with same group.instance.id: Fatal consumer error: Broker: Static consumer fenced by other consumer with same group.instance.id
+2026-11-07T16:53:32.170257034Z 2026-11-07 16:53:32,169 WARNING eventplat.deadletter kafka: KafkaError{code=_FATAL,val=-150,str="Fatal error: Broker: Static consumer fenced by other consumer with same group.instance.id: Fatal consumer error: Broker: Static consumer fenced by other consumer with same 
+
+# kafka-consumer-groups.sh --describe --group totals, minutes later:
+Consumer group 'totals' has no active members.
+GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-
+totals          usage.events    0          11201           12397           1196            -        
+totals          usage.events    1          21093           22694           1601            -        
+totals          usage.events    2          18219           19487           1268            -        
+totals          usage.events    3          20094           21383           1289            -        
+totals          usage.events    4          22527           24355           1828            -        
+totals          usage.events    5          18623           20158           1535            -        

@@ -1,0 +1,16 @@
+{
+  "image": "confluentinc/cp-schema-registry:8.3.2",
+  "image_mib": 826,
+  "license": "Confluent Community License (source-available, not OSI open source)",
+  "mem_limit": "512m",
+  "ready_s": 6.7,
+  "set_backward_compatibility": 200,
+  "register_v1": 200,
+  "register_safe_change": 200,
+  "register_breaking_change": 409,
+  "breaking_change_blocked": true,
+  "breaking_change_message": "{'error_code': 40901, 'message': 'Schema being registered is incompatible with an earlier schema for subject \"usage.events-value\", details: [{errorType:\\'READER_FIELD_MISSING_DEFAULT_VALUE\\', descript",
+  "idle_mib": 262.9,
+  "after_lookups_mib": 276.9,
+  "lookups_per_s": 246
+}

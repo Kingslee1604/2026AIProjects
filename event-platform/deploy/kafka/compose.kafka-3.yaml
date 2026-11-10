@@ -1,0 +1,49 @@
+# Three Kafka nodes (each broker + KRaft controller). Crash-test mode: lose one node,
+# keep writing (replication factor 3, min in-sync replicas 2).
+name: eventplat-k3
+
+x-kafka: &kafka
+  image: apache/kafka:4.3.1
+  mem_limit: 640m
+
+x-env: &env
+  CLUSTER_ID: "Sd4yoPY5T1mmYn3u0c0Zcg"
+  KAFKA_PROCESS_ROLES: broker,controller
+  KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:9093,2@kafka-2:9093,3@kafka-3:9093
+  KAFKA_LISTENERS: INTERNAL://:9092,CONTROLLER://:9093,HOST://:29092
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,HOST:PLAINTEXT
+  KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+  KAFKA_MIN_INSYNC_REPLICAS: 2
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+  KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
+
+services:
+  kafka-1:
+    <<: *kafka
+    hostname: kafka-1
+    ports: ["29092:29092"]
+    environment:
+      <<: *env
+      KAFKA_NODE_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-1:9092,HOST://localhost:29092
+  kafka-2:
+    <<: *kafka
+    hostname: kafka-2
+    ports: ["29093:29092"]
+    environment:
+      <<: *env
+      KAFKA_NODE_ID: 2
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-2:9092,HOST://localhost:29093
+  kafka-3:
+    <<: *kafka
+    hostname: kafka-3
+    ports: ["29094:29092"]
+    environment:
+      <<: *env
+      KAFKA_NODE_ID: 3
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-3:9092,HOST://localhost:29094

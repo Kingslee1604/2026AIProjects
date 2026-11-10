@@ -1,0 +1,102 @@
+# Event Platform CI. Runs the same gates as `make check`, dependency and history scans, an
+# image scan with an SBOM, and the end-to-end tests against the full Compose stack (Kafka,
+# Postgres and every service). Actions are pinned to commit SHAs; tools are installed by a
+# checksum-verified script (event-platform/scripts/install-tools.sh).
+name: event-platform CI
+
+on:
+  push:
+    branches: [main, "feature/**"]
+    paths:
+      - "event-platform/**"
+      - ".github/workflows/event-platform-ci.yml"
+      - ".gitleaks.toml"
+  pull_request:
+    paths:
+      - "event-platform/**"
+      - ".github/workflows/event-platform-ci.yml"
+      - ".gitleaks.toml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: event-platform-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+    working-directory: event-platform
+
+env:
+  UV_CACHE_DIR: /home/runner/.cache/uv
+
+jobs:
+  checks:
+    name: lint, types, unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.local/bin
+            ~/.local/share/uv
+            ~/.cache/uv
+          key: event-platform-${{ runner.os }}-${{ hashFiles('event-platform/scripts/install-tools.sh', 'event-platform/uv.lock') }}
+      - name: Install pinned tools
+        run: ./scripts/install-tools.sh && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Install dependencies from the lockfile
+        run: uv sync --frozen
+      - name: make check (ruff, pyright strict on src/, pytest)
+        run: make check
+
+  security:
+    name: dependency and history scans
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install pinned tools and scanners
+        run: ./scripts/install-tools.sh && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: pip-audit and OSV-Scanner (uv.lock)
+        run: ./scripts/security-scan.sh deps
+      - name: gitleaks over full history
+        run: ./scripts/security-scan.sh history
+
+  stack:
+    name: image scan, SBOM, end-to-end tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned tools and scanners
+        run: ./scripts/install-tools.sh && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Build the image (after make env, which writes the database password compose needs)
+        run: make env && docker compose build gateway
+      - name: Trivy image scan and Syft SBOM
+        run: ./scripts/security-scan.sh images
+      - name: Upload SBOM
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: event-platform-sbom
+          path: event-platform/build/sbom/
+          if-no-files-found: error
+      - name: Start the stack (one Kafka node, Postgres, gateway, budget, ledger, totals)
+        run: make up
+      - name: End-to-end tests (usage pipeline, exactly-once totals, budgets, dead letters)
+        run: uv sync --frozen && make e2e
+      - name: Stack logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail 200

@@ -1,0 +1,13 @@
+{
+  "per_container_peak_mib": {
+    "idle/eventplat-bench-topic": 74.0,
+    "idle/eventplat-k1-kafka-1-1": 314.9,
+    "load/eventplat-bench-consumer": 145.7,
+    "load/eventplat-bench-producer": 318.2,
+    "load/eventplat-k1-kafka-1-1": 522.9
+  },
+  "cluster_peak_mib": {
+    "idle": 314.9,
+    "load": 522.9
+  }
+}

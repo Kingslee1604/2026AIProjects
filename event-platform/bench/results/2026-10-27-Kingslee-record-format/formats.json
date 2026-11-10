@@ -1,0 +1,65 @@
+{
+  "records": 100000,
+  "versions": {
+    "pydantic": "2.14.1",
+    "fastavro": "1.13.1",
+    "protobuf": "7.36.2"
+  },
+  "formats": {
+    "json": {
+      "bytes_per_record": 189.2,
+      "encode_per_s": 621683,
+      "decode_codec_only_per_s": 514507,
+      "decode_to_validated_event_per_s": 667063,
+      "on_broker_bytes_per_record": {
+        "none": 210.2,
+        "lz4": 87.5,
+        "zstd": 52.1
+      }
+    },
+    "avro": {
+      "bytes_per_record": 78.6,
+      "encode_per_s": 196857,
+      "decode_codec_only_per_s": 256024,
+      "decode_to_validated_event_per_s": 174266,
+      "on_broker_bytes_per_record": {
+        "none": 99.8,
+        "lz4": 64.7,
+        "zstd": 46.6
+      }
+    },
+    "protobuf": {
+      "bytes_per_record": 64.1,
+      "encode_per_s": 735687,
+      "decode_codec_only_per_s": 4617695,
+      "decode_to_validated_event_per_s": 263482,
+      "on_broker_bytes_per_record": {
+        "none": 85.1,
+        "lz4": 50.0,
+        "zstd": 38.9
+      }
+    }
+  },
+  "evolution": {
+    "json, extra=forbid (as today)": {
+      "new reader, old record": "ok",
+      "old reader, new record": "fails: ValidationError: 1 validation error for UsageEvent"
+    },
+    "json, extra=ignore": {
+      "new reader, old record": "ok",
+      "old reader, new record": "ok"
+    },
+    "avro, writer schema known (registry)": {
+      "new reader, old record": "ok",
+      "old reader, new record": "ok"
+    },
+    "avro, writer schema unknown (no registry)": {
+      "new reader, old record": "fails: EOFError: ",
+      "old reader, new record": "fails: ValueError: 1 bytes left unread"
+    },
+    "protobuf": {
+      "new reader, old record": "ok",
+      "old reader, new record": "ok"
+    }
+  }
+}

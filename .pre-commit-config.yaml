@@ -20,6 +20,12 @@ repos:
         language: system
         files: ^agentforge/.*\.py$
         pass_filenames: false
+      - id: event-platform-ruff
+        name: event-platform ruff (lint + format)
+        entry: bash -c 'cd event-platform && uv run --frozen ruff check . && uv run --frozen ruff format .'
+        language: system
+        files: ^event-platform/.*\.py$
+        pass_filenames: false
       - id: agentforge-prettier
         name: agentforge prettier
         entry: bash -c 'cd agentforge && pnpm exec prettier --check .'
