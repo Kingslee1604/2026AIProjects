@@ -1,3 +1,5 @@
+![Event Platform: every AI call metered and billed exactly once. Kafka, Postgres, per-tenant budgets, crash-tested.](docs/images/banner.svg)
+
 # Event Platform: AI usage metering and budget limits on Kafka
 
 [![CI](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml/badge.svg?branch=main)](https://github.com/Kingslee1604/2026AIProjects/actions/workflows/event-platform-ci.yml)
@@ -20,6 +22,10 @@ killing every part of it while it works.
   person.
 - **Measured, not claimed.** Every number below links to its raw results and the machine it ran
   on.
+
+[![Crash test replay: usage records flow through the gateways, Kafka and the workers while a gateway, the totals service and a Kafka broker are killed; afterwards 0 lost, 0 counted twice, 0 out of order](docs/images/crash-replay.gif)](docs/adr/0004-crash-testing.md)
+
+*A real crash-test run, replayed: kill times, stalls and final counts come from its results file (60 s shown in 12 s).*
 
 ## How it works
 

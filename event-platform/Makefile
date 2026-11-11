@@ -3,7 +3,7 @@ SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
 .PHONY: help env setup lint format typecheck test tools security up down logs ps e2e check bench-memory chaos-up chaos-down bench-budget bench-load \
-	crash-stack-up crash-stack-down bench-crash
+	crash-stack-up crash-stack-down bench-crash demo-gif
 
 # The database password lives in .env (git-ignored), created by `make env`.
 -include .env
@@ -83,3 +83,6 @@ crash-stack-down: env ## Remove the crash-test stack and its data (Kafka keeps n
 
 bench-crash: ## Crash harness: broker, worker and gateway kills, frozen DB, replay (crash stack)
 	KAFKA_BOOTSTRAP=$(CRASH_BOOTSTRAP) uv run --frozen python bench/crash.py $(SCENARIOS)
+
+demo-gif: ## Rebuild docs/images/crash-replay.gif from a crash run's results.json
+	uv run --no-project --with pillow==11.3.0 python bench/demo_gif.py
