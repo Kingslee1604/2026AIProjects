@@ -59,14 +59,9 @@ Usage metering and budget limits for AI model calls, built on Kafka. Every call 
 recorded **once**: never lost and never billed twice, even when clients retry and servers crash.
 A call that would go over the tenant's daily token budget is refused **before** it runs.
 
-```mermaid
-flowchart LR
-    app([AI app]) -- "authorize, then record usage" --> gw["Gateways<br/>(any number)"]
-    gw -- "budget slices" --> budget[Budget service] --> pg[(Postgres)]
-    gw -- "acks=all, idempotent" --> kafka[["Kafka<br/>usage.events"]]
-    kafka --> ledger["Ledger writer<br/>(billing)"] --> pg
-    kafka --> totals["Totals service<br/>(Kafka transactions)"] --> live[["Kafka<br/>live totals"]]
-```
+[![Crash test replay: usage records flow through the gateways, Kafka and the workers while a gateway, the totals service and a Kafka broker are killed; afterwards 0 lost, 0 counted twice, 0 out of order](event-platform/docs/images/crash-replay.gif)](event-platform/docs/adr/0004-crash-testing.md)
+
+*A real crash-test run, replayed: kill times, stalls and final counts come from its results file (60 s shown in 12 s).*
 
 - **Tested by breaking it:** a crash harness kills Kafka brokers, gateways and workers, forces
   rebalances and freezes the database. Across 101,000+ records: **0 lost, 0 counted twice, 0 out
